@@ -13,7 +13,7 @@ import (
 )
 
 func Test_Run_SuccessCallRegisteredArgument(t *testing.T) {
-	os.Args = []string{"", "log"}
+	os.Args = []string{"", "-log"}
 
 	c := cmd{}
 
@@ -34,7 +34,7 @@ func Test_Run_SuccessCallRegisteredArgument(t *testing.T) {
 }
 
 func Test_Run_SuccessSkipEmptySpaceAndMatchCommandWithSpace(t *testing.T) {
-	os.Args = []string{"", "", " ", "log"}
+	os.Args = []string{"", "", " ", "-log"}
 
 	c := cmd{}
 
@@ -54,7 +54,7 @@ func Test_Run_SuccessSkipEmptySpaceAndMatchCommandWithSpace(t *testing.T) {
 }
 
 func Test_Run_SuccessCommandWithMultipleParameters(t *testing.T) {
-	os.Args = []string{"", "log", "-param=value", "-b", "-c"}
+	os.Args = []string{"", "-log", "param=value", "-b", "-c"}
 
 	c := cmd{}
 

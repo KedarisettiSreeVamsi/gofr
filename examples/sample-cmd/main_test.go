@@ -20,7 +20,7 @@ func TestCMDRunWithNoArg(t *testing.T) {
 
 func TestCMDRunWithProperArg(t *testing.T) {
 	expResp := "Hello World!"
-	os.Args = []string{"command", "hello"}
+	os.Args = []string{"command", "-hello"}
 
 	output := testutil.StdoutOutputForFunc(main)
 
@@ -31,10 +31,9 @@ func TestCMDRunWithParams(t *testing.T) {
 	expResp := "Hello Vikash!"
 
 	commands := []string{
-		"command params -name=Vikash",
-		"command params   -name=Vikash",
-		"command -name=Vikash params",
-		"command params -name=Vikash -",
+		"command -params name=Vikash",
+		"command -params   name=Vikash",
+		"command -params name=Vikash ",
 	}
 
 	for i, command := range commands {

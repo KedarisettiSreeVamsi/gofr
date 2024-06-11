@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
@@ -99,12 +100,82 @@ func New() *App {
 // NewCMD creates a command-line application.
 func NewCMD() *App {
 	app := &App{}
+
 	app.readConfig(true)
 	app.container = container.NewContainer(nil)
 	app.container.Logger = logging.NewFileLogger(app.Config.Get("CMD_LOGS_FILE"))
-	app.cmd = &cmd{}
+	app.cmd = &cmd{
+		description: app.Config.GetOrDefault("CMD_DESCRIPTION", "a sample command interface"),
+	}
 	app.container.Create(app.Config)
 	app.initTracer()
+
+	app.SubCommand("h", func(_ *Context) (interface{}, error) {
+		resStr := ""
+
+		allRoutes := ""
+
+		descriptor := ""
+
+		patternData := make(map[string]interface{})
+
+		maxPatternLength := 0
+
+		maxFullPatternLength := 0
+
+		for _, router := range app.cmd.routes {
+			if maxPatternLength < len(router.pattern) {
+				maxPatternLength = len(router.pattern)
+			}
+
+			allRoutes += "[-" + router.pattern
+
+			if router.fullPattern != "nil" {
+
+				allRoutes += "|--" + router.fullPattern
+
+				if maxFullPatternLength < len(router.fullPattern) {
+					maxFullPatternLength = len(router.fullPattern)
+				}
+
+			}
+
+			allRoutes += "] "
+
+			patternData[router.pattern] = map[string]interface{}{
+				"fullPattern": router.fullPattern,
+				"helperText":  router.help,
+			}
+		}
+
+		// Generate descriptor
+		for key, val := range patternData {
+			fullPatternInfo := fmt.Sprintf("%s", val.(map[string]interface{})["fullPattern"])
+			helperInfo := fmt.Sprintf("%s", val.(map[string]interface{})["helperText"])
+
+			if fullPatternInfo != "nil" {
+				descriptor += fmt.Sprintf("-%s, --%s%s\t%s\n",
+					key,
+					fullPatternInfo,
+					strings.Repeat(" ", maxPatternLength+maxFullPatternLength-len(key)-len(fullPatternInfo)),
+					helperInfo,
+				)
+			} else {
+				descriptor += fmt.Sprintf("-%s%s\t%s\n",
+					key,
+					strings.Repeat(" ", maxFullPatternLength+maxPatternLength-len(key)),
+					helperInfo,
+				)
+			}
+		}
+
+		caller := filepath.Base(os.Args[0])
+		resStr += fmt.Sprintf("usage: %s %s\n\n", caller, allRoutes)
+		resStr += fmt.Sprintf("%s. \n\n", app.cmd.description)
+		resStr += fmt.Sprintf("options:\n\n%s", descriptor)
+
+		return resStr, nil
+	}, AddHelp("show help and exit the command"), AddFullPattern("help"))
 
 	return app
 }

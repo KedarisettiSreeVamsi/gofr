@@ -78,6 +78,11 @@ This document lists all the configuration options supported by the Gofr framewor
 - Name: CMD_LOGS_FILE
 - Description: File to save the logs in case of a CMD application
 
+---
+
+- Name: CMD_DESCRIPTION
+- Description: Describes the usage of command interface
+
 {% endtable %}
 
 ## Datasource Configs
