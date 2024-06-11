@@ -100,20 +100,30 @@ func (cmd *cmd) Run(c *container.Container) {
 
 func (cmd *cmd) handler(path string) Handler {
 	// Trim leading dashes
-	path = strings.TrimPrefix(strings.TrimPrefix(path, "--"), "-")
+	shortFlag := strings.HasPrefix(path, "-") && !strings.HasPrefix(path, "--")
+
+	fullFlag := strings.HasPrefix(path, "--")
+
+	if shortFlag {
+		path = strings.Trim(path, "-")
+	} else if fullFlag {
+		path = strings.Trim(path, "--")
+	}
 
 	path = strings.Split(path, " ")[0]
 
 	// Iterate over the routes to find a matching handler
 	for _, route := range cmd.routes {
 
-		re := regexp.MustCompile(route.pattern)
+		if shortFlag {
+			re := regexp.MustCompile(route.pattern)
 
-		if cmd.Validate(re.Split(path, -1)) {
-			return route.handler
+			if cmd.Validate(re.Split(path, -1)) {
+				return route.handler
+			}
 		}
 
-		if route.fullPattern != "nil" {
+		if fullFlag && route.fullPattern != "nil" {
 
 			reFullPattern := regexp.MustCompile(route.fullPattern)
 
