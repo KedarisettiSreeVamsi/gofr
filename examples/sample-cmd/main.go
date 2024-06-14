@@ -16,6 +16,7 @@ func main() {
 	},
 		gofr.AddDescription("Print 'Hello World!'"),
 		gofr.AddHelp("hello world option"),
+		gofr.AddFullPattern("hello-world"),
 	)
 
 	// Add a sub-command "params" with its handler, help and description

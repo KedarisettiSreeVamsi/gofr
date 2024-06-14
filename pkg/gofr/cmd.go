@@ -19,6 +19,7 @@ type route struct {
 	handler     Handler
 	description string
 	help        string
+	fullPattern string
 }
 
 type Options func(c *route)
@@ -27,6 +28,15 @@ type ErrCommandNotFound struct{}
 
 func (e ErrCommandNotFound) Error() string {
 	return "No Command Found!"
+}
+
+func (cmd *cmd) Validate(data []string) bool {
+	for _, val := range data {
+		if val != "" {
+			return false
+		}
+	}
+	return true
 }
 
 func (cmd *cmd) Run(c *container.Container) {
@@ -91,15 +101,38 @@ func (cmd *cmd) noCommandResponse(r *route, ctx *Context) bool {
 
 func (cmd *cmd) handler(path string) *route {
 	// Trim leading dashes
-	path = strings.TrimPrefix(strings.TrimPrefix(path, "--"), "-")
+	shortFlag := strings.HasPrefix(path, "-") && !strings.HasPrefix(path, "--")
+
+	fullFlag := strings.HasPrefix(path, "--")
+
+	if shortFlag {
+		path = strings.Trim(path, "-")
+	} else if fullFlag {
+		path = strings.Trim(path, "--")
+	}
+
+	path = strings.Split(path, " ")[0]
 
 	// Iterate over the routes to find a matching handler
-	for _, r := range cmd.routes {
-		re := regexp.MustCompile(r.pattern)
+	for _, route := range cmd.routes {
 
-		if re.MatchString(path) {
-			return &r
+		if shortFlag {
+			re := regexp.MustCompile(route.pattern)
+
+			if cmd.Validate(re.Split(path, -1)) {
+				return &route
+			}
 		}
+
+		if fullFlag && route.fullPattern != "nil" {
+
+			reFullPattern := regexp.MustCompile(route.fullPattern)
+
+			if cmd.Validate(reFullPattern.Split(path, -1)) {
+				return &route
+			}
+		}
+
 	}
 
 	// Return nil if no handler matches
@@ -118,6 +151,14 @@ func AddDescription(descString string) Options {
 func AddHelp(helperString string) Options {
 	return func(r *route) {
 		r.help = helperString
+	}
+}
+
+// AddFullPattern enables full length pattern matching for a given subcommand
+// Like --help for -h,etc.
+func AddFullPattern(fullPatternString string) Options {
+	return func(r *route) {
+		r.fullPattern = fullPatternString
 	}
 }
 
