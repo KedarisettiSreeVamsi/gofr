@@ -100,31 +100,19 @@ func (cmd *cmd) noCommandResponse(r *route, ctx *Context) bool {
 }
 
 func (cmd *cmd) handler(path string) *route {
-	// Trim leading dashes
-	shortFlag := strings.HasPrefix(path, "-") && !strings.HasPrefix(path, "--")
 
-	fullFlag := strings.HasPrefix(path, "--")
-
-	if shortFlag {
-		path = strings.Trim(path, "-")
-	} else if fullFlag {
-		path = strings.Trim(path, "--")
-	}
-
-	path = strings.Split(path, " ")[0]
+	path = strings.TrimSpace(path)
 
 	// Iterate over the routes to find a matching handler
 	for _, route := range cmd.routes {
 
-		if shortFlag {
-			re := regexp.MustCompile(route.pattern)
+		re := regexp.MustCompile(route.pattern)
 
-			if cmd.Validate(re.Split(path, -1)) {
-				return &route
-			}
+		if cmd.Validate(re.Split(path, -1)) {
+			return &route
 		}
 
-		if fullFlag && route.fullPattern != "nil" {
+		if route.fullPattern != "nil" {
 
 			reFullPattern := regexp.MustCompile(route.fullPattern)
 
@@ -183,10 +171,14 @@ func (cmd *cmd) printHelp() {
 
 		if r.description != "" {
 			fmt.Printf("    Description: %s\n", r.description)
+		} else {
+			fmt.Printf("    Description: %s\n", "Not provided")
 		}
 
 		if r.help != "" {
 			fmt.Printf("    Help: %s\n", r.help)
+		} else {
+			fmt.Printf("    Help: %s\n", "Not provided")
 		}
 	}
 }
