@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
@@ -29,6 +30,8 @@ import (
 	"gofr.dev/pkg/gofr/migration"
 	"gofr.dev/pkg/gofr/service"
 )
+
+const defaultPublicStaticDir = "static"
 
 // App is the main application in the GoFr framework.
 type App struct {
@@ -82,7 +85,11 @@ func New() *App {
 
 	app.httpServer = newHTTPServer(app.container, port, middleware.GetConfigs(app.Config))
 
-	// GRPC Server
+	if app.Config.Get("APP_ENV") == "DEBUG" {
+		app.httpServer.RegisterProfilingRoutes()
+	}
+
+	// gRPC Server
 	port, err = strconv.Atoi(app.Config.Get("GRPC_PORT"))
 	if err != nil || port <= 0 {
 		port = defaultGRPCPort
@@ -91,6 +98,14 @@ func New() *App {
 	app.grpcServer = newGRPCServer(app.container, port)
 
 	app.subscriptionManager = newSubscriptionManager(app.container)
+
+	// static fileserver
+	currentWd, _ := os.Getwd()
+	checkDirectory := filepath.Join(currentWd, defaultPublicStaticDir)
+
+	if _, err = os.Stat(checkDirectory); err == nil {
+		app.AddStaticFiles(defaultPublicStaticDir, checkDirectory)
+	}
 
 	return app
 }
@@ -438,4 +453,23 @@ func contains(elems []string, v string) bool {
 	}
 
 	return false
+}
+
+func (a *App) AddStaticFiles(endpoint, filePath string) {
+	a.httpRegistered = true
+
+	// update file path based on current directory if it starts with ./
+	if strings.HasPrefix(filePath, "./") {
+		currentWorkingDir, _ := os.Getwd()
+		filePath = filepath.Join(currentWorkingDir, filePath)
+	}
+
+	endpoint = "/" + strings.TrimPrefix(endpoint, "/")
+
+	if _, err := os.Stat(filePath); err != nil {
+		a.container.Logger.Errorf("error in registering '%s' static endpoint, error: %v", endpoint, err)
+		return
+	}
+
+	a.httpServer.router.AddStaticFiles(endpoint, filePath)
 }
