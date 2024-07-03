@@ -54,7 +54,7 @@ Therefore, GoFr utilizes a pluggable approach for new datasources by separating 
 - Interface Definition:
 
    Create an interface with required methods within the datasource package.
-   Register the interface with the container (similar to Mongo in https://github.com/tfogo/mongodb-go-tutorial).
+   Register the interface with the container (similar to MongoDB in https://github.com/tfogo/mongodb-go-tutorial).
 
 
 - Method Registration:
@@ -70,12 +70,13 @@ Therefore, GoFr utilizes a pluggable approach for new datasources by separating 
 ## Supported Datasources
 
 | Datasource | Health-Check | Logs | Metrics | Traces | As Driver |
-|------------|--------------|------|---------|--------|-----------|
-| MySQL      | ✅            | ✅    | ✅       | ✅      |           |
-| REDIS      | ✅            | ✅    | ✅       | ✅      |           |
-| PostgreSQL | ✅            | ✅    | ✅       | ✅      |           |
-| MongoDB    | ✅            | ✅    | ✅       |        | ✅         |
-| SQLite     | ✅            | ✅    | ✅       | ✅      |           |
-| Cassandra  | ✅            | ✅    | ✅       |        | ✅         | 
+|------------|-----------|------|---------|--------|-----------|
+| MySQL      | ✅         | ✅    | ✅       | ✅      |           |
+| REDIS      | ✅         | ✅    | ✅       | ✅      |           |
+| PostgreSQL | ✅         | ✅    | ✅       | ✅      |           |
+| MongoDB    | ✅         | ✅    | ✅       |        | ✅         |
+| SQLite     | ✅         | ✅    | ✅       | ✅      |           |
+| Cassandra  | ✅         | ✅    | ✅       |        | ✅         |
+| Clickhouse |           | ✅    | ✅       |        | ✅         |
 
 
