@@ -36,6 +36,7 @@ func Run(migrationsMap map[int64]Migrate, c *container.Container) {
 	sortkeys.Int64s(keys)
 
 	ds, mg, ok := getMigrator(c)
+	ds.Logger = c.Logger
 
 	// Returning with an error log as migration would eventually fail as No databases are initialized.
 	// Pub/Sub is considered as initialized if its configurations are given.
@@ -47,7 +48,7 @@ func Run(migrationsMap map[int64]Migrate, c *container.Container) {
 
 	err := mg.checkAndCreateMigrationTable(c)
 	if err != nil {
-		c.Errorf("failed to create gofr_migration table, err: %v", err)
+		c.Fatalf("failed to create gofr_migration table, err: %v", err)
 
 		return
 	}
@@ -74,6 +75,8 @@ func Run(migrationsMap map[int64]Migrate, c *container.Container) {
 
 		err = migrationsMap[currentMigration].UP(ds)
 		if err != nil {
+			c.Logger.Errorf("failed to run migration : [%v], err: %v", currentMigration, err)
+
 			mg.rollback(c, migrationInfo)
 
 			return
@@ -111,7 +114,7 @@ func getMigrator(c *container.Container) (Datasource, migrator, bool) {
 	var (
 		ok bool
 		ds Datasource
-		mg migrator = ds
+		mg migrator = &ds
 	)
 
 	if !isNil(c.SQL) {
@@ -151,10 +154,30 @@ func getMigrator(c *container.Container) (Datasource, migrator, bool) {
 		ds.PubSub = c.PubSub
 	}
 
+	if !isNil(c.Cassandra) {
+		ok = true
+
+		ds.Cassandra = cassandraDS{c.Cassandra}
+
+		mg = cassandraDS{c.Cassandra}.apply(mg)
+
+		c.Debug("initialized data source for Cassandra")
+	}
+
+	if !isNil(c.Mongo) {
+		ok = true
+
+		ds.Mongo = mongoDS{c.Mongo}
+
+		mg = mongoDS{c.Mongo}.apply(mg)
+
+		c.Debug("initialized data source for Mongo")
+	}
+
 	return ds, mg, ok
 }
 
-func isNil(i interface{}) bool {
+func isNil(i any) bool {
 	// Get the value of the interface
 	val := reflect.ValueOf(i)
 

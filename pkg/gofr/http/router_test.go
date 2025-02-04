@@ -1,6 +1,7 @@
 package http
 
 import (
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -12,10 +13,13 @@ import (
 
 	"gofr.dev/pkg/gofr/config"
 	"gofr.dev/pkg/gofr/container"
+	"gofr.dev/pkg/gofr/testutil"
 )
 
 func TestRouter(t *testing.T) {
-	cfg := map[string]string{"HTTP_PORT": "8000", "LOG_LEVEL": "INFO"}
+	port := testutil.GetFreePort(t)
+
+	cfg := map[string]string{"HTTP_PORT": fmt.Sprint(port), "LOG_LEVEL": "INFO"}
 	c := container.NewContainer(config.NewMockConfig(cfg))
 
 	c.Metrics().NewCounter("test-counter", "test")
@@ -24,12 +28,12 @@ func TestRouter(t *testing.T) {
 	router := NewRouter()
 
 	// Add a test handler to the router
-	router.Add("GET", "/test", http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+	router.Add(http.MethodGet, "/test", http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	}))
 
 	// Send a request to the test handler
-	req := httptest.NewRequest("GET", "/test", http.NoBody)
+	req := httptest.NewRequest(http.MethodGet, "/test", http.NoBody)
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
 
@@ -38,7 +42,9 @@ func TestRouter(t *testing.T) {
 }
 
 func TestRouterWithMiddleware(t *testing.T) {
-	cfg := map[string]string{"HTTP_PORT": "8000", "LOG_LEVEL": "INFO"}
+	port := testutil.GetFreePort(t)
+
+	cfg := map[string]string{"HTTP_PORT": fmt.Sprint(port), "LOG_LEVEL": "INFO"}
 	c := container.NewContainer(config.NewMockConfig(cfg))
 
 	c.Metrics().NewCounter("test-counter", "test")
@@ -54,12 +60,12 @@ func TestRouterWithMiddleware(t *testing.T) {
 	})
 
 	// Add a test handler to the router
-	router.Add("GET", "/test", http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+	router.Add(http.MethodGet, "/test", http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	}))
 
 	// Send a request to the test handler
-	req := httptest.NewRequest("GET", "/test", http.NoBody)
+	req := httptest.NewRequest(http.MethodGet, "/test", http.NoBody)
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
 
@@ -71,14 +77,16 @@ func TestRouterWithMiddleware(t *testing.T) {
 }
 
 func TestRouter_AddStaticFiles(t *testing.T) {
-	cfg := map[string]string{"HTTP_PORT": "8000", "LOG_LEVEL": "INFO"}
+	port := testutil.GetFreePort(t)
+
+	cfg := map[string]string{"HTTP_PORT": fmt.Sprint(port), "LOG_LEVEL": "INFO"}
 	_ = container.NewContainer(config.NewMockConfig(cfg))
 
 	createTestFileAndDirectory(t, "testDir")
 
 	defer os.RemoveAll("testDir")
 
-	time.Sleep(1 * time.Second)
+	time.Sleep(100 * time.Millisecond)
 
 	currentWorkingDir, _ := os.Getwd()
 
@@ -87,7 +95,7 @@ func TestRouter_AddStaticFiles(t *testing.T) {
 	router.AddStaticFiles("/gofr", currentWorkingDir+"/testDir")
 
 	// Send a request to the test handler
-	req := httptest.NewRequest("GET", "/gofr/indexTest.html", http.NoBody)
+	req := httptest.NewRequest(http.MethodGet, "/gofr/indexTest.html", http.NoBody)
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
 
@@ -95,7 +103,7 @@ func TestRouter_AddStaticFiles(t *testing.T) {
 	assert.Equal(t, http.StatusOK, rec.Code)
 
 	// Send a request to the test handler
-	req = httptest.NewRequest("GET", "/gofr/openapi.json", http.NoBody)
+	req = httptest.NewRequest(http.MethodGet, "/gofr/openapi.json", http.NoBody)
 	rec = httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
 

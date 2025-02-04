@@ -10,6 +10,7 @@
 package container
 
 import (
+	bytes "bytes"
 	context "context"
 	sql "database/sql"
 	reflect "reflect"
@@ -18,6 +19,7 @@ import (
 	redis "github.com/redis/go-redis/v9"
 	gomock "go.uber.org/mock/gomock"
 	datasource "gofr.dev/pkg/gofr/datasource"
+	pubsub "gofr.dev/pkg/gofr/datasource/pubsub"
 	sql0 "gofr.dev/pkg/gofr/datasource/sql"
 )
 
@@ -25,6 +27,7 @@ import (
 type MockDB struct {
 	ctrl     *gomock.Controller
 	recorder *MockDBMockRecorder
+	isgomock struct{}
 }
 
 // MockDBMockRecorder is the mock recorder for MockDB.
@@ -57,6 +60,20 @@ func (m *MockDB) Begin() (*sql0.Tx, error) {
 func (mr *MockDBMockRecorder) Begin() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Begin", reflect.TypeOf((*MockDB)(nil).Begin))
+}
+
+// Close mocks base method.
+func (m *MockDB) Close() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Close")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Close indicates an expected call of Close.
+func (mr *MockDBMockRecorder) Close() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockDB)(nil).Close))
 }
 
 // Dialect mocks base method.
@@ -241,6 +258,7 @@ func (mr *MockDBMockRecorder) Select(ctx, data, query any, args ...any) *gomock.
 type MockRedis struct {
 	ctrl     *gomock.Controller
 	recorder *MockRedisMockRecorder
+	isgomock struct{}
 }
 
 // MockRedisMockRecorder is the mock recorder for MockRedis.
@@ -803,6 +821,25 @@ func (mr *MockRedisMockRecorder) BitField(ctx, key any, values ...any) *gomock.C
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]any{ctx, key}, values...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BitField", reflect.TypeOf((*MockRedis)(nil).BitField), varargs...)
+}
+
+// BitFieldRO mocks base method.
+func (m *MockRedis) BitFieldRO(ctx context.Context, key string, values ...any) *redis.IntSliceCmd {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, key}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "BitFieldRO", varargs...)
+	ret0, _ := ret[0].(*redis.IntSliceCmd)
+	return ret0
+}
+
+// BitFieldRO indicates an expected call of BitFieldRO.
+func (mr *MockRedisMockRecorder) BitFieldRO(ctx, key any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, key}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BitFieldRO", reflect.TypeOf((*MockRedis)(nil).BitFieldRO), varargs...)
 }
 
 // BitOpAnd mocks base method.
@@ -1404,6 +1441,20 @@ func (m *MockRedis) ClientUnpause(ctx context.Context) *redis.BoolCmd {
 func (mr *MockRedisMockRecorder) ClientUnpause(ctx any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ClientUnpause", reflect.TypeOf((*MockRedis)(nil).ClientUnpause), ctx)
+}
+
+// Close mocks base method.
+func (m *MockRedis) Close() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Close")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Close indicates an expected call of Close.
+func (mr *MockRedisMockRecorder) Close() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockRedis)(nil).Close))
 }
 
 // ClusterAddSlots mocks base method.
@@ -2213,6 +2264,413 @@ func (mr *MockRedisMockRecorder) FCallRo(ctx, function, keys any, args ...any) *
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FCallRo", reflect.TypeOf((*MockRedis)(nil).FCallRo), varargs...)
 }
 
+// FTAggregate mocks base method.
+func (m *MockRedis) FTAggregate(ctx context.Context, index, query string) *redis.MapStringInterfaceCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FTAggregate", ctx, index, query)
+	ret0, _ := ret[0].(*redis.MapStringInterfaceCmd)
+	return ret0
+}
+
+// FTAggregate indicates an expected call of FTAggregate.
+func (mr *MockRedisMockRecorder) FTAggregate(ctx, index, query any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FTAggregate", reflect.TypeOf((*MockRedis)(nil).FTAggregate), ctx, index, query)
+}
+
+// FTAggregateWithArgs mocks base method.
+func (m *MockRedis) FTAggregateWithArgs(ctx context.Context, index, query string, options *redis.FTAggregateOptions) *redis.AggregateCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FTAggregateWithArgs", ctx, index, query, options)
+	ret0, _ := ret[0].(*redis.AggregateCmd)
+	return ret0
+}
+
+// FTAggregateWithArgs indicates an expected call of FTAggregateWithArgs.
+func (mr *MockRedisMockRecorder) FTAggregateWithArgs(ctx, index, query, options any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FTAggregateWithArgs", reflect.TypeOf((*MockRedis)(nil).FTAggregateWithArgs), ctx, index, query, options)
+}
+
+// FTAliasAdd mocks base method.
+func (m *MockRedis) FTAliasAdd(ctx context.Context, index, alias string) *redis.StatusCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FTAliasAdd", ctx, index, alias)
+	ret0, _ := ret[0].(*redis.StatusCmd)
+	return ret0
+}
+
+// FTAliasAdd indicates an expected call of FTAliasAdd.
+func (mr *MockRedisMockRecorder) FTAliasAdd(ctx, index, alias any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FTAliasAdd", reflect.TypeOf((*MockRedis)(nil).FTAliasAdd), ctx, index, alias)
+}
+
+// FTAliasDel mocks base method.
+func (m *MockRedis) FTAliasDel(ctx context.Context, alias string) *redis.StatusCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FTAliasDel", ctx, alias)
+	ret0, _ := ret[0].(*redis.StatusCmd)
+	return ret0
+}
+
+// FTAliasDel indicates an expected call of FTAliasDel.
+func (mr *MockRedisMockRecorder) FTAliasDel(ctx, alias any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FTAliasDel", reflect.TypeOf((*MockRedis)(nil).FTAliasDel), ctx, alias)
+}
+
+// FTAliasUpdate mocks base method.
+func (m *MockRedis) FTAliasUpdate(ctx context.Context, index, alias string) *redis.StatusCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FTAliasUpdate", ctx, index, alias)
+	ret0, _ := ret[0].(*redis.StatusCmd)
+	return ret0
+}
+
+// FTAliasUpdate indicates an expected call of FTAliasUpdate.
+func (mr *MockRedisMockRecorder) FTAliasUpdate(ctx, index, alias any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FTAliasUpdate", reflect.TypeOf((*MockRedis)(nil).FTAliasUpdate), ctx, index, alias)
+}
+
+// FTAlter mocks base method.
+func (m *MockRedis) FTAlter(ctx context.Context, index string, skipInitialScan bool, definition []any) *redis.StatusCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FTAlter", ctx, index, skipInitialScan, definition)
+	ret0, _ := ret[0].(*redis.StatusCmd)
+	return ret0
+}
+
+// FTAlter indicates an expected call of FTAlter.
+func (mr *MockRedisMockRecorder) FTAlter(ctx, index, skipInitialScan, definition any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FTAlter", reflect.TypeOf((*MockRedis)(nil).FTAlter), ctx, index, skipInitialScan, definition)
+}
+
+// FTConfigGet mocks base method.
+func (m *MockRedis) FTConfigGet(ctx context.Context, option string) *redis.MapMapStringInterfaceCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FTConfigGet", ctx, option)
+	ret0, _ := ret[0].(*redis.MapMapStringInterfaceCmd)
+	return ret0
+}
+
+// FTConfigGet indicates an expected call of FTConfigGet.
+func (mr *MockRedisMockRecorder) FTConfigGet(ctx, option any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FTConfigGet", reflect.TypeOf((*MockRedis)(nil).FTConfigGet), ctx, option)
+}
+
+// FTConfigSet mocks base method.
+func (m *MockRedis) FTConfigSet(ctx context.Context, option string, value any) *redis.StatusCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FTConfigSet", ctx, option, value)
+	ret0, _ := ret[0].(*redis.StatusCmd)
+	return ret0
+}
+
+// FTConfigSet indicates an expected call of FTConfigSet.
+func (mr *MockRedisMockRecorder) FTConfigSet(ctx, option, value any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FTConfigSet", reflect.TypeOf((*MockRedis)(nil).FTConfigSet), ctx, option, value)
+}
+
+// FTCreate mocks base method.
+func (m *MockRedis) FTCreate(ctx context.Context, index string, options *redis.FTCreateOptions, schema ...*redis.FieldSchema) *redis.StatusCmd {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, index, options}
+	for _, a := range schema {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "FTCreate", varargs...)
+	ret0, _ := ret[0].(*redis.StatusCmd)
+	return ret0
+}
+
+// FTCreate indicates an expected call of FTCreate.
+func (mr *MockRedisMockRecorder) FTCreate(ctx, index, options any, schema ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, index, options}, schema...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FTCreate", reflect.TypeOf((*MockRedis)(nil).FTCreate), varargs...)
+}
+
+// FTCursorDel mocks base method.
+func (m *MockRedis) FTCursorDel(ctx context.Context, index string, cursorId int) *redis.StatusCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FTCursorDel", ctx, index, cursorId)
+	ret0, _ := ret[0].(*redis.StatusCmd)
+	return ret0
+}
+
+// FTCursorDel indicates an expected call of FTCursorDel.
+func (mr *MockRedisMockRecorder) FTCursorDel(ctx, index, cursorId any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FTCursorDel", reflect.TypeOf((*MockRedis)(nil).FTCursorDel), ctx, index, cursorId)
+}
+
+// FTCursorRead mocks base method.
+func (m *MockRedis) FTCursorRead(ctx context.Context, index string, cursorId, count int) *redis.MapStringInterfaceCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FTCursorRead", ctx, index, cursorId, count)
+	ret0, _ := ret[0].(*redis.MapStringInterfaceCmd)
+	return ret0
+}
+
+// FTCursorRead indicates an expected call of FTCursorRead.
+func (mr *MockRedisMockRecorder) FTCursorRead(ctx, index, cursorId, count any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FTCursorRead", reflect.TypeOf((*MockRedis)(nil).FTCursorRead), ctx, index, cursorId, count)
+}
+
+// FTDictAdd mocks base method.
+func (m *MockRedis) FTDictAdd(ctx context.Context, dict string, term ...any) *redis.IntCmd {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, dict}
+	for _, a := range term {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "FTDictAdd", varargs...)
+	ret0, _ := ret[0].(*redis.IntCmd)
+	return ret0
+}
+
+// FTDictAdd indicates an expected call of FTDictAdd.
+func (mr *MockRedisMockRecorder) FTDictAdd(ctx, dict any, term ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, dict}, term...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FTDictAdd", reflect.TypeOf((*MockRedis)(nil).FTDictAdd), varargs...)
+}
+
+// FTDictDel mocks base method.
+func (m *MockRedis) FTDictDel(ctx context.Context, dict string, term ...any) *redis.IntCmd {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, dict}
+	for _, a := range term {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "FTDictDel", varargs...)
+	ret0, _ := ret[0].(*redis.IntCmd)
+	return ret0
+}
+
+// FTDictDel indicates an expected call of FTDictDel.
+func (mr *MockRedisMockRecorder) FTDictDel(ctx, dict any, term ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, dict}, term...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FTDictDel", reflect.TypeOf((*MockRedis)(nil).FTDictDel), varargs...)
+}
+
+// FTDictDump mocks base method.
+func (m *MockRedis) FTDictDump(ctx context.Context, dict string) *redis.StringSliceCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FTDictDump", ctx, dict)
+	ret0, _ := ret[0].(*redis.StringSliceCmd)
+	return ret0
+}
+
+// FTDictDump indicates an expected call of FTDictDump.
+func (mr *MockRedisMockRecorder) FTDictDump(ctx, dict any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FTDictDump", reflect.TypeOf((*MockRedis)(nil).FTDictDump), ctx, dict)
+}
+
+// FTDropIndex mocks base method.
+func (m *MockRedis) FTDropIndex(ctx context.Context, index string) *redis.StatusCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FTDropIndex", ctx, index)
+	ret0, _ := ret[0].(*redis.StatusCmd)
+	return ret0
+}
+
+// FTDropIndex indicates an expected call of FTDropIndex.
+func (mr *MockRedisMockRecorder) FTDropIndex(ctx, index any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FTDropIndex", reflect.TypeOf((*MockRedis)(nil).FTDropIndex), ctx, index)
+}
+
+// FTDropIndexWithArgs mocks base method.
+func (m *MockRedis) FTDropIndexWithArgs(ctx context.Context, index string, options *redis.FTDropIndexOptions) *redis.StatusCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FTDropIndexWithArgs", ctx, index, options)
+	ret0, _ := ret[0].(*redis.StatusCmd)
+	return ret0
+}
+
+// FTDropIndexWithArgs indicates an expected call of FTDropIndexWithArgs.
+func (mr *MockRedisMockRecorder) FTDropIndexWithArgs(ctx, index, options any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FTDropIndexWithArgs", reflect.TypeOf((*MockRedis)(nil).FTDropIndexWithArgs), ctx, index, options)
+}
+
+// FTExplain mocks base method.
+func (m *MockRedis) FTExplain(ctx context.Context, index, query string) *redis.StringCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FTExplain", ctx, index, query)
+	ret0, _ := ret[0].(*redis.StringCmd)
+	return ret0
+}
+
+// FTExplain indicates an expected call of FTExplain.
+func (mr *MockRedisMockRecorder) FTExplain(ctx, index, query any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FTExplain", reflect.TypeOf((*MockRedis)(nil).FTExplain), ctx, index, query)
+}
+
+// FTExplainWithArgs mocks base method.
+func (m *MockRedis) FTExplainWithArgs(ctx context.Context, index, query string, options *redis.FTExplainOptions) *redis.StringCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FTExplainWithArgs", ctx, index, query, options)
+	ret0, _ := ret[0].(*redis.StringCmd)
+	return ret0
+}
+
+// FTExplainWithArgs indicates an expected call of FTExplainWithArgs.
+func (mr *MockRedisMockRecorder) FTExplainWithArgs(ctx, index, query, options any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FTExplainWithArgs", reflect.TypeOf((*MockRedis)(nil).FTExplainWithArgs), ctx, index, query, options)
+}
+
+// FTInfo mocks base method.
+func (m *MockRedis) FTInfo(ctx context.Context, index string) *redis.FTInfoCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FTInfo", ctx, index)
+	ret0, _ := ret[0].(*redis.FTInfoCmd)
+	return ret0
+}
+
+// FTInfo indicates an expected call of FTInfo.
+func (mr *MockRedisMockRecorder) FTInfo(ctx, index any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FTInfo", reflect.TypeOf((*MockRedis)(nil).FTInfo), ctx, index)
+}
+
+// FTSearch mocks base method.
+func (m *MockRedis) FTSearch(ctx context.Context, index, query string) *redis.FTSearchCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FTSearch", ctx, index, query)
+	ret0, _ := ret[0].(*redis.FTSearchCmd)
+	return ret0
+}
+
+// FTSearch indicates an expected call of FTSearch.
+func (mr *MockRedisMockRecorder) FTSearch(ctx, index, query any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FTSearch", reflect.TypeOf((*MockRedis)(nil).FTSearch), ctx, index, query)
+}
+
+// FTSearchWithArgs mocks base method.
+func (m *MockRedis) FTSearchWithArgs(ctx context.Context, index, query string, options *redis.FTSearchOptions) *redis.FTSearchCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FTSearchWithArgs", ctx, index, query, options)
+	ret0, _ := ret[0].(*redis.FTSearchCmd)
+	return ret0
+}
+
+// FTSearchWithArgs indicates an expected call of FTSearchWithArgs.
+func (mr *MockRedisMockRecorder) FTSearchWithArgs(ctx, index, query, options any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FTSearchWithArgs", reflect.TypeOf((*MockRedis)(nil).FTSearchWithArgs), ctx, index, query, options)
+}
+
+// FTSpellCheck mocks base method.
+func (m *MockRedis) FTSpellCheck(ctx context.Context, index, query string) *redis.FTSpellCheckCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FTSpellCheck", ctx, index, query)
+	ret0, _ := ret[0].(*redis.FTSpellCheckCmd)
+	return ret0
+}
+
+// FTSpellCheck indicates an expected call of FTSpellCheck.
+func (mr *MockRedisMockRecorder) FTSpellCheck(ctx, index, query any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FTSpellCheck", reflect.TypeOf((*MockRedis)(nil).FTSpellCheck), ctx, index, query)
+}
+
+// FTSpellCheckWithArgs mocks base method.
+func (m *MockRedis) FTSpellCheckWithArgs(ctx context.Context, index, query string, options *redis.FTSpellCheckOptions) *redis.FTSpellCheckCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FTSpellCheckWithArgs", ctx, index, query, options)
+	ret0, _ := ret[0].(*redis.FTSpellCheckCmd)
+	return ret0
+}
+
+// FTSpellCheckWithArgs indicates an expected call of FTSpellCheckWithArgs.
+func (mr *MockRedisMockRecorder) FTSpellCheckWithArgs(ctx, index, query, options any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FTSpellCheckWithArgs", reflect.TypeOf((*MockRedis)(nil).FTSpellCheckWithArgs), ctx, index, query, options)
+}
+
+// FTSynDump mocks base method.
+func (m *MockRedis) FTSynDump(ctx context.Context, index string) *redis.FTSynDumpCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FTSynDump", ctx, index)
+	ret0, _ := ret[0].(*redis.FTSynDumpCmd)
+	return ret0
+}
+
+// FTSynDump indicates an expected call of FTSynDump.
+func (mr *MockRedisMockRecorder) FTSynDump(ctx, index any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FTSynDump", reflect.TypeOf((*MockRedis)(nil).FTSynDump), ctx, index)
+}
+
+// FTSynUpdate mocks base method.
+func (m *MockRedis) FTSynUpdate(ctx context.Context, index string, synGroupId any, terms []any) *redis.StatusCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FTSynUpdate", ctx, index, synGroupId, terms)
+	ret0, _ := ret[0].(*redis.StatusCmd)
+	return ret0
+}
+
+// FTSynUpdate indicates an expected call of FTSynUpdate.
+func (mr *MockRedisMockRecorder) FTSynUpdate(ctx, index, synGroupId, terms any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FTSynUpdate", reflect.TypeOf((*MockRedis)(nil).FTSynUpdate), ctx, index, synGroupId, terms)
+}
+
+// FTSynUpdateWithArgs mocks base method.
+func (m *MockRedis) FTSynUpdateWithArgs(ctx context.Context, index string, synGroupId any, options *redis.FTSynUpdateOptions, terms []any) *redis.StatusCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FTSynUpdateWithArgs", ctx, index, synGroupId, options, terms)
+	ret0, _ := ret[0].(*redis.StatusCmd)
+	return ret0
+}
+
+// FTSynUpdateWithArgs indicates an expected call of FTSynUpdateWithArgs.
+func (mr *MockRedisMockRecorder) FTSynUpdateWithArgs(ctx, index, synGroupId, options, terms any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FTSynUpdateWithArgs", reflect.TypeOf((*MockRedis)(nil).FTSynUpdateWithArgs), ctx, index, synGroupId, options, terms)
+}
+
+// FTTagVals mocks base method.
+func (m *MockRedis) FTTagVals(ctx context.Context, index, field string) *redis.StringSliceCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FTTagVals", ctx, index, field)
+	ret0, _ := ret[0].(*redis.StringSliceCmd)
+	return ret0
+}
+
+// FTTagVals indicates an expected call of FTTagVals.
+func (mr *MockRedisMockRecorder) FTTagVals(ctx, index, field any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FTTagVals", reflect.TypeOf((*MockRedis)(nil).FTTagVals), ctx, index, field)
+}
+
+// FT_List mocks base method.
+func (m *MockRedis) FT_List(ctx context.Context) *redis.StringSliceCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FT_List", ctx)
+	ret0, _ := ret[0].(*redis.StringSliceCmd)
+	return ret0
+}
+
+// FT_List indicates an expected call of FT_List.
+func (mr *MockRedisMockRecorder) FT_List(ctx any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FT_List", reflect.TypeOf((*MockRedis)(nil).FT_List), ctx)
+}
+
 // FlushAll mocks base method.
 func (m *MockRedis) FlushAll(ctx context.Context) *redis.StatusCmd {
 	m.ctrl.T.Helper()
@@ -2695,6 +3153,101 @@ func (mr *MockRedisMockRecorder) HExists(ctx, key, field any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HExists", reflect.TypeOf((*MockRedis)(nil).HExists), ctx, key, field)
 }
 
+// HExpire mocks base method.
+func (m *MockRedis) HExpire(ctx context.Context, key string, expiration time.Duration, fields ...string) *redis.IntSliceCmd {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, key, expiration}
+	for _, a := range fields {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "HExpire", varargs...)
+	ret0, _ := ret[0].(*redis.IntSliceCmd)
+	return ret0
+}
+
+// HExpire indicates an expected call of HExpire.
+func (mr *MockRedisMockRecorder) HExpire(ctx, key, expiration any, fields ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, key, expiration}, fields...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HExpire", reflect.TypeOf((*MockRedis)(nil).HExpire), varargs...)
+}
+
+// HExpireAt mocks base method.
+func (m *MockRedis) HExpireAt(ctx context.Context, key string, tm time.Time, fields ...string) *redis.IntSliceCmd {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, key, tm}
+	for _, a := range fields {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "HExpireAt", varargs...)
+	ret0, _ := ret[0].(*redis.IntSliceCmd)
+	return ret0
+}
+
+// HExpireAt indicates an expected call of HExpireAt.
+func (mr *MockRedisMockRecorder) HExpireAt(ctx, key, tm any, fields ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, key, tm}, fields...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HExpireAt", reflect.TypeOf((*MockRedis)(nil).HExpireAt), varargs...)
+}
+
+// HExpireAtWithArgs mocks base method.
+func (m *MockRedis) HExpireAtWithArgs(ctx context.Context, key string, tm time.Time, expirationArgs redis.HExpireArgs, fields ...string) *redis.IntSliceCmd {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, key, tm, expirationArgs}
+	for _, a := range fields {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "HExpireAtWithArgs", varargs...)
+	ret0, _ := ret[0].(*redis.IntSliceCmd)
+	return ret0
+}
+
+// HExpireAtWithArgs indicates an expected call of HExpireAtWithArgs.
+func (mr *MockRedisMockRecorder) HExpireAtWithArgs(ctx, key, tm, expirationArgs any, fields ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, key, tm, expirationArgs}, fields...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HExpireAtWithArgs", reflect.TypeOf((*MockRedis)(nil).HExpireAtWithArgs), varargs...)
+}
+
+// HExpireTime mocks base method.
+func (m *MockRedis) HExpireTime(ctx context.Context, key string, fields ...string) *redis.IntSliceCmd {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, key}
+	for _, a := range fields {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "HExpireTime", varargs...)
+	ret0, _ := ret[0].(*redis.IntSliceCmd)
+	return ret0
+}
+
+// HExpireTime indicates an expected call of HExpireTime.
+func (mr *MockRedisMockRecorder) HExpireTime(ctx, key any, fields ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, key}, fields...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HExpireTime", reflect.TypeOf((*MockRedis)(nil).HExpireTime), varargs...)
+}
+
+// HExpireWithArgs mocks base method.
+func (m *MockRedis) HExpireWithArgs(ctx context.Context, key string, expiration time.Duration, expirationArgs redis.HExpireArgs, fields ...string) *redis.IntSliceCmd {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, key, expiration, expirationArgs}
+	for _, a := range fields {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "HExpireWithArgs", varargs...)
+	ret0, _ := ret[0].(*redis.IntSliceCmd)
+	return ret0
+}
+
+// HExpireWithArgs indicates an expected call of HExpireWithArgs.
+func (mr *MockRedisMockRecorder) HExpireWithArgs(ctx, key, expiration, expirationArgs any, fields ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, key, expiration, expirationArgs}, fields...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HExpireWithArgs", reflect.TypeOf((*MockRedis)(nil).HExpireWithArgs), varargs...)
+}
+
 // HGet mocks base method.
 func (m *MockRedis) HGet(ctx context.Context, key, field string) *redis.StringCmd {
 	m.ctrl.T.Helper()
@@ -2817,6 +3370,139 @@ func (mr *MockRedisMockRecorder) HMSet(ctx, key any, values ...any) *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HMSet", reflect.TypeOf((*MockRedis)(nil).HMSet), varargs...)
 }
 
+// HPExpire mocks base method.
+func (m *MockRedis) HPExpire(ctx context.Context, key string, expiration time.Duration, fields ...string) *redis.IntSliceCmd {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, key, expiration}
+	for _, a := range fields {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "HPExpire", varargs...)
+	ret0, _ := ret[0].(*redis.IntSliceCmd)
+	return ret0
+}
+
+// HPExpire indicates an expected call of HPExpire.
+func (mr *MockRedisMockRecorder) HPExpire(ctx, key, expiration any, fields ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, key, expiration}, fields...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HPExpire", reflect.TypeOf((*MockRedis)(nil).HPExpire), varargs...)
+}
+
+// HPExpireAt mocks base method.
+func (m *MockRedis) HPExpireAt(ctx context.Context, key string, tm time.Time, fields ...string) *redis.IntSliceCmd {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, key, tm}
+	for _, a := range fields {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "HPExpireAt", varargs...)
+	ret0, _ := ret[0].(*redis.IntSliceCmd)
+	return ret0
+}
+
+// HPExpireAt indicates an expected call of HPExpireAt.
+func (mr *MockRedisMockRecorder) HPExpireAt(ctx, key, tm any, fields ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, key, tm}, fields...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HPExpireAt", reflect.TypeOf((*MockRedis)(nil).HPExpireAt), varargs...)
+}
+
+// HPExpireAtWithArgs mocks base method.
+func (m *MockRedis) HPExpireAtWithArgs(ctx context.Context, key string, tm time.Time, expirationArgs redis.HExpireArgs, fields ...string) *redis.IntSliceCmd {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, key, tm, expirationArgs}
+	for _, a := range fields {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "HPExpireAtWithArgs", varargs...)
+	ret0, _ := ret[0].(*redis.IntSliceCmd)
+	return ret0
+}
+
+// HPExpireAtWithArgs indicates an expected call of HPExpireAtWithArgs.
+func (mr *MockRedisMockRecorder) HPExpireAtWithArgs(ctx, key, tm, expirationArgs any, fields ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, key, tm, expirationArgs}, fields...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HPExpireAtWithArgs", reflect.TypeOf((*MockRedis)(nil).HPExpireAtWithArgs), varargs...)
+}
+
+// HPExpireTime mocks base method.
+func (m *MockRedis) HPExpireTime(ctx context.Context, key string, fields ...string) *redis.IntSliceCmd {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, key}
+	for _, a := range fields {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "HPExpireTime", varargs...)
+	ret0, _ := ret[0].(*redis.IntSliceCmd)
+	return ret0
+}
+
+// HPExpireTime indicates an expected call of HPExpireTime.
+func (mr *MockRedisMockRecorder) HPExpireTime(ctx, key any, fields ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, key}, fields...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HPExpireTime", reflect.TypeOf((*MockRedis)(nil).HPExpireTime), varargs...)
+}
+
+// HPExpireWithArgs mocks base method.
+func (m *MockRedis) HPExpireWithArgs(ctx context.Context, key string, expiration time.Duration, expirationArgs redis.HExpireArgs, fields ...string) *redis.IntSliceCmd {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, key, expiration, expirationArgs}
+	for _, a := range fields {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "HPExpireWithArgs", varargs...)
+	ret0, _ := ret[0].(*redis.IntSliceCmd)
+	return ret0
+}
+
+// HPExpireWithArgs indicates an expected call of HPExpireWithArgs.
+func (mr *MockRedisMockRecorder) HPExpireWithArgs(ctx, key, expiration, expirationArgs any, fields ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, key, expiration, expirationArgs}, fields...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HPExpireWithArgs", reflect.TypeOf((*MockRedis)(nil).HPExpireWithArgs), varargs...)
+}
+
+// HPTTL mocks base method.
+func (m *MockRedis) HPTTL(ctx context.Context, key string, fields ...string) *redis.IntSliceCmd {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, key}
+	for _, a := range fields {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "HPTTL", varargs...)
+	ret0, _ := ret[0].(*redis.IntSliceCmd)
+	return ret0
+}
+
+// HPTTL indicates an expected call of HPTTL.
+func (mr *MockRedisMockRecorder) HPTTL(ctx, key any, fields ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, key}, fields...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HPTTL", reflect.TypeOf((*MockRedis)(nil).HPTTL), varargs...)
+}
+
+// HPersist mocks base method.
+func (m *MockRedis) HPersist(ctx context.Context, key string, fields ...string) *redis.IntSliceCmd {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, key}
+	for _, a := range fields {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "HPersist", varargs...)
+	ret0, _ := ret[0].(*redis.IntSliceCmd)
+	return ret0
+}
+
+// HPersist indicates an expected call of HPersist.
+func (mr *MockRedisMockRecorder) HPersist(ctx, key any, fields ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, key}, fields...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HPersist", reflect.TypeOf((*MockRedis)(nil).HPersist), varargs...)
+}
+
 // HRandField mocks base method.
 func (m *MockRedis) HRandField(ctx context.Context, key string, count int) *redis.StringSliceCmd {
 	m.ctrl.T.Helper()
@@ -2859,6 +3545,20 @@ func (mr *MockRedisMockRecorder) HScan(ctx, key, cursor, match, count any) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HScan", reflect.TypeOf((*MockRedis)(nil).HScan), ctx, key, cursor, match, count)
 }
 
+// HScanNoValues mocks base method.
+func (m *MockRedis) HScanNoValues(ctx context.Context, key string, cursor uint64, match string, count int64) *redis.ScanCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HScanNoValues", ctx, key, cursor, match, count)
+	ret0, _ := ret[0].(*redis.ScanCmd)
+	return ret0
+}
+
+// HScanNoValues indicates an expected call of HScanNoValues.
+func (mr *MockRedisMockRecorder) HScanNoValues(ctx, key, cursor, match, count any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HScanNoValues", reflect.TypeOf((*MockRedis)(nil).HScanNoValues), ctx, key, cursor, match, count)
+}
+
 // HSet mocks base method.
 func (m *MockRedis) HSet(ctx context.Context, key string, values ...any) *redis.IntCmd {
 	m.ctrl.T.Helper()
@@ -2890,6 +3590,25 @@ func (m *MockRedis) HSetNX(ctx context.Context, key, field string, value any) *r
 func (mr *MockRedisMockRecorder) HSetNX(ctx, key, field, value any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HSetNX", reflect.TypeOf((*MockRedis)(nil).HSetNX), ctx, key, field, value)
+}
+
+// HTTL mocks base method.
+func (m *MockRedis) HTTL(ctx context.Context, key string, fields ...string) *redis.IntSliceCmd {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, key}
+	for _, a := range fields {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "HTTL", varargs...)
+	ret0, _ := ret[0].(*redis.IntSliceCmd)
+	return ret0
+}
+
+// HTTL indicates an expected call of HTTL.
+func (mr *MockRedisMockRecorder) HTTL(ctx, key any, fields ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, key}, fields...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HTTL", reflect.TypeOf((*MockRedis)(nil).HTTL), varargs...)
 }
 
 // HVals mocks base method.
@@ -7269,6 +7988,7 @@ func (mr *MockRedisMockRecorder) ZUnionWithScores(ctx, store any) *gomock.Call {
 type MockCassandra struct {
 	ctrl     *gomock.Controller
 	recorder *MockCassandraMockRecorder
+	isgomock struct{}
 }
 
 // MockCassandraMockRecorder is the mock recorder for MockCassandra.
@@ -7286,6 +8006,25 @@ func NewMockCassandra(ctrl *gomock.Controller) *MockCassandra {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockCassandra) EXPECT() *MockCassandraMockRecorder {
 	return m.recorder
+}
+
+// BatchQuery mocks base method.
+func (m *MockCassandra) BatchQuery(name, stmt string, values ...any) error {
+	m.ctrl.T.Helper()
+	varargs := []any{name, stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "BatchQuery", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// BatchQuery indicates an expected call of BatchQuery.
+func (mr *MockCassandraMockRecorder) BatchQuery(name, stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{name, stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BatchQuery", reflect.TypeOf((*MockCassandra)(nil).BatchQuery), varargs...)
 }
 
 // Exec mocks base method.
@@ -7327,6 +8066,69 @@ func (mr *MockCassandraMockRecorder) ExecCAS(dest, stmt any, values ...any) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecCAS", reflect.TypeOf((*MockCassandra)(nil).ExecCAS), varargs...)
 }
 
+// ExecuteBatch mocks base method.
+func (m *MockCassandra) ExecuteBatch(name string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ExecuteBatch", name)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ExecuteBatch indicates an expected call of ExecuteBatch.
+func (mr *MockCassandraMockRecorder) ExecuteBatch(name any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecuteBatch", reflect.TypeOf((*MockCassandra)(nil).ExecuteBatch), name)
+}
+
+// ExecuteBatchCAS mocks base method.
+func (m *MockCassandra) ExecuteBatchCAS(name string, dest ...any) (bool, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{name}
+	for _, a := range dest {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ExecuteBatchCAS", varargs...)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ExecuteBatchCAS indicates an expected call of ExecuteBatchCAS.
+func (mr *MockCassandraMockRecorder) ExecuteBatchCAS(name any, dest ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{name}, dest...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecuteBatchCAS", reflect.TypeOf((*MockCassandra)(nil).ExecuteBatchCAS), varargs...)
+}
+
+// HealthCheck mocks base method.
+func (m *MockCassandra) HealthCheck(arg0 context.Context) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HealthCheck", arg0)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HealthCheck indicates an expected call of HealthCheck.
+func (mr *MockCassandraMockRecorder) HealthCheck(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HealthCheck", reflect.TypeOf((*MockCassandra)(nil).HealthCheck), arg0)
+}
+
+// NewBatch mocks base method.
+func (m *MockCassandra) NewBatch(name string, batchType int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NewBatch", name, batchType)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// NewBatch indicates an expected call of NewBatch.
+func (mr *MockCassandraMockRecorder) NewBatch(name, batchType any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewBatch", reflect.TypeOf((*MockCassandra)(nil).NewBatch), name, batchType)
+}
+
 // Query mocks base method.
 func (m *MockCassandra) Query(dest any, stmt string, values ...any) error {
 	m.ctrl.T.Helper()
@@ -7346,10 +8148,791 @@ func (mr *MockCassandraMockRecorder) Query(dest, stmt any, values ...any) *gomoc
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Query", reflect.TypeOf((*MockCassandra)(nil).Query), varargs...)
 }
 
+// MockCassandraBatch is a mock of CassandraBatch interface.
+type MockCassandraBatch struct {
+	ctrl     *gomock.Controller
+	recorder *MockCassandraBatchMockRecorder
+	isgomock struct{}
+}
+
+// MockCassandraBatchMockRecorder is the mock recorder for MockCassandraBatch.
+type MockCassandraBatchMockRecorder struct {
+	mock *MockCassandraBatch
+}
+
+// NewMockCassandraBatch creates a new mock instance.
+func NewMockCassandraBatch(ctrl *gomock.Controller) *MockCassandraBatch {
+	mock := &MockCassandraBatch{ctrl: ctrl}
+	mock.recorder = &MockCassandraBatchMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockCassandraBatch) EXPECT() *MockCassandraBatchMockRecorder {
+	return m.recorder
+}
+
+// BatchQuery mocks base method.
+func (m *MockCassandraBatch) BatchQuery(name, stmt string, values ...any) error {
+	m.ctrl.T.Helper()
+	varargs := []any{name, stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "BatchQuery", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// BatchQuery indicates an expected call of BatchQuery.
+func (mr *MockCassandraBatchMockRecorder) BatchQuery(name, stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{name, stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BatchQuery", reflect.TypeOf((*MockCassandraBatch)(nil).BatchQuery), varargs...)
+}
+
+// ExecuteBatch mocks base method.
+func (m *MockCassandraBatch) ExecuteBatch(name string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ExecuteBatch", name)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ExecuteBatch indicates an expected call of ExecuteBatch.
+func (mr *MockCassandraBatchMockRecorder) ExecuteBatch(name any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecuteBatch", reflect.TypeOf((*MockCassandraBatch)(nil).ExecuteBatch), name)
+}
+
+// ExecuteBatchCAS mocks base method.
+func (m *MockCassandraBatch) ExecuteBatchCAS(name string, dest ...any) (bool, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{name}
+	for _, a := range dest {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ExecuteBatchCAS", varargs...)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ExecuteBatchCAS indicates an expected call of ExecuteBatchCAS.
+func (mr *MockCassandraBatchMockRecorder) ExecuteBatchCAS(name any, dest ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{name}, dest...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecuteBatchCAS", reflect.TypeOf((*MockCassandraBatch)(nil).ExecuteBatchCAS), varargs...)
+}
+
+// MockCassandraWithContext is a mock of CassandraWithContext interface.
+type MockCassandraWithContext struct {
+	ctrl     *gomock.Controller
+	recorder *MockCassandraWithContextMockRecorder
+	isgomock struct{}
+}
+
+// MockCassandraWithContextMockRecorder is the mock recorder for MockCassandraWithContext.
+type MockCassandraWithContextMockRecorder struct {
+	mock *MockCassandraWithContext
+}
+
+// NewMockCassandraWithContext creates a new mock instance.
+func NewMockCassandraWithContext(ctrl *gomock.Controller) *MockCassandraWithContext {
+	mock := &MockCassandraWithContext{ctrl: ctrl}
+	mock.recorder = &MockCassandraWithContextMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockCassandraWithContext) EXPECT() *MockCassandraWithContextMockRecorder {
+	return m.recorder
+}
+
+// BatchQuery mocks base method.
+func (m *MockCassandraWithContext) BatchQuery(name, stmt string, values ...any) error {
+	m.ctrl.T.Helper()
+	varargs := []any{name, stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "BatchQuery", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// BatchQuery indicates an expected call of BatchQuery.
+func (mr *MockCassandraWithContextMockRecorder) BatchQuery(name, stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{name, stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BatchQuery", reflect.TypeOf((*MockCassandraWithContext)(nil).BatchQuery), varargs...)
+}
+
+// BatchQueryWithCtx mocks base method.
+func (m *MockCassandraWithContext) BatchQueryWithCtx(ctx context.Context, name, stmt string, values ...any) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, name, stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "BatchQueryWithCtx", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// BatchQueryWithCtx indicates an expected call of BatchQueryWithCtx.
+func (mr *MockCassandraWithContextMockRecorder) BatchQueryWithCtx(ctx, name, stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, name, stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BatchQueryWithCtx", reflect.TypeOf((*MockCassandraWithContext)(nil).BatchQueryWithCtx), varargs...)
+}
+
+// Exec mocks base method.
+func (m *MockCassandraWithContext) Exec(stmt string, values ...any) error {
+	m.ctrl.T.Helper()
+	varargs := []any{stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Exec", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Exec indicates an expected call of Exec.
+func (mr *MockCassandraWithContextMockRecorder) Exec(stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Exec", reflect.TypeOf((*MockCassandraWithContext)(nil).Exec), varargs...)
+}
+
+// ExecCAS mocks base method.
+func (m *MockCassandraWithContext) ExecCAS(dest any, stmt string, values ...any) (bool, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{dest, stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ExecCAS", varargs...)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ExecCAS indicates an expected call of ExecCAS.
+func (mr *MockCassandraWithContextMockRecorder) ExecCAS(dest, stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{dest, stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecCAS", reflect.TypeOf((*MockCassandraWithContext)(nil).ExecCAS), varargs...)
+}
+
+// ExecCASWithCtx mocks base method.
+func (m *MockCassandraWithContext) ExecCASWithCtx(ctx context.Context, dest any, stmt string, values ...any) (bool, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, dest, stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ExecCASWithCtx", varargs...)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ExecCASWithCtx indicates an expected call of ExecCASWithCtx.
+func (mr *MockCassandraWithContextMockRecorder) ExecCASWithCtx(ctx, dest, stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, dest, stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecCASWithCtx", reflect.TypeOf((*MockCassandraWithContext)(nil).ExecCASWithCtx), varargs...)
+}
+
+// ExecWithCtx mocks base method.
+func (m *MockCassandraWithContext) ExecWithCtx(ctx context.Context, stmt string, values ...any) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ExecWithCtx", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ExecWithCtx indicates an expected call of ExecWithCtx.
+func (mr *MockCassandraWithContextMockRecorder) ExecWithCtx(ctx, stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecWithCtx", reflect.TypeOf((*MockCassandraWithContext)(nil).ExecWithCtx), varargs...)
+}
+
+// ExecuteBatch mocks base method.
+func (m *MockCassandraWithContext) ExecuteBatch(name string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ExecuteBatch", name)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ExecuteBatch indicates an expected call of ExecuteBatch.
+func (mr *MockCassandraWithContextMockRecorder) ExecuteBatch(name any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecuteBatch", reflect.TypeOf((*MockCassandraWithContext)(nil).ExecuteBatch), name)
+}
+
+// ExecuteBatchCAS mocks base method.
+func (m *MockCassandraWithContext) ExecuteBatchCAS(name string, dest ...any) (bool, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{name}
+	for _, a := range dest {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ExecuteBatchCAS", varargs...)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ExecuteBatchCAS indicates an expected call of ExecuteBatchCAS.
+func (mr *MockCassandraWithContextMockRecorder) ExecuteBatchCAS(name any, dest ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{name}, dest...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecuteBatchCAS", reflect.TypeOf((*MockCassandraWithContext)(nil).ExecuteBatchCAS), varargs...)
+}
+
+// ExecuteBatchCASWithCtx mocks base method.
+func (m *MockCassandraWithContext) ExecuteBatchCASWithCtx(ctx context.Context, name string, dest ...any) (bool, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, name}
+	for _, a := range dest {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ExecuteBatchCASWithCtx", varargs...)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ExecuteBatchCASWithCtx indicates an expected call of ExecuteBatchCASWithCtx.
+func (mr *MockCassandraWithContextMockRecorder) ExecuteBatchCASWithCtx(ctx, name any, dest ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, name}, dest...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecuteBatchCASWithCtx", reflect.TypeOf((*MockCassandraWithContext)(nil).ExecuteBatchCASWithCtx), varargs...)
+}
+
+// ExecuteBatchWithCtx mocks base method.
+func (m *MockCassandraWithContext) ExecuteBatchWithCtx(ctx context.Context, name string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ExecuteBatchWithCtx", ctx, name)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ExecuteBatchWithCtx indicates an expected call of ExecuteBatchWithCtx.
+func (mr *MockCassandraWithContextMockRecorder) ExecuteBatchWithCtx(ctx, name any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecuteBatchWithCtx", reflect.TypeOf((*MockCassandraWithContext)(nil).ExecuteBatchWithCtx), ctx, name)
+}
+
+// HealthCheck mocks base method.
+func (m *MockCassandraWithContext) HealthCheck(arg0 context.Context) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HealthCheck", arg0)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HealthCheck indicates an expected call of HealthCheck.
+func (mr *MockCassandraWithContextMockRecorder) HealthCheck(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HealthCheck", reflect.TypeOf((*MockCassandraWithContext)(nil).HealthCheck), arg0)
+}
+
+// NewBatch mocks base method.
+func (m *MockCassandraWithContext) NewBatch(name string, batchType int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NewBatch", name, batchType)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// NewBatch indicates an expected call of NewBatch.
+func (mr *MockCassandraWithContextMockRecorder) NewBatch(name, batchType any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewBatch", reflect.TypeOf((*MockCassandraWithContext)(nil).NewBatch), name, batchType)
+}
+
+// NewBatchWithCtx mocks base method.
+func (m *MockCassandraWithContext) NewBatchWithCtx(ctx context.Context, name string, batchType int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NewBatchWithCtx", ctx, name, batchType)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// NewBatchWithCtx indicates an expected call of NewBatchWithCtx.
+func (mr *MockCassandraWithContextMockRecorder) NewBatchWithCtx(ctx, name, batchType any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewBatchWithCtx", reflect.TypeOf((*MockCassandraWithContext)(nil).NewBatchWithCtx), ctx, name, batchType)
+}
+
+// Query mocks base method.
+func (m *MockCassandraWithContext) Query(dest any, stmt string, values ...any) error {
+	m.ctrl.T.Helper()
+	varargs := []any{dest, stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Query", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Query indicates an expected call of Query.
+func (mr *MockCassandraWithContextMockRecorder) Query(dest, stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{dest, stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Query", reflect.TypeOf((*MockCassandraWithContext)(nil).Query), varargs...)
+}
+
+// QueryWithCtx mocks base method.
+func (m *MockCassandraWithContext) QueryWithCtx(ctx context.Context, dest any, stmt string, values ...any) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, dest, stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "QueryWithCtx", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// QueryWithCtx indicates an expected call of QueryWithCtx.
+func (mr *MockCassandraWithContextMockRecorder) QueryWithCtx(ctx, dest, stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, dest, stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueryWithCtx", reflect.TypeOf((*MockCassandraWithContext)(nil).QueryWithCtx), varargs...)
+}
+
+// MockCassandraBatchWithContext is a mock of CassandraBatchWithContext interface.
+type MockCassandraBatchWithContext struct {
+	ctrl     *gomock.Controller
+	recorder *MockCassandraBatchWithContextMockRecorder
+	isgomock struct{}
+}
+
+// MockCassandraBatchWithContextMockRecorder is the mock recorder for MockCassandraBatchWithContext.
+type MockCassandraBatchWithContextMockRecorder struct {
+	mock *MockCassandraBatchWithContext
+}
+
+// NewMockCassandraBatchWithContext creates a new mock instance.
+func NewMockCassandraBatchWithContext(ctrl *gomock.Controller) *MockCassandraBatchWithContext {
+	mock := &MockCassandraBatchWithContext{ctrl: ctrl}
+	mock.recorder = &MockCassandraBatchWithContextMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockCassandraBatchWithContext) EXPECT() *MockCassandraBatchWithContextMockRecorder {
+	return m.recorder
+}
+
+// BatchQueryWithCtx mocks base method.
+func (m *MockCassandraBatchWithContext) BatchQueryWithCtx(ctx context.Context, name, stmt string, values ...any) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, name, stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "BatchQueryWithCtx", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// BatchQueryWithCtx indicates an expected call of BatchQueryWithCtx.
+func (mr *MockCassandraBatchWithContextMockRecorder) BatchQueryWithCtx(ctx, name, stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, name, stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BatchQueryWithCtx", reflect.TypeOf((*MockCassandraBatchWithContext)(nil).BatchQueryWithCtx), varargs...)
+}
+
+// ExecuteBatchCASWithCtx mocks base method.
+func (m *MockCassandraBatchWithContext) ExecuteBatchCASWithCtx(ctx context.Context, name string, dest ...any) (bool, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, name}
+	for _, a := range dest {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ExecuteBatchCASWithCtx", varargs...)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ExecuteBatchCASWithCtx indicates an expected call of ExecuteBatchCASWithCtx.
+func (mr *MockCassandraBatchWithContextMockRecorder) ExecuteBatchCASWithCtx(ctx, name any, dest ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, name}, dest...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecuteBatchCASWithCtx", reflect.TypeOf((*MockCassandraBatchWithContext)(nil).ExecuteBatchCASWithCtx), varargs...)
+}
+
+// ExecuteBatchWithCtx mocks base method.
+func (m *MockCassandraBatchWithContext) ExecuteBatchWithCtx(ctx context.Context, name string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ExecuteBatchWithCtx", ctx, name)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ExecuteBatchWithCtx indicates an expected call of ExecuteBatchWithCtx.
+func (mr *MockCassandraBatchWithContextMockRecorder) ExecuteBatchWithCtx(ctx, name any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecuteBatchWithCtx", reflect.TypeOf((*MockCassandraBatchWithContext)(nil).ExecuteBatchWithCtx), ctx, name)
+}
+
+// MockCassandraProvider is a mock of CassandraProvider interface.
+type MockCassandraProvider struct {
+	ctrl     *gomock.Controller
+	recorder *MockCassandraProviderMockRecorder
+	isgomock struct{}
+}
+
+// MockCassandraProviderMockRecorder is the mock recorder for MockCassandraProvider.
+type MockCassandraProviderMockRecorder struct {
+	mock *MockCassandraProvider
+}
+
+// NewMockCassandraProvider creates a new mock instance.
+func NewMockCassandraProvider(ctrl *gomock.Controller) *MockCassandraProvider {
+	mock := &MockCassandraProvider{ctrl: ctrl}
+	mock.recorder = &MockCassandraProviderMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockCassandraProvider) EXPECT() *MockCassandraProviderMockRecorder {
+	return m.recorder
+}
+
+// BatchQuery mocks base method.
+func (m *MockCassandraProvider) BatchQuery(name, stmt string, values ...any) error {
+	m.ctrl.T.Helper()
+	varargs := []any{name, stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "BatchQuery", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// BatchQuery indicates an expected call of BatchQuery.
+func (mr *MockCassandraProviderMockRecorder) BatchQuery(name, stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{name, stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BatchQuery", reflect.TypeOf((*MockCassandraProvider)(nil).BatchQuery), varargs...)
+}
+
+// BatchQueryWithCtx mocks base method.
+func (m *MockCassandraProvider) BatchQueryWithCtx(ctx context.Context, name, stmt string, values ...any) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, name, stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "BatchQueryWithCtx", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// BatchQueryWithCtx indicates an expected call of BatchQueryWithCtx.
+func (mr *MockCassandraProviderMockRecorder) BatchQueryWithCtx(ctx, name, stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, name, stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BatchQueryWithCtx", reflect.TypeOf((*MockCassandraProvider)(nil).BatchQueryWithCtx), varargs...)
+}
+
+// Connect mocks base method.
+func (m *MockCassandraProvider) Connect() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Connect")
+}
+
+// Connect indicates an expected call of Connect.
+func (mr *MockCassandraProviderMockRecorder) Connect() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockCassandraProvider)(nil).Connect))
+}
+
+// Exec mocks base method.
+func (m *MockCassandraProvider) Exec(stmt string, values ...any) error {
+	m.ctrl.T.Helper()
+	varargs := []any{stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Exec", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Exec indicates an expected call of Exec.
+func (mr *MockCassandraProviderMockRecorder) Exec(stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Exec", reflect.TypeOf((*MockCassandraProvider)(nil).Exec), varargs...)
+}
+
+// ExecCAS mocks base method.
+func (m *MockCassandraProvider) ExecCAS(dest any, stmt string, values ...any) (bool, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{dest, stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ExecCAS", varargs...)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ExecCAS indicates an expected call of ExecCAS.
+func (mr *MockCassandraProviderMockRecorder) ExecCAS(dest, stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{dest, stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecCAS", reflect.TypeOf((*MockCassandraProvider)(nil).ExecCAS), varargs...)
+}
+
+// ExecCASWithCtx mocks base method.
+func (m *MockCassandraProvider) ExecCASWithCtx(ctx context.Context, dest any, stmt string, values ...any) (bool, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, dest, stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ExecCASWithCtx", varargs...)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ExecCASWithCtx indicates an expected call of ExecCASWithCtx.
+func (mr *MockCassandraProviderMockRecorder) ExecCASWithCtx(ctx, dest, stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, dest, stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecCASWithCtx", reflect.TypeOf((*MockCassandraProvider)(nil).ExecCASWithCtx), varargs...)
+}
+
+// ExecWithCtx mocks base method.
+func (m *MockCassandraProvider) ExecWithCtx(ctx context.Context, stmt string, values ...any) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ExecWithCtx", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ExecWithCtx indicates an expected call of ExecWithCtx.
+func (mr *MockCassandraProviderMockRecorder) ExecWithCtx(ctx, stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecWithCtx", reflect.TypeOf((*MockCassandraProvider)(nil).ExecWithCtx), varargs...)
+}
+
+// ExecuteBatch mocks base method.
+func (m *MockCassandraProvider) ExecuteBatch(name string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ExecuteBatch", name)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ExecuteBatch indicates an expected call of ExecuteBatch.
+func (mr *MockCassandraProviderMockRecorder) ExecuteBatch(name any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecuteBatch", reflect.TypeOf((*MockCassandraProvider)(nil).ExecuteBatch), name)
+}
+
+// ExecuteBatchCAS mocks base method.
+func (m *MockCassandraProvider) ExecuteBatchCAS(name string, dest ...any) (bool, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{name}
+	for _, a := range dest {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ExecuteBatchCAS", varargs...)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ExecuteBatchCAS indicates an expected call of ExecuteBatchCAS.
+func (mr *MockCassandraProviderMockRecorder) ExecuteBatchCAS(name any, dest ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{name}, dest...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecuteBatchCAS", reflect.TypeOf((*MockCassandraProvider)(nil).ExecuteBatchCAS), varargs...)
+}
+
+// ExecuteBatchCASWithCtx mocks base method.
+func (m *MockCassandraProvider) ExecuteBatchCASWithCtx(ctx context.Context, name string, dest ...any) (bool, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, name}
+	for _, a := range dest {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ExecuteBatchCASWithCtx", varargs...)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ExecuteBatchCASWithCtx indicates an expected call of ExecuteBatchCASWithCtx.
+func (mr *MockCassandraProviderMockRecorder) ExecuteBatchCASWithCtx(ctx, name any, dest ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, name}, dest...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecuteBatchCASWithCtx", reflect.TypeOf((*MockCassandraProvider)(nil).ExecuteBatchCASWithCtx), varargs...)
+}
+
+// ExecuteBatchWithCtx mocks base method.
+func (m *MockCassandraProvider) ExecuteBatchWithCtx(ctx context.Context, name string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ExecuteBatchWithCtx", ctx, name)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ExecuteBatchWithCtx indicates an expected call of ExecuteBatchWithCtx.
+func (mr *MockCassandraProviderMockRecorder) ExecuteBatchWithCtx(ctx, name any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecuteBatchWithCtx", reflect.TypeOf((*MockCassandraProvider)(nil).ExecuteBatchWithCtx), ctx, name)
+}
+
+// HealthCheck mocks base method.
+func (m *MockCassandraProvider) HealthCheck(arg0 context.Context) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HealthCheck", arg0)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HealthCheck indicates an expected call of HealthCheck.
+func (mr *MockCassandraProviderMockRecorder) HealthCheck(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HealthCheck", reflect.TypeOf((*MockCassandraProvider)(nil).HealthCheck), arg0)
+}
+
+// NewBatch mocks base method.
+func (m *MockCassandraProvider) NewBatch(name string, batchType int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NewBatch", name, batchType)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// NewBatch indicates an expected call of NewBatch.
+func (mr *MockCassandraProviderMockRecorder) NewBatch(name, batchType any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewBatch", reflect.TypeOf((*MockCassandraProvider)(nil).NewBatch), name, batchType)
+}
+
+// NewBatchWithCtx mocks base method.
+func (m *MockCassandraProvider) NewBatchWithCtx(ctx context.Context, name string, batchType int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NewBatchWithCtx", ctx, name, batchType)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// NewBatchWithCtx indicates an expected call of NewBatchWithCtx.
+func (mr *MockCassandraProviderMockRecorder) NewBatchWithCtx(ctx, name, batchType any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewBatchWithCtx", reflect.TypeOf((*MockCassandraProvider)(nil).NewBatchWithCtx), ctx, name, batchType)
+}
+
+// Query mocks base method.
+func (m *MockCassandraProvider) Query(dest any, stmt string, values ...any) error {
+	m.ctrl.T.Helper()
+	varargs := []any{dest, stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Query", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Query indicates an expected call of Query.
+func (mr *MockCassandraProviderMockRecorder) Query(dest, stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{dest, stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Query", reflect.TypeOf((*MockCassandraProvider)(nil).Query), varargs...)
+}
+
+// QueryWithCtx mocks base method.
+func (m *MockCassandraProvider) QueryWithCtx(ctx context.Context, dest any, stmt string, values ...any) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, dest, stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "QueryWithCtx", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// QueryWithCtx indicates an expected call of QueryWithCtx.
+func (mr *MockCassandraProviderMockRecorder) QueryWithCtx(ctx, dest, stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, dest, stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueryWithCtx", reflect.TypeOf((*MockCassandraProvider)(nil).QueryWithCtx), varargs...)
+}
+
+// UseLogger mocks base method.
+func (m *MockCassandraProvider) UseLogger(logger any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UseLogger", logger)
+}
+
+// UseLogger indicates an expected call of UseLogger.
+func (mr *MockCassandraProviderMockRecorder) UseLogger(logger any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseLogger", reflect.TypeOf((*MockCassandraProvider)(nil).UseLogger), logger)
+}
+
+// UseMetrics mocks base method.
+func (m *MockCassandraProvider) UseMetrics(metrics any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UseMetrics", metrics)
+}
+
+// UseMetrics indicates an expected call of UseMetrics.
+func (mr *MockCassandraProviderMockRecorder) UseMetrics(metrics any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseMetrics", reflect.TypeOf((*MockCassandraProvider)(nil).UseMetrics), metrics)
+}
+
+// UseTracer mocks base method.
+func (m *MockCassandraProvider) UseTracer(tracer any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UseTracer", tracer)
+}
+
+// UseTracer indicates an expected call of UseTracer.
+func (mr *MockCassandraProviderMockRecorder) UseTracer(tracer any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseTracer", reflect.TypeOf((*MockCassandraProvider)(nil).UseTracer), tracer)
+}
+
 // MockClickhouse is a mock of Clickhouse interface.
 type MockClickhouse struct {
 	ctrl     *gomock.Controller
 	recorder *MockClickhouseMockRecorder
+	isgomock struct{}
 }
 
 // MockClickhouseMockRecorder is the mock recorder for MockClickhouse.
@@ -7407,6 +8990,21 @@ func (mr *MockClickhouseMockRecorder) Exec(ctx, query any, args ...any) *gomock.
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Exec", reflect.TypeOf((*MockClickhouse)(nil).Exec), varargs...)
 }
 
+// HealthCheck mocks base method.
+func (m *MockClickhouse) HealthCheck(arg0 context.Context) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HealthCheck", arg0)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HealthCheck indicates an expected call of HealthCheck.
+func (mr *MockClickhouseMockRecorder) HealthCheck(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HealthCheck", reflect.TypeOf((*MockClickhouse)(nil).HealthCheck), arg0)
+}
+
 // Select mocks base method.
 func (m *MockClickhouse) Select(ctx context.Context, dest any, query string, args ...any) error {
 	m.ctrl.T.Helper()
@@ -7430,6 +9028,7 @@ func (mr *MockClickhouseMockRecorder) Select(ctx, dest, query any, args ...any) 
 type MockClickhouseProvider struct {
 	ctrl     *gomock.Controller
 	recorder *MockClickhouseProviderMockRecorder
+	isgomock struct{}
 }
 
 // MockClickhouseProviderMockRecorder is the mock recorder for MockClickhouseProvider.
@@ -7499,6 +9098,21 @@ func (mr *MockClickhouseProviderMockRecorder) Exec(ctx, query any, args ...any) 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Exec", reflect.TypeOf((*MockClickhouseProvider)(nil).Exec), varargs...)
 }
 
+// HealthCheck mocks base method.
+func (m *MockClickhouseProvider) HealthCheck(arg0 context.Context) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HealthCheck", arg0)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HealthCheck indicates an expected call of HealthCheck.
+func (mr *MockClickhouseProviderMockRecorder) HealthCheck(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HealthCheck", reflect.TypeOf((*MockClickhouseProvider)(nil).HealthCheck), arg0)
+}
+
 // Select mocks base method.
 func (m *MockClickhouseProvider) Select(ctx context.Context, dest any, query string, args ...any) error {
 	m.ctrl.T.Helper()
@@ -7542,127 +9156,23 @@ func (mr *MockClickhouseProviderMockRecorder) UseMetrics(metrics any) *gomock.Ca
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseMetrics", reflect.TypeOf((*MockClickhouseProvider)(nil).UseMetrics), metrics)
 }
 
-// MockCassandraProvider is a mock of CassandraProvider interface.
-type MockCassandraProvider struct {
-	ctrl     *gomock.Controller
-	recorder *MockCassandraProviderMockRecorder
-}
-
-// MockCassandraProviderMockRecorder is the mock recorder for MockCassandraProvider.
-type MockCassandraProviderMockRecorder struct {
-	mock *MockCassandraProvider
-}
-
-// NewMockCassandraProvider creates a new mock instance.
-func NewMockCassandraProvider(ctrl *gomock.Controller) *MockCassandraProvider {
-	mock := &MockCassandraProvider{ctrl: ctrl}
-	mock.recorder = &MockCassandraProviderMockRecorder{mock}
-	return mock
-}
-
-// EXPECT returns an object that allows the caller to indicate expected use.
-func (m *MockCassandraProvider) EXPECT() *MockCassandraProviderMockRecorder {
-	return m.recorder
-}
-
-// Connect mocks base method.
-func (m *MockCassandraProvider) Connect() {
+// UseTracer mocks base method.
+func (m *MockClickhouseProvider) UseTracer(tracer any) {
 	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "Connect")
+	m.ctrl.Call(m, "UseTracer", tracer)
 }
 
-// Connect indicates an expected call of Connect.
-func (mr *MockCassandraProviderMockRecorder) Connect() *gomock.Call {
+// UseTracer indicates an expected call of UseTracer.
+func (mr *MockClickhouseProviderMockRecorder) UseTracer(tracer any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockCassandraProvider)(nil).Connect))
-}
-
-// Exec mocks base method.
-func (m *MockCassandraProvider) Exec(stmt string, values ...any) error {
-	m.ctrl.T.Helper()
-	varargs := []any{stmt}
-	for _, a := range values {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "Exec", varargs...)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// Exec indicates an expected call of Exec.
-func (mr *MockCassandraProviderMockRecorder) Exec(stmt any, values ...any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{stmt}, values...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Exec", reflect.TypeOf((*MockCassandraProvider)(nil).Exec), varargs...)
-}
-
-// ExecCAS mocks base method.
-func (m *MockCassandraProvider) ExecCAS(dest any, stmt string, values ...any) (bool, error) {
-	m.ctrl.T.Helper()
-	varargs := []any{dest, stmt}
-	for _, a := range values {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "ExecCAS", varargs...)
-	ret0, _ := ret[0].(bool)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// ExecCAS indicates an expected call of ExecCAS.
-func (mr *MockCassandraProviderMockRecorder) ExecCAS(dest, stmt any, values ...any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{dest, stmt}, values...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecCAS", reflect.TypeOf((*MockCassandraProvider)(nil).ExecCAS), varargs...)
-}
-
-// Query mocks base method.
-func (m *MockCassandraProvider) Query(dest any, stmt string, values ...any) error {
-	m.ctrl.T.Helper()
-	varargs := []any{dest, stmt}
-	for _, a := range values {
-		varargs = append(varargs, a)
-	}
-	ret := m.ctrl.Call(m, "Query", varargs...)
-	ret0, _ := ret[0].(error)
-	return ret0
-}
-
-// Query indicates an expected call of Query.
-func (mr *MockCassandraProviderMockRecorder) Query(dest, stmt any, values ...any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	varargs := append([]any{dest, stmt}, values...)
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Query", reflect.TypeOf((*MockCassandraProvider)(nil).Query), varargs...)
-}
-
-// UseLogger mocks base method.
-func (m *MockCassandraProvider) UseLogger(logger any) {
-	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "UseLogger", logger)
-}
-
-// UseLogger indicates an expected call of UseLogger.
-func (mr *MockCassandraProviderMockRecorder) UseLogger(logger any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseLogger", reflect.TypeOf((*MockCassandraProvider)(nil).UseLogger), logger)
-}
-
-// UseMetrics mocks base method.
-func (m *MockCassandraProvider) UseMetrics(metrics any) {
-	m.ctrl.T.Helper()
-	m.ctrl.Call(m, "UseMetrics", metrics)
-}
-
-// UseMetrics indicates an expected call of UseMetrics.
-func (mr *MockCassandraProviderMockRecorder) UseMetrics(metrics any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseMetrics", reflect.TypeOf((*MockCassandraProvider)(nil).UseMetrics), metrics)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseTracer", reflect.TypeOf((*MockClickhouseProvider)(nil).UseTracer), tracer)
 }
 
 // MockMongo is a mock of Mongo interface.
 type MockMongo struct {
 	ctrl     *gomock.Controller
 	recorder *MockMongoMockRecorder
+	isgomock struct{}
 }
 
 // MockMongoMockRecorder is the mock recorder for MockMongo.
@@ -7695,6 +9205,20 @@ func (m *MockMongo) CountDocuments(ctx context.Context, collection string, filte
 func (mr *MockMongoMockRecorder) CountDocuments(ctx, collection, filter any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CountDocuments", reflect.TypeOf((*MockMongo)(nil).CountDocuments), ctx, collection, filter)
+}
+
+// CreateCollection mocks base method.
+func (m *MockMongo) CreateCollection(ctx context.Context, name string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateCollection", ctx, name)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateCollection indicates an expected call of CreateCollection.
+func (mr *MockMongoMockRecorder) CreateCollection(ctx, name any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCollection", reflect.TypeOf((*MockMongo)(nil).CreateCollection), ctx, name)
 }
 
 // DeleteMany mocks base method.
@@ -7769,6 +9293,21 @@ func (mr *MockMongoMockRecorder) FindOne(ctx, collection, filter, result any) *g
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindOne", reflect.TypeOf((*MockMongo)(nil).FindOne), ctx, collection, filter, result)
 }
 
+// HealthCheck mocks base method.
+func (m *MockMongo) HealthCheck(arg0 context.Context) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HealthCheck", arg0)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HealthCheck indicates an expected call of HealthCheck.
+func (mr *MockMongoMockRecorder) HealthCheck(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HealthCheck", reflect.TypeOf((*MockMongo)(nil).HealthCheck), arg0)
+}
+
 // InsertMany mocks base method.
 func (m *MockMongo) InsertMany(ctx context.Context, collection string, documents []any) ([]any, error) {
 	m.ctrl.T.Helper()
@@ -7797,6 +9336,21 @@ func (m *MockMongo) InsertOne(ctx context.Context, collection string, document a
 func (mr *MockMongoMockRecorder) InsertOne(ctx, collection, document any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertOne", reflect.TypeOf((*MockMongo)(nil).InsertOne), ctx, collection, document)
+}
+
+// StartSession mocks base method.
+func (m *MockMongo) StartSession() (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "StartSession")
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// StartSession indicates an expected call of StartSession.
+func (mr *MockMongoMockRecorder) StartSession() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartSession", reflect.TypeOf((*MockMongo)(nil).StartSession))
 }
 
 // UpdateByID mocks base method.
@@ -7843,10 +9397,89 @@ func (mr *MockMongoMockRecorder) UpdateOne(ctx, collection, filter, update any) 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateOne", reflect.TypeOf((*MockMongo)(nil).UpdateOne), ctx, collection, filter, update)
 }
 
+// MockTransaction is a mock of Transaction interface.
+type MockTransaction struct {
+	ctrl     *gomock.Controller
+	recorder *MockTransactionMockRecorder
+	isgomock struct{}
+}
+
+// MockTransactionMockRecorder is the mock recorder for MockTransaction.
+type MockTransactionMockRecorder struct {
+	mock *MockTransaction
+}
+
+// NewMockTransaction creates a new mock instance.
+func NewMockTransaction(ctrl *gomock.Controller) *MockTransaction {
+	mock := &MockTransaction{ctrl: ctrl}
+	mock.recorder = &MockTransactionMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockTransaction) EXPECT() *MockTransactionMockRecorder {
+	return m.recorder
+}
+
+// AbortTransaction mocks base method.
+func (m *MockTransaction) AbortTransaction(arg0 context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AbortTransaction", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AbortTransaction indicates an expected call of AbortTransaction.
+func (mr *MockTransactionMockRecorder) AbortTransaction(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AbortTransaction", reflect.TypeOf((*MockTransaction)(nil).AbortTransaction), arg0)
+}
+
+// CommitTransaction mocks base method.
+func (m *MockTransaction) CommitTransaction(arg0 context.Context) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CommitTransaction", arg0)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CommitTransaction indicates an expected call of CommitTransaction.
+func (mr *MockTransactionMockRecorder) CommitTransaction(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CommitTransaction", reflect.TypeOf((*MockTransaction)(nil).CommitTransaction), arg0)
+}
+
+// EndSession mocks base method.
+func (m *MockTransaction) EndSession(arg0 context.Context) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "EndSession", arg0)
+}
+
+// EndSession indicates an expected call of EndSession.
+func (mr *MockTransactionMockRecorder) EndSession(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "EndSession", reflect.TypeOf((*MockTransaction)(nil).EndSession), arg0)
+}
+
+// StartTransaction mocks base method.
+func (m *MockTransaction) StartTransaction() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "StartTransaction")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// StartTransaction indicates an expected call of StartTransaction.
+func (mr *MockTransactionMockRecorder) StartTransaction() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartTransaction", reflect.TypeOf((*MockTransaction)(nil).StartTransaction))
+}
+
 // MockMongoProvider is a mock of MongoProvider interface.
 type MockMongoProvider struct {
 	ctrl     *gomock.Controller
 	recorder *MockMongoProviderMockRecorder
+	isgomock struct{}
 }
 
 // MockMongoProviderMockRecorder is the mock recorder for MockMongoProvider.
@@ -7891,6 +9524,20 @@ func (m *MockMongoProvider) CountDocuments(ctx context.Context, collection strin
 func (mr *MockMongoProviderMockRecorder) CountDocuments(ctx, collection, filter any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CountDocuments", reflect.TypeOf((*MockMongoProvider)(nil).CountDocuments), ctx, collection, filter)
+}
+
+// CreateCollection mocks base method.
+func (m *MockMongoProvider) CreateCollection(ctx context.Context, name string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateCollection", ctx, name)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateCollection indicates an expected call of CreateCollection.
+func (mr *MockMongoProviderMockRecorder) CreateCollection(ctx, name any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCollection", reflect.TypeOf((*MockMongoProvider)(nil).CreateCollection), ctx, name)
 }
 
 // DeleteMany mocks base method.
@@ -7965,6 +9612,21 @@ func (mr *MockMongoProviderMockRecorder) FindOne(ctx, collection, filter, result
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindOne", reflect.TypeOf((*MockMongoProvider)(nil).FindOne), ctx, collection, filter, result)
 }
 
+// HealthCheck mocks base method.
+func (m *MockMongoProvider) HealthCheck(arg0 context.Context) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HealthCheck", arg0)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HealthCheck indicates an expected call of HealthCheck.
+func (mr *MockMongoProviderMockRecorder) HealthCheck(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HealthCheck", reflect.TypeOf((*MockMongoProvider)(nil).HealthCheck), arg0)
+}
+
 // InsertMany mocks base method.
 func (m *MockMongoProvider) InsertMany(ctx context.Context, collection string, documents []any) ([]any, error) {
 	m.ctrl.T.Helper()
@@ -7993,6 +9655,21 @@ func (m *MockMongoProvider) InsertOne(ctx context.Context, collection string, do
 func (mr *MockMongoProviderMockRecorder) InsertOne(ctx, collection, document any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "InsertOne", reflect.TypeOf((*MockMongoProvider)(nil).InsertOne), ctx, collection, document)
+}
+
+// StartSession mocks base method.
+func (m *MockMongoProvider) StartSession() (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "StartSession")
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// StartSession indicates an expected call of StartSession.
+func (mr *MockMongoProviderMockRecorder) StartSession() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "StartSession", reflect.TypeOf((*MockMongoProvider)(nil).StartSession))
 }
 
 // UpdateByID mocks base method.
@@ -8063,10 +9740,23 @@ func (mr *MockMongoProviderMockRecorder) UseMetrics(metrics any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseMetrics", reflect.TypeOf((*MockMongoProvider)(nil).UseMetrics), metrics)
 }
 
+// UseTracer mocks base method.
+func (m *MockMongoProvider) UseTracer(tracer any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UseTracer", tracer)
+}
+
+// UseTracer indicates an expected call of UseTracer.
+func (mr *MockMongoProviderMockRecorder) UseTracer(tracer any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseTracer", reflect.TypeOf((*MockMongoProvider)(nil).UseTracer), tracer)
+}
+
 // Mockprovider is a mock of provider interface.
 type Mockprovider struct {
 	ctrl     *gomock.Controller
 	recorder *MockproviderMockRecorder
+	isgomock struct{}
 }
 
 // MockproviderMockRecorder is the mock recorder for Mockprovider.
@@ -8120,4 +9810,1948 @@ func (m *Mockprovider) UseMetrics(metrics any) {
 func (mr *MockproviderMockRecorder) UseMetrics(metrics any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseMetrics", reflect.TypeOf((*Mockprovider)(nil).UseMetrics), metrics)
+}
+
+// UseTracer mocks base method.
+func (m *Mockprovider) UseTracer(tracer any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UseTracer", tracer)
+}
+
+// UseTracer indicates an expected call of UseTracer.
+func (mr *MockproviderMockRecorder) UseTracer(tracer any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseTracer", reflect.TypeOf((*Mockprovider)(nil).UseTracer), tracer)
+}
+
+// MockHealthChecker is a mock of HealthChecker interface.
+type MockHealthChecker struct {
+	ctrl     *gomock.Controller
+	recorder *MockHealthCheckerMockRecorder
+	isgomock struct{}
+}
+
+// MockHealthCheckerMockRecorder is the mock recorder for MockHealthChecker.
+type MockHealthCheckerMockRecorder struct {
+	mock *MockHealthChecker
+}
+
+// NewMockHealthChecker creates a new mock instance.
+func NewMockHealthChecker(ctrl *gomock.Controller) *MockHealthChecker {
+	mock := &MockHealthChecker{ctrl: ctrl}
+	mock.recorder = &MockHealthCheckerMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockHealthChecker) EXPECT() *MockHealthCheckerMockRecorder {
+	return m.recorder
+}
+
+// HealthCheck mocks base method.
+func (m *MockHealthChecker) HealthCheck(arg0 context.Context) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HealthCheck", arg0)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HealthCheck indicates an expected call of HealthCheck.
+func (mr *MockHealthCheckerMockRecorder) HealthCheck(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HealthCheck", reflect.TypeOf((*MockHealthChecker)(nil).HealthCheck), arg0)
+}
+
+// MockKVStore is a mock of KVStore interface.
+type MockKVStore struct {
+	ctrl     *gomock.Controller
+	recorder *MockKVStoreMockRecorder
+	isgomock struct{}
+}
+
+// MockKVStoreMockRecorder is the mock recorder for MockKVStore.
+type MockKVStoreMockRecorder struct {
+	mock *MockKVStore
+}
+
+// NewMockKVStore creates a new mock instance.
+func NewMockKVStore(ctrl *gomock.Controller) *MockKVStore {
+	mock := &MockKVStore{ctrl: ctrl}
+	mock.recorder = &MockKVStoreMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockKVStore) EXPECT() *MockKVStoreMockRecorder {
+	return m.recorder
+}
+
+// Delete mocks base method.
+func (m *MockKVStore) Delete(ctx context.Context, key string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Delete", ctx, key)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Delete indicates an expected call of Delete.
+func (mr *MockKVStoreMockRecorder) Delete(ctx, key any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockKVStore)(nil).Delete), ctx, key)
+}
+
+// Get mocks base method.
+func (m *MockKVStore) Get(ctx context.Context, key string) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Get", ctx, key)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Get indicates an expected call of Get.
+func (mr *MockKVStoreMockRecorder) Get(ctx, key any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockKVStore)(nil).Get), ctx, key)
+}
+
+// HealthCheck mocks base method.
+func (m *MockKVStore) HealthCheck(arg0 context.Context) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HealthCheck", arg0)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HealthCheck indicates an expected call of HealthCheck.
+func (mr *MockKVStoreMockRecorder) HealthCheck(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HealthCheck", reflect.TypeOf((*MockKVStore)(nil).HealthCheck), arg0)
+}
+
+// Set mocks base method.
+func (m *MockKVStore) Set(ctx context.Context, key, value string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Set", ctx, key, value)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Set indicates an expected call of Set.
+func (mr *MockKVStoreMockRecorder) Set(ctx, key, value any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Set", reflect.TypeOf((*MockKVStore)(nil).Set), ctx, key, value)
+}
+
+// MockKVStoreProvider is a mock of KVStoreProvider interface.
+type MockKVStoreProvider struct {
+	ctrl     *gomock.Controller
+	recorder *MockKVStoreProviderMockRecorder
+	isgomock struct{}
+}
+
+// MockKVStoreProviderMockRecorder is the mock recorder for MockKVStoreProvider.
+type MockKVStoreProviderMockRecorder struct {
+	mock *MockKVStoreProvider
+}
+
+// NewMockKVStoreProvider creates a new mock instance.
+func NewMockKVStoreProvider(ctrl *gomock.Controller) *MockKVStoreProvider {
+	mock := &MockKVStoreProvider{ctrl: ctrl}
+	mock.recorder = &MockKVStoreProviderMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockKVStoreProvider) EXPECT() *MockKVStoreProviderMockRecorder {
+	return m.recorder
+}
+
+// Connect mocks base method.
+func (m *MockKVStoreProvider) Connect() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Connect")
+}
+
+// Connect indicates an expected call of Connect.
+func (mr *MockKVStoreProviderMockRecorder) Connect() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockKVStoreProvider)(nil).Connect))
+}
+
+// Delete mocks base method.
+func (m *MockKVStoreProvider) Delete(ctx context.Context, key string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Delete", ctx, key)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Delete indicates an expected call of Delete.
+func (mr *MockKVStoreProviderMockRecorder) Delete(ctx, key any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockKVStoreProvider)(nil).Delete), ctx, key)
+}
+
+// Get mocks base method.
+func (m *MockKVStoreProvider) Get(ctx context.Context, key string) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Get", ctx, key)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Get indicates an expected call of Get.
+func (mr *MockKVStoreProviderMockRecorder) Get(ctx, key any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Get", reflect.TypeOf((*MockKVStoreProvider)(nil).Get), ctx, key)
+}
+
+// HealthCheck mocks base method.
+func (m *MockKVStoreProvider) HealthCheck(arg0 context.Context) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HealthCheck", arg0)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HealthCheck indicates an expected call of HealthCheck.
+func (mr *MockKVStoreProviderMockRecorder) HealthCheck(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HealthCheck", reflect.TypeOf((*MockKVStoreProvider)(nil).HealthCheck), arg0)
+}
+
+// Set mocks base method.
+func (m *MockKVStoreProvider) Set(ctx context.Context, key, value string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Set", ctx, key, value)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Set indicates an expected call of Set.
+func (mr *MockKVStoreProviderMockRecorder) Set(ctx, key, value any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Set", reflect.TypeOf((*MockKVStoreProvider)(nil).Set), ctx, key, value)
+}
+
+// UseLogger mocks base method.
+func (m *MockKVStoreProvider) UseLogger(logger any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UseLogger", logger)
+}
+
+// UseLogger indicates an expected call of UseLogger.
+func (mr *MockKVStoreProviderMockRecorder) UseLogger(logger any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseLogger", reflect.TypeOf((*MockKVStoreProvider)(nil).UseLogger), logger)
+}
+
+// UseMetrics mocks base method.
+func (m *MockKVStoreProvider) UseMetrics(metrics any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UseMetrics", metrics)
+}
+
+// UseMetrics indicates an expected call of UseMetrics.
+func (mr *MockKVStoreProviderMockRecorder) UseMetrics(metrics any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseMetrics", reflect.TypeOf((*MockKVStoreProvider)(nil).UseMetrics), metrics)
+}
+
+// UseTracer mocks base method.
+func (m *MockKVStoreProvider) UseTracer(tracer any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UseTracer", tracer)
+}
+
+// UseTracer indicates an expected call of UseTracer.
+func (mr *MockKVStoreProviderMockRecorder) UseTracer(tracer any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseTracer", reflect.TypeOf((*MockKVStoreProvider)(nil).UseTracer), tracer)
+}
+
+// MockPubSubProvider is a mock of PubSubProvider interface.
+type MockPubSubProvider struct {
+	ctrl     *gomock.Controller
+	recorder *MockPubSubProviderMockRecorder
+	isgomock struct{}
+}
+
+// MockPubSubProviderMockRecorder is the mock recorder for MockPubSubProvider.
+type MockPubSubProviderMockRecorder struct {
+	mock *MockPubSubProvider
+}
+
+// NewMockPubSubProvider creates a new mock instance.
+func NewMockPubSubProvider(ctrl *gomock.Controller) *MockPubSubProvider {
+	mock := &MockPubSubProvider{ctrl: ctrl}
+	mock.recorder = &MockPubSubProviderMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockPubSubProvider) EXPECT() *MockPubSubProviderMockRecorder {
+	return m.recorder
+}
+
+// Close mocks base method.
+func (m *MockPubSubProvider) Close() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Close")
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Close indicates an expected call of Close.
+func (mr *MockPubSubProviderMockRecorder) Close() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockPubSubProvider)(nil).Close))
+}
+
+// Connect mocks base method.
+func (m *MockPubSubProvider) Connect() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Connect")
+}
+
+// Connect indicates an expected call of Connect.
+func (mr *MockPubSubProviderMockRecorder) Connect() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockPubSubProvider)(nil).Connect))
+}
+
+// CreateTopic mocks base method.
+func (m *MockPubSubProvider) CreateTopic(context context.Context, name string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateTopic", context, name)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateTopic indicates an expected call of CreateTopic.
+func (mr *MockPubSubProviderMockRecorder) CreateTopic(context, name any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateTopic", reflect.TypeOf((*MockPubSubProvider)(nil).CreateTopic), context, name)
+}
+
+// DeleteTopic mocks base method.
+func (m *MockPubSubProvider) DeleteTopic(context context.Context, name string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteTopic", context, name)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteTopic indicates an expected call of DeleteTopic.
+func (mr *MockPubSubProviderMockRecorder) DeleteTopic(context, name any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteTopic", reflect.TypeOf((*MockPubSubProvider)(nil).DeleteTopic), context, name)
+}
+
+// Health mocks base method.
+func (m *MockPubSubProvider) Health() datasource.Health {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Health")
+	ret0, _ := ret[0].(datasource.Health)
+	return ret0
+}
+
+// Health indicates an expected call of Health.
+func (mr *MockPubSubProviderMockRecorder) Health() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Health", reflect.TypeOf((*MockPubSubProvider)(nil).Health))
+}
+
+// Publish mocks base method.
+func (m *MockPubSubProvider) Publish(ctx context.Context, topic string, message []byte) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Publish", ctx, topic, message)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Publish indicates an expected call of Publish.
+func (mr *MockPubSubProviderMockRecorder) Publish(ctx, topic, message any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Publish", reflect.TypeOf((*MockPubSubProvider)(nil).Publish), ctx, topic, message)
+}
+
+// Subscribe mocks base method.
+func (m *MockPubSubProvider) Subscribe(ctx context.Context, topic string) (*pubsub.Message, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Subscribe", ctx, topic)
+	ret0, _ := ret[0].(*pubsub.Message)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Subscribe indicates an expected call of Subscribe.
+func (mr *MockPubSubProviderMockRecorder) Subscribe(ctx, topic any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Subscribe", reflect.TypeOf((*MockPubSubProvider)(nil).Subscribe), ctx, topic)
+}
+
+// UseLogger mocks base method.
+func (m *MockPubSubProvider) UseLogger(logger any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UseLogger", logger)
+}
+
+// UseLogger indicates an expected call of UseLogger.
+func (mr *MockPubSubProviderMockRecorder) UseLogger(logger any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseLogger", reflect.TypeOf((*MockPubSubProvider)(nil).UseLogger), logger)
+}
+
+// UseMetrics mocks base method.
+func (m *MockPubSubProvider) UseMetrics(metrics any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UseMetrics", metrics)
+}
+
+// UseMetrics indicates an expected call of UseMetrics.
+func (mr *MockPubSubProviderMockRecorder) UseMetrics(metrics any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseMetrics", reflect.TypeOf((*MockPubSubProvider)(nil).UseMetrics), metrics)
+}
+
+// UseTracer mocks base method.
+func (m *MockPubSubProvider) UseTracer(tracer any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UseTracer", tracer)
+}
+
+// UseTracer indicates an expected call of UseTracer.
+func (mr *MockPubSubProviderMockRecorder) UseTracer(tracer any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseTracer", reflect.TypeOf((*MockPubSubProvider)(nil).UseTracer), tracer)
+}
+
+// MockSolr is a mock of Solr interface.
+type MockSolr struct {
+	ctrl     *gomock.Controller
+	recorder *MockSolrMockRecorder
+	isgomock struct{}
+}
+
+// MockSolrMockRecorder is the mock recorder for MockSolr.
+type MockSolrMockRecorder struct {
+	mock *MockSolr
+}
+
+// NewMockSolr creates a new mock instance.
+func NewMockSolr(ctrl *gomock.Controller) *MockSolr {
+	mock := &MockSolr{ctrl: ctrl}
+	mock.recorder = &MockSolrMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockSolr) EXPECT() *MockSolrMockRecorder {
+	return m.recorder
+}
+
+// AddField mocks base method.
+func (m *MockSolr) AddField(ctx context.Context, collection string, document *bytes.Buffer) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddField", ctx, collection, document)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AddField indicates an expected call of AddField.
+func (mr *MockSolrMockRecorder) AddField(ctx, collection, document any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddField", reflect.TypeOf((*MockSolr)(nil).AddField), ctx, collection, document)
+}
+
+// Create mocks base method.
+func (m *MockSolr) Create(ctx context.Context, collection string, document *bytes.Buffer, params map[string]any) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Create", ctx, collection, document, params)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Create indicates an expected call of Create.
+func (mr *MockSolrMockRecorder) Create(ctx, collection, document, params any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockSolr)(nil).Create), ctx, collection, document, params)
+}
+
+// Delete mocks base method.
+func (m *MockSolr) Delete(ctx context.Context, collection string, document *bytes.Buffer, params map[string]any) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Delete", ctx, collection, document, params)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Delete indicates an expected call of Delete.
+func (mr *MockSolrMockRecorder) Delete(ctx, collection, document, params any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockSolr)(nil).Delete), ctx, collection, document, params)
+}
+
+// DeleteField mocks base method.
+func (m *MockSolr) DeleteField(ctx context.Context, collection string, document *bytes.Buffer) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteField", ctx, collection, document)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteField indicates an expected call of DeleteField.
+func (mr *MockSolrMockRecorder) DeleteField(ctx, collection, document any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteField", reflect.TypeOf((*MockSolr)(nil).DeleteField), ctx, collection, document)
+}
+
+// HealthCheck mocks base method.
+func (m *MockSolr) HealthCheck(arg0 context.Context) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HealthCheck", arg0)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HealthCheck indicates an expected call of HealthCheck.
+func (mr *MockSolrMockRecorder) HealthCheck(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HealthCheck", reflect.TypeOf((*MockSolr)(nil).HealthCheck), arg0)
+}
+
+// ListFields mocks base method.
+func (m *MockSolr) ListFields(ctx context.Context, collection string, params map[string]any) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListFields", ctx, collection, params)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListFields indicates an expected call of ListFields.
+func (mr *MockSolrMockRecorder) ListFields(ctx, collection, params any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFields", reflect.TypeOf((*MockSolr)(nil).ListFields), ctx, collection, params)
+}
+
+// Retrieve mocks base method.
+func (m *MockSolr) Retrieve(ctx context.Context, collection string, params map[string]any) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Retrieve", ctx, collection, params)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Retrieve indicates an expected call of Retrieve.
+func (mr *MockSolrMockRecorder) Retrieve(ctx, collection, params any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Retrieve", reflect.TypeOf((*MockSolr)(nil).Retrieve), ctx, collection, params)
+}
+
+// Search mocks base method.
+func (m *MockSolr) Search(ctx context.Context, collection string, params map[string]any) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Search", ctx, collection, params)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Search indicates an expected call of Search.
+func (mr *MockSolrMockRecorder) Search(ctx, collection, params any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Search", reflect.TypeOf((*MockSolr)(nil).Search), ctx, collection, params)
+}
+
+// Update mocks base method.
+func (m *MockSolr) Update(ctx context.Context, collection string, document *bytes.Buffer, params map[string]any) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Update", ctx, collection, document, params)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Update indicates an expected call of Update.
+func (mr *MockSolrMockRecorder) Update(ctx, collection, document, params any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockSolr)(nil).Update), ctx, collection, document, params)
+}
+
+// UpdateField mocks base method.
+func (m *MockSolr) UpdateField(ctx context.Context, collection string, document *bytes.Buffer) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateField", ctx, collection, document)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateField indicates an expected call of UpdateField.
+func (mr *MockSolrMockRecorder) UpdateField(ctx, collection, document any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateField", reflect.TypeOf((*MockSolr)(nil).UpdateField), ctx, collection, document)
+}
+
+// MockSolrProvider is a mock of SolrProvider interface.
+type MockSolrProvider struct {
+	ctrl     *gomock.Controller
+	recorder *MockSolrProviderMockRecorder
+	isgomock struct{}
+}
+
+// MockSolrProviderMockRecorder is the mock recorder for MockSolrProvider.
+type MockSolrProviderMockRecorder struct {
+	mock *MockSolrProvider
+}
+
+// NewMockSolrProvider creates a new mock instance.
+func NewMockSolrProvider(ctrl *gomock.Controller) *MockSolrProvider {
+	mock := &MockSolrProvider{ctrl: ctrl}
+	mock.recorder = &MockSolrProviderMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockSolrProvider) EXPECT() *MockSolrProviderMockRecorder {
+	return m.recorder
+}
+
+// AddField mocks base method.
+func (m *MockSolrProvider) AddField(ctx context.Context, collection string, document *bytes.Buffer) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddField", ctx, collection, document)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// AddField indicates an expected call of AddField.
+func (mr *MockSolrProviderMockRecorder) AddField(ctx, collection, document any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddField", reflect.TypeOf((*MockSolrProvider)(nil).AddField), ctx, collection, document)
+}
+
+// Connect mocks base method.
+func (m *MockSolrProvider) Connect() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Connect")
+}
+
+// Connect indicates an expected call of Connect.
+func (mr *MockSolrProviderMockRecorder) Connect() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockSolrProvider)(nil).Connect))
+}
+
+// Create mocks base method.
+func (m *MockSolrProvider) Create(ctx context.Context, collection string, document *bytes.Buffer, params map[string]any) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Create", ctx, collection, document, params)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Create indicates an expected call of Create.
+func (mr *MockSolrProviderMockRecorder) Create(ctx, collection, document, params any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockSolrProvider)(nil).Create), ctx, collection, document, params)
+}
+
+// Delete mocks base method.
+func (m *MockSolrProvider) Delete(ctx context.Context, collection string, document *bytes.Buffer, params map[string]any) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Delete", ctx, collection, document, params)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Delete indicates an expected call of Delete.
+func (mr *MockSolrProviderMockRecorder) Delete(ctx, collection, document, params any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockSolrProvider)(nil).Delete), ctx, collection, document, params)
+}
+
+// DeleteField mocks base method.
+func (m *MockSolrProvider) DeleteField(ctx context.Context, collection string, document *bytes.Buffer) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteField", ctx, collection, document)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DeleteField indicates an expected call of DeleteField.
+func (mr *MockSolrProviderMockRecorder) DeleteField(ctx, collection, document any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteField", reflect.TypeOf((*MockSolrProvider)(nil).DeleteField), ctx, collection, document)
+}
+
+// HealthCheck mocks base method.
+func (m *MockSolrProvider) HealthCheck(arg0 context.Context) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HealthCheck", arg0)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HealthCheck indicates an expected call of HealthCheck.
+func (mr *MockSolrProviderMockRecorder) HealthCheck(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HealthCheck", reflect.TypeOf((*MockSolrProvider)(nil).HealthCheck), arg0)
+}
+
+// ListFields mocks base method.
+func (m *MockSolrProvider) ListFields(ctx context.Context, collection string, params map[string]any) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ListFields", ctx, collection, params)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ListFields indicates an expected call of ListFields.
+func (mr *MockSolrProviderMockRecorder) ListFields(ctx, collection, params any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ListFields", reflect.TypeOf((*MockSolrProvider)(nil).ListFields), ctx, collection, params)
+}
+
+// Retrieve mocks base method.
+func (m *MockSolrProvider) Retrieve(ctx context.Context, collection string, params map[string]any) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Retrieve", ctx, collection, params)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Retrieve indicates an expected call of Retrieve.
+func (mr *MockSolrProviderMockRecorder) Retrieve(ctx, collection, params any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Retrieve", reflect.TypeOf((*MockSolrProvider)(nil).Retrieve), ctx, collection, params)
+}
+
+// Search mocks base method.
+func (m *MockSolrProvider) Search(ctx context.Context, collection string, params map[string]any) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Search", ctx, collection, params)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Search indicates an expected call of Search.
+func (mr *MockSolrProviderMockRecorder) Search(ctx, collection, params any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Search", reflect.TypeOf((*MockSolrProvider)(nil).Search), ctx, collection, params)
+}
+
+// Update mocks base method.
+func (m *MockSolrProvider) Update(ctx context.Context, collection string, document *bytes.Buffer, params map[string]any) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Update", ctx, collection, document, params)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Update indicates an expected call of Update.
+func (mr *MockSolrProviderMockRecorder) Update(ctx, collection, document, params any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockSolrProvider)(nil).Update), ctx, collection, document, params)
+}
+
+// UpdateField mocks base method.
+func (m *MockSolrProvider) UpdateField(ctx context.Context, collection string, document *bytes.Buffer) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateField", ctx, collection, document)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// UpdateField indicates an expected call of UpdateField.
+func (mr *MockSolrProviderMockRecorder) UpdateField(ctx, collection, document any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateField", reflect.TypeOf((*MockSolrProvider)(nil).UpdateField), ctx, collection, document)
+}
+
+// UseLogger mocks base method.
+func (m *MockSolrProvider) UseLogger(logger any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UseLogger", logger)
+}
+
+// UseLogger indicates an expected call of UseLogger.
+func (mr *MockSolrProviderMockRecorder) UseLogger(logger any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseLogger", reflect.TypeOf((*MockSolrProvider)(nil).UseLogger), logger)
+}
+
+// UseMetrics mocks base method.
+func (m *MockSolrProvider) UseMetrics(metrics any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UseMetrics", metrics)
+}
+
+// UseMetrics indicates an expected call of UseMetrics.
+func (mr *MockSolrProviderMockRecorder) UseMetrics(metrics any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseMetrics", reflect.TypeOf((*MockSolrProvider)(nil).UseMetrics), metrics)
+}
+
+// UseTracer mocks base method.
+func (m *MockSolrProvider) UseTracer(tracer any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UseTracer", tracer)
+}
+
+// UseTracer indicates an expected call of UseTracer.
+func (mr *MockSolrProviderMockRecorder) UseTracer(tracer any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseTracer", reflect.TypeOf((*MockSolrProvider)(nil).UseTracer), tracer)
+}
+
+// MockDgraph is a mock of Dgraph interface.
+type MockDgraph struct {
+	ctrl     *gomock.Controller
+	recorder *MockDgraphMockRecorder
+	isgomock struct{}
+}
+
+// MockDgraphMockRecorder is the mock recorder for MockDgraph.
+type MockDgraphMockRecorder struct {
+	mock *MockDgraph
+}
+
+// NewMockDgraph creates a new mock instance.
+func NewMockDgraph(ctrl *gomock.Controller) *MockDgraph {
+	mock := &MockDgraph{ctrl: ctrl}
+	mock.recorder = &MockDgraphMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockDgraph) EXPECT() *MockDgraphMockRecorder {
+	return m.recorder
+}
+
+// Alter mocks base method.
+func (m *MockDgraph) Alter(ctx context.Context, op any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Alter", ctx, op)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Alter indicates an expected call of Alter.
+func (mr *MockDgraphMockRecorder) Alter(ctx, op any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Alter", reflect.TypeOf((*MockDgraph)(nil).Alter), ctx, op)
+}
+
+// HealthCheck mocks base method.
+func (m *MockDgraph) HealthCheck(arg0 context.Context) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HealthCheck", arg0)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HealthCheck indicates an expected call of HealthCheck.
+func (mr *MockDgraphMockRecorder) HealthCheck(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HealthCheck", reflect.TypeOf((*MockDgraph)(nil).HealthCheck), arg0)
+}
+
+// Mutate mocks base method.
+func (m *MockDgraph) Mutate(ctx context.Context, mu any) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Mutate", ctx, mu)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Mutate indicates an expected call of Mutate.
+func (mr *MockDgraphMockRecorder) Mutate(ctx, mu any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Mutate", reflect.TypeOf((*MockDgraph)(nil).Mutate), ctx, mu)
+}
+
+// NewReadOnlyTxn mocks base method.
+func (m *MockDgraph) NewReadOnlyTxn() any {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NewReadOnlyTxn")
+	ret0, _ := ret[0].(any)
+	return ret0
+}
+
+// NewReadOnlyTxn indicates an expected call of NewReadOnlyTxn.
+func (mr *MockDgraphMockRecorder) NewReadOnlyTxn() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewReadOnlyTxn", reflect.TypeOf((*MockDgraph)(nil).NewReadOnlyTxn))
+}
+
+// NewTxn mocks base method.
+func (m *MockDgraph) NewTxn() any {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NewTxn")
+	ret0, _ := ret[0].(any)
+	return ret0
+}
+
+// NewTxn indicates an expected call of NewTxn.
+func (mr *MockDgraphMockRecorder) NewTxn() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewTxn", reflect.TypeOf((*MockDgraph)(nil).NewTxn))
+}
+
+// Query mocks base method.
+func (m *MockDgraph) Query(ctx context.Context, query string) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Query", ctx, query)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Query indicates an expected call of Query.
+func (mr *MockDgraphMockRecorder) Query(ctx, query any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Query", reflect.TypeOf((*MockDgraph)(nil).Query), ctx, query)
+}
+
+// QueryWithVars mocks base method.
+func (m *MockDgraph) QueryWithVars(ctx context.Context, query string, vars map[string]string) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "QueryWithVars", ctx, query, vars)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// QueryWithVars indicates an expected call of QueryWithVars.
+func (mr *MockDgraphMockRecorder) QueryWithVars(ctx, query, vars any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueryWithVars", reflect.TypeOf((*MockDgraph)(nil).QueryWithVars), ctx, query, vars)
+}
+
+// MockDgraphProvider is a mock of DgraphProvider interface.
+type MockDgraphProvider struct {
+	ctrl     *gomock.Controller
+	recorder *MockDgraphProviderMockRecorder
+	isgomock struct{}
+}
+
+// MockDgraphProviderMockRecorder is the mock recorder for MockDgraphProvider.
+type MockDgraphProviderMockRecorder struct {
+	mock *MockDgraphProvider
+}
+
+// NewMockDgraphProvider creates a new mock instance.
+func NewMockDgraphProvider(ctrl *gomock.Controller) *MockDgraphProvider {
+	mock := &MockDgraphProvider{ctrl: ctrl}
+	mock.recorder = &MockDgraphProviderMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockDgraphProvider) EXPECT() *MockDgraphProviderMockRecorder {
+	return m.recorder
+}
+
+// Alter mocks base method.
+func (m *MockDgraphProvider) Alter(ctx context.Context, op any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Alter", ctx, op)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Alter indicates an expected call of Alter.
+func (mr *MockDgraphProviderMockRecorder) Alter(ctx, op any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Alter", reflect.TypeOf((*MockDgraphProvider)(nil).Alter), ctx, op)
+}
+
+// Connect mocks base method.
+func (m *MockDgraphProvider) Connect() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Connect")
+}
+
+// Connect indicates an expected call of Connect.
+func (mr *MockDgraphProviderMockRecorder) Connect() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockDgraphProvider)(nil).Connect))
+}
+
+// HealthCheck mocks base method.
+func (m *MockDgraphProvider) HealthCheck(arg0 context.Context) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HealthCheck", arg0)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HealthCheck indicates an expected call of HealthCheck.
+func (mr *MockDgraphProviderMockRecorder) HealthCheck(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HealthCheck", reflect.TypeOf((*MockDgraphProvider)(nil).HealthCheck), arg0)
+}
+
+// Mutate mocks base method.
+func (m *MockDgraphProvider) Mutate(ctx context.Context, mu any) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Mutate", ctx, mu)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Mutate indicates an expected call of Mutate.
+func (mr *MockDgraphProviderMockRecorder) Mutate(ctx, mu any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Mutate", reflect.TypeOf((*MockDgraphProvider)(nil).Mutate), ctx, mu)
+}
+
+// NewReadOnlyTxn mocks base method.
+func (m *MockDgraphProvider) NewReadOnlyTxn() any {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NewReadOnlyTxn")
+	ret0, _ := ret[0].(any)
+	return ret0
+}
+
+// NewReadOnlyTxn indicates an expected call of NewReadOnlyTxn.
+func (mr *MockDgraphProviderMockRecorder) NewReadOnlyTxn() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewReadOnlyTxn", reflect.TypeOf((*MockDgraphProvider)(nil).NewReadOnlyTxn))
+}
+
+// NewTxn mocks base method.
+func (m *MockDgraphProvider) NewTxn() any {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NewTxn")
+	ret0, _ := ret[0].(any)
+	return ret0
+}
+
+// NewTxn indicates an expected call of NewTxn.
+func (mr *MockDgraphProviderMockRecorder) NewTxn() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewTxn", reflect.TypeOf((*MockDgraphProvider)(nil).NewTxn))
+}
+
+// Query mocks base method.
+func (m *MockDgraphProvider) Query(ctx context.Context, query string) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Query", ctx, query)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Query indicates an expected call of Query.
+func (mr *MockDgraphProviderMockRecorder) Query(ctx, query any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Query", reflect.TypeOf((*MockDgraphProvider)(nil).Query), ctx, query)
+}
+
+// QueryWithVars mocks base method.
+func (m *MockDgraphProvider) QueryWithVars(ctx context.Context, query string, vars map[string]string) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "QueryWithVars", ctx, query, vars)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// QueryWithVars indicates an expected call of QueryWithVars.
+func (mr *MockDgraphProviderMockRecorder) QueryWithVars(ctx, query, vars any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueryWithVars", reflect.TypeOf((*MockDgraphProvider)(nil).QueryWithVars), ctx, query, vars)
+}
+
+// UseLogger mocks base method.
+func (m *MockDgraphProvider) UseLogger(logger any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UseLogger", logger)
+}
+
+// UseLogger indicates an expected call of UseLogger.
+func (mr *MockDgraphProviderMockRecorder) UseLogger(logger any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseLogger", reflect.TypeOf((*MockDgraphProvider)(nil).UseLogger), logger)
+}
+
+// UseMetrics mocks base method.
+func (m *MockDgraphProvider) UseMetrics(metrics any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UseMetrics", metrics)
+}
+
+// UseMetrics indicates an expected call of UseMetrics.
+func (mr *MockDgraphProviderMockRecorder) UseMetrics(metrics any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseMetrics", reflect.TypeOf((*MockDgraphProvider)(nil).UseMetrics), metrics)
+}
+
+// UseTracer mocks base method.
+func (m *MockDgraphProvider) UseTracer(tracer any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UseTracer", tracer)
+}
+
+// UseTracer indicates an expected call of UseTracer.
+func (mr *MockDgraphProviderMockRecorder) UseTracer(tracer any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseTracer", reflect.TypeOf((*MockDgraphProvider)(nil).UseTracer), tracer)
+}
+
+// MockOpenTSDBProvider is a mock of OpenTSDBProvider interface.
+type MockOpenTSDBProvider struct {
+	ctrl     *gomock.Controller
+	recorder *MockOpenTSDBProviderMockRecorder
+	isgomock struct{}
+}
+
+// MockOpenTSDBProviderMockRecorder is the mock recorder for MockOpenTSDBProvider.
+type MockOpenTSDBProviderMockRecorder struct {
+	mock *MockOpenTSDBProvider
+}
+
+// NewMockOpenTSDBProvider creates a new mock instance.
+func NewMockOpenTSDBProvider(ctrl *gomock.Controller) *MockOpenTSDBProvider {
+	mock := &MockOpenTSDBProvider{ctrl: ctrl}
+	mock.recorder = &MockOpenTSDBProviderMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockOpenTSDBProvider) EXPECT() *MockOpenTSDBProviderMockRecorder {
+	return m.recorder
+}
+
+// Connect mocks base method.
+func (m *MockOpenTSDBProvider) Connect() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Connect")
+}
+
+// Connect indicates an expected call of Connect.
+func (mr *MockOpenTSDBProviderMockRecorder) Connect() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockOpenTSDBProvider)(nil).Connect))
+}
+
+// DeleteAnnotation mocks base method.
+func (m *MockOpenTSDBProvider) DeleteAnnotation(ctx context.Context, annotation, res any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteAnnotation", ctx, annotation, res)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteAnnotation indicates an expected call of DeleteAnnotation.
+func (mr *MockOpenTSDBProviderMockRecorder) DeleteAnnotation(ctx, annotation, res any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteAnnotation", reflect.TypeOf((*MockOpenTSDBProvider)(nil).DeleteAnnotation), ctx, annotation, res)
+}
+
+// GetAggregators mocks base method.
+func (m *MockOpenTSDBProvider) GetAggregators(ctx context.Context, res any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAggregators", ctx, res)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// GetAggregators indicates an expected call of GetAggregators.
+func (mr *MockOpenTSDBProviderMockRecorder) GetAggregators(ctx, res any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAggregators", reflect.TypeOf((*MockOpenTSDBProvider)(nil).GetAggregators), ctx, res)
+}
+
+// HealthCheck mocks base method.
+func (m *MockOpenTSDBProvider) HealthCheck(arg0 context.Context) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HealthCheck", arg0)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HealthCheck indicates an expected call of HealthCheck.
+func (mr *MockOpenTSDBProviderMockRecorder) HealthCheck(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HealthCheck", reflect.TypeOf((*MockOpenTSDBProvider)(nil).HealthCheck), arg0)
+}
+
+// PostAnnotation mocks base method.
+func (m *MockOpenTSDBProvider) PostAnnotation(ctx context.Context, annotation, res any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PostAnnotation", ctx, annotation, res)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// PostAnnotation indicates an expected call of PostAnnotation.
+func (mr *MockOpenTSDBProviderMockRecorder) PostAnnotation(ctx, annotation, res any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PostAnnotation", reflect.TypeOf((*MockOpenTSDBProvider)(nil).PostAnnotation), ctx, annotation, res)
+}
+
+// PutAnnotation mocks base method.
+func (m *MockOpenTSDBProvider) PutAnnotation(ctx context.Context, annotation, res any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PutAnnotation", ctx, annotation, res)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// PutAnnotation indicates an expected call of PutAnnotation.
+func (mr *MockOpenTSDBProviderMockRecorder) PutAnnotation(ctx, annotation, res any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PutAnnotation", reflect.TypeOf((*MockOpenTSDBProvider)(nil).PutAnnotation), ctx, annotation, res)
+}
+
+// PutDataPoints mocks base method.
+func (m *MockOpenTSDBProvider) PutDataPoints(ctx context.Context, data any, queryParam string, res any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PutDataPoints", ctx, data, queryParam, res)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// PutDataPoints indicates an expected call of PutDataPoints.
+func (mr *MockOpenTSDBProviderMockRecorder) PutDataPoints(ctx, data, queryParam, res any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PutDataPoints", reflect.TypeOf((*MockOpenTSDBProvider)(nil).PutDataPoints), ctx, data, queryParam, res)
+}
+
+// QueryAnnotation mocks base method.
+func (m *MockOpenTSDBProvider) QueryAnnotation(ctx context.Context, queryAnnoParam map[string]any, res any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "QueryAnnotation", ctx, queryAnnoParam, res)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// QueryAnnotation indicates an expected call of QueryAnnotation.
+func (mr *MockOpenTSDBProviderMockRecorder) QueryAnnotation(ctx, queryAnnoParam, res any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueryAnnotation", reflect.TypeOf((*MockOpenTSDBProvider)(nil).QueryAnnotation), ctx, queryAnnoParam, res)
+}
+
+// QueryDataPoints mocks base method.
+func (m *MockOpenTSDBProvider) QueryDataPoints(ctx context.Context, param, res any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "QueryDataPoints", ctx, param, res)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// QueryDataPoints indicates an expected call of QueryDataPoints.
+func (mr *MockOpenTSDBProviderMockRecorder) QueryDataPoints(ctx, param, res any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueryDataPoints", reflect.TypeOf((*MockOpenTSDBProvider)(nil).QueryDataPoints), ctx, param, res)
+}
+
+// QueryLatestDataPoints mocks base method.
+func (m *MockOpenTSDBProvider) QueryLatestDataPoints(ctx context.Context, param, res any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "QueryLatestDataPoints", ctx, param, res)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// QueryLatestDataPoints indicates an expected call of QueryLatestDataPoints.
+func (mr *MockOpenTSDBProviderMockRecorder) QueryLatestDataPoints(ctx, param, res any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueryLatestDataPoints", reflect.TypeOf((*MockOpenTSDBProvider)(nil).QueryLatestDataPoints), ctx, param, res)
+}
+
+// UseLogger mocks base method.
+func (m *MockOpenTSDBProvider) UseLogger(logger any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UseLogger", logger)
+}
+
+// UseLogger indicates an expected call of UseLogger.
+func (mr *MockOpenTSDBProviderMockRecorder) UseLogger(logger any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseLogger", reflect.TypeOf((*MockOpenTSDBProvider)(nil).UseLogger), logger)
+}
+
+// UseMetrics mocks base method.
+func (m *MockOpenTSDBProvider) UseMetrics(metrics any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UseMetrics", metrics)
+}
+
+// UseMetrics indicates an expected call of UseMetrics.
+func (mr *MockOpenTSDBProviderMockRecorder) UseMetrics(metrics any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseMetrics", reflect.TypeOf((*MockOpenTSDBProvider)(nil).UseMetrics), metrics)
+}
+
+// UseTracer mocks base method.
+func (m *MockOpenTSDBProvider) UseTracer(tracer any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UseTracer", tracer)
+}
+
+// UseTracer indicates an expected call of UseTracer.
+func (mr *MockOpenTSDBProviderMockRecorder) UseTracer(tracer any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseTracer", reflect.TypeOf((*MockOpenTSDBProvider)(nil).UseTracer), tracer)
+}
+
+// MockOpenTSDB is a mock of OpenTSDB interface.
+type MockOpenTSDB struct {
+	ctrl     *gomock.Controller
+	recorder *MockOpenTSDBMockRecorder
+	isgomock struct{}
+}
+
+// MockOpenTSDBMockRecorder is the mock recorder for MockOpenTSDB.
+type MockOpenTSDBMockRecorder struct {
+	mock *MockOpenTSDB
+}
+
+// NewMockOpenTSDB creates a new mock instance.
+func NewMockOpenTSDB(ctrl *gomock.Controller) *MockOpenTSDB {
+	mock := &MockOpenTSDB{ctrl: ctrl}
+	mock.recorder = &MockOpenTSDBMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockOpenTSDB) EXPECT() *MockOpenTSDBMockRecorder {
+	return m.recorder
+}
+
+// DeleteAnnotation mocks base method.
+func (m *MockOpenTSDB) DeleteAnnotation(ctx context.Context, annotation, res any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteAnnotation", ctx, annotation, res)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteAnnotation indicates an expected call of DeleteAnnotation.
+func (mr *MockOpenTSDBMockRecorder) DeleteAnnotation(ctx, annotation, res any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteAnnotation", reflect.TypeOf((*MockOpenTSDB)(nil).DeleteAnnotation), ctx, annotation, res)
+}
+
+// GetAggregators mocks base method.
+func (m *MockOpenTSDB) GetAggregators(ctx context.Context, res any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetAggregators", ctx, res)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// GetAggregators indicates an expected call of GetAggregators.
+func (mr *MockOpenTSDBMockRecorder) GetAggregators(ctx, res any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAggregators", reflect.TypeOf((*MockOpenTSDB)(nil).GetAggregators), ctx, res)
+}
+
+// HealthCheck mocks base method.
+func (m *MockOpenTSDB) HealthCheck(arg0 context.Context) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HealthCheck", arg0)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HealthCheck indicates an expected call of HealthCheck.
+func (mr *MockOpenTSDBMockRecorder) HealthCheck(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HealthCheck", reflect.TypeOf((*MockOpenTSDB)(nil).HealthCheck), arg0)
+}
+
+// PostAnnotation mocks base method.
+func (m *MockOpenTSDB) PostAnnotation(ctx context.Context, annotation, res any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PostAnnotation", ctx, annotation, res)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// PostAnnotation indicates an expected call of PostAnnotation.
+func (mr *MockOpenTSDBMockRecorder) PostAnnotation(ctx, annotation, res any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PostAnnotation", reflect.TypeOf((*MockOpenTSDB)(nil).PostAnnotation), ctx, annotation, res)
+}
+
+// PutAnnotation mocks base method.
+func (m *MockOpenTSDB) PutAnnotation(ctx context.Context, annotation, res any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PutAnnotation", ctx, annotation, res)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// PutAnnotation indicates an expected call of PutAnnotation.
+func (mr *MockOpenTSDBMockRecorder) PutAnnotation(ctx, annotation, res any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PutAnnotation", reflect.TypeOf((*MockOpenTSDB)(nil).PutAnnotation), ctx, annotation, res)
+}
+
+// PutDataPoints mocks base method.
+func (m *MockOpenTSDB) PutDataPoints(ctx context.Context, data any, queryParam string, res any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "PutDataPoints", ctx, data, queryParam, res)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// PutDataPoints indicates an expected call of PutDataPoints.
+func (mr *MockOpenTSDBMockRecorder) PutDataPoints(ctx, data, queryParam, res any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PutDataPoints", reflect.TypeOf((*MockOpenTSDB)(nil).PutDataPoints), ctx, data, queryParam, res)
+}
+
+// QueryAnnotation mocks base method.
+func (m *MockOpenTSDB) QueryAnnotation(ctx context.Context, queryAnnoParam map[string]any, res any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "QueryAnnotation", ctx, queryAnnoParam, res)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// QueryAnnotation indicates an expected call of QueryAnnotation.
+func (mr *MockOpenTSDBMockRecorder) QueryAnnotation(ctx, queryAnnoParam, res any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueryAnnotation", reflect.TypeOf((*MockOpenTSDB)(nil).QueryAnnotation), ctx, queryAnnoParam, res)
+}
+
+// QueryDataPoints mocks base method.
+func (m *MockOpenTSDB) QueryDataPoints(ctx context.Context, param, res any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "QueryDataPoints", ctx, param, res)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// QueryDataPoints indicates an expected call of QueryDataPoints.
+func (mr *MockOpenTSDBMockRecorder) QueryDataPoints(ctx, param, res any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueryDataPoints", reflect.TypeOf((*MockOpenTSDB)(nil).QueryDataPoints), ctx, param, res)
+}
+
+// QueryLatestDataPoints mocks base method.
+func (m *MockOpenTSDB) QueryLatestDataPoints(ctx context.Context, param, res any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "QueryLatestDataPoints", ctx, param, res)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// QueryLatestDataPoints indicates an expected call of QueryLatestDataPoints.
+func (mr *MockOpenTSDBMockRecorder) QueryLatestDataPoints(ctx, param, res any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueryLatestDataPoints", reflect.TypeOf((*MockOpenTSDB)(nil).QueryLatestDataPoints), ctx, param, res)
+}
+
+// MockScyllaDB is a mock of ScyllaDB interface.
+type MockScyllaDB struct {
+	ctrl     *gomock.Controller
+	recorder *MockScyllaDBMockRecorder
+	isgomock struct{}
+}
+
+// MockScyllaDBMockRecorder is the mock recorder for MockScyllaDB.
+type MockScyllaDBMockRecorder struct {
+	mock *MockScyllaDB
+}
+
+// NewMockScyllaDB creates a new mock instance.
+func NewMockScyllaDB(ctrl *gomock.Controller) *MockScyllaDB {
+	mock := &MockScyllaDB{ctrl: ctrl}
+	mock.recorder = &MockScyllaDBMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockScyllaDB) EXPECT() *MockScyllaDBMockRecorder {
+	return m.recorder
+}
+
+// BatchQuery mocks base method.
+func (m *MockScyllaDB) BatchQuery(name, stmt string, values ...any) error {
+	m.ctrl.T.Helper()
+	varargs := []any{name, stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "BatchQuery", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// BatchQuery indicates an expected call of BatchQuery.
+func (mr *MockScyllaDBMockRecorder) BatchQuery(name, stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{name, stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BatchQuery", reflect.TypeOf((*MockScyllaDB)(nil).BatchQuery), varargs...)
+}
+
+// BatchQueryWithCtx mocks base method.
+func (m *MockScyllaDB) BatchQueryWithCtx(ctx context.Context, name, stmt string, values ...any) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, name, stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "BatchQueryWithCtx", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// BatchQueryWithCtx indicates an expected call of BatchQueryWithCtx.
+func (mr *MockScyllaDBMockRecorder) BatchQueryWithCtx(ctx, name, stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, name, stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BatchQueryWithCtx", reflect.TypeOf((*MockScyllaDB)(nil).BatchQueryWithCtx), varargs...)
+}
+
+// Exec mocks base method.
+func (m *MockScyllaDB) Exec(stmt string, values ...any) error {
+	m.ctrl.T.Helper()
+	varargs := []any{stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Exec", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Exec indicates an expected call of Exec.
+func (mr *MockScyllaDBMockRecorder) Exec(stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Exec", reflect.TypeOf((*MockScyllaDB)(nil).Exec), varargs...)
+}
+
+// ExecCAS mocks base method.
+func (m *MockScyllaDB) ExecCAS(dest any, stmt string, values ...any) (bool, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{dest, stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ExecCAS", varargs...)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ExecCAS indicates an expected call of ExecCAS.
+func (mr *MockScyllaDBMockRecorder) ExecCAS(dest, stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{dest, stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecCAS", reflect.TypeOf((*MockScyllaDB)(nil).ExecCAS), varargs...)
+}
+
+// ExecWithCtx mocks base method.
+func (m *MockScyllaDB) ExecWithCtx(ctx context.Context, stmt string, values ...any) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ExecWithCtx", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ExecWithCtx indicates an expected call of ExecWithCtx.
+func (mr *MockScyllaDBMockRecorder) ExecWithCtx(ctx, stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecWithCtx", reflect.TypeOf((*MockScyllaDB)(nil).ExecWithCtx), varargs...)
+}
+
+// ExecuteBatchWithCtx mocks base method.
+func (m *MockScyllaDB) ExecuteBatchWithCtx(ctx context.Context, name string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ExecuteBatchWithCtx", ctx, name)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ExecuteBatchWithCtx indicates an expected call of ExecuteBatchWithCtx.
+func (mr *MockScyllaDBMockRecorder) ExecuteBatchWithCtx(ctx, name any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecuteBatchWithCtx", reflect.TypeOf((*MockScyllaDB)(nil).ExecuteBatchWithCtx), ctx, name)
+}
+
+// HealthCheck mocks base method.
+func (m *MockScyllaDB) HealthCheck(arg0 context.Context) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HealthCheck", arg0)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HealthCheck indicates an expected call of HealthCheck.
+func (mr *MockScyllaDBMockRecorder) HealthCheck(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HealthCheck", reflect.TypeOf((*MockScyllaDB)(nil).HealthCheck), arg0)
+}
+
+// NewBatch mocks base method.
+func (m *MockScyllaDB) NewBatch(name string, batchType int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NewBatch", name, batchType)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// NewBatch indicates an expected call of NewBatch.
+func (mr *MockScyllaDBMockRecorder) NewBatch(name, batchType any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewBatch", reflect.TypeOf((*MockScyllaDB)(nil).NewBatch), name, batchType)
+}
+
+// NewBatchWithCtx mocks base method.
+func (m *MockScyllaDB) NewBatchWithCtx(arg0 context.Context, name string, batchType int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NewBatchWithCtx", arg0, name, batchType)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// NewBatchWithCtx indicates an expected call of NewBatchWithCtx.
+func (mr *MockScyllaDBMockRecorder) NewBatchWithCtx(arg0, name, batchType any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewBatchWithCtx", reflect.TypeOf((*MockScyllaDB)(nil).NewBatchWithCtx), arg0, name, batchType)
+}
+
+// Query mocks base method.
+func (m *MockScyllaDB) Query(dest any, stmt string, values ...any) error {
+	m.ctrl.T.Helper()
+	varargs := []any{dest, stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Query", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Query indicates an expected call of Query.
+func (mr *MockScyllaDBMockRecorder) Query(dest, stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{dest, stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Query", reflect.TypeOf((*MockScyllaDB)(nil).Query), varargs...)
+}
+
+// QueryWithCtx mocks base method.
+func (m *MockScyllaDB) QueryWithCtx(ctx context.Context, dest any, stmt string, values ...any) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, dest, stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "QueryWithCtx", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// QueryWithCtx indicates an expected call of QueryWithCtx.
+func (mr *MockScyllaDBMockRecorder) QueryWithCtx(ctx, dest, stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, dest, stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueryWithCtx", reflect.TypeOf((*MockScyllaDB)(nil).QueryWithCtx), varargs...)
+}
+
+// MockScyllaDBProvider is a mock of ScyllaDBProvider interface.
+type MockScyllaDBProvider struct {
+	ctrl     *gomock.Controller
+	recorder *MockScyllaDBProviderMockRecorder
+	isgomock struct{}
+}
+
+// MockScyllaDBProviderMockRecorder is the mock recorder for MockScyllaDBProvider.
+type MockScyllaDBProviderMockRecorder struct {
+	mock *MockScyllaDBProvider
+}
+
+// NewMockScyllaDBProvider creates a new mock instance.
+func NewMockScyllaDBProvider(ctrl *gomock.Controller) *MockScyllaDBProvider {
+	mock := &MockScyllaDBProvider{ctrl: ctrl}
+	mock.recorder = &MockScyllaDBProviderMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockScyllaDBProvider) EXPECT() *MockScyllaDBProviderMockRecorder {
+	return m.recorder
+}
+
+// BatchQuery mocks base method.
+func (m *MockScyllaDBProvider) BatchQuery(name, stmt string, values ...any) error {
+	m.ctrl.T.Helper()
+	varargs := []any{name, stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "BatchQuery", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// BatchQuery indicates an expected call of BatchQuery.
+func (mr *MockScyllaDBProviderMockRecorder) BatchQuery(name, stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{name, stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BatchQuery", reflect.TypeOf((*MockScyllaDBProvider)(nil).BatchQuery), varargs...)
+}
+
+// BatchQueryWithCtx mocks base method.
+func (m *MockScyllaDBProvider) BatchQueryWithCtx(ctx context.Context, name, stmt string, values ...any) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, name, stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "BatchQueryWithCtx", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// BatchQueryWithCtx indicates an expected call of BatchQueryWithCtx.
+func (mr *MockScyllaDBProviderMockRecorder) BatchQueryWithCtx(ctx, name, stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, name, stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "BatchQueryWithCtx", reflect.TypeOf((*MockScyllaDBProvider)(nil).BatchQueryWithCtx), varargs...)
+}
+
+// Connect mocks base method.
+func (m *MockScyllaDBProvider) Connect() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Connect")
+}
+
+// Connect indicates an expected call of Connect.
+func (mr *MockScyllaDBProviderMockRecorder) Connect() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockScyllaDBProvider)(nil).Connect))
+}
+
+// Exec mocks base method.
+func (m *MockScyllaDBProvider) Exec(stmt string, values ...any) error {
+	m.ctrl.T.Helper()
+	varargs := []any{stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Exec", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Exec indicates an expected call of Exec.
+func (mr *MockScyllaDBProviderMockRecorder) Exec(stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Exec", reflect.TypeOf((*MockScyllaDBProvider)(nil).Exec), varargs...)
+}
+
+// ExecCAS mocks base method.
+func (m *MockScyllaDBProvider) ExecCAS(dest any, stmt string, values ...any) (bool, error) {
+	m.ctrl.T.Helper()
+	varargs := []any{dest, stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ExecCAS", varargs...)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// ExecCAS indicates an expected call of ExecCAS.
+func (mr *MockScyllaDBProviderMockRecorder) ExecCAS(dest, stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{dest, stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecCAS", reflect.TypeOf((*MockScyllaDBProvider)(nil).ExecCAS), varargs...)
+}
+
+// ExecWithCtx mocks base method.
+func (m *MockScyllaDBProvider) ExecWithCtx(ctx context.Context, stmt string, values ...any) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ExecWithCtx", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ExecWithCtx indicates an expected call of ExecWithCtx.
+func (mr *MockScyllaDBProviderMockRecorder) ExecWithCtx(ctx, stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecWithCtx", reflect.TypeOf((*MockScyllaDBProvider)(nil).ExecWithCtx), varargs...)
+}
+
+// ExecuteBatchWithCtx mocks base method.
+func (m *MockScyllaDBProvider) ExecuteBatchWithCtx(ctx context.Context, name string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ExecuteBatchWithCtx", ctx, name)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ExecuteBatchWithCtx indicates an expected call of ExecuteBatchWithCtx.
+func (mr *MockScyllaDBProviderMockRecorder) ExecuteBatchWithCtx(ctx, name any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ExecuteBatchWithCtx", reflect.TypeOf((*MockScyllaDBProvider)(nil).ExecuteBatchWithCtx), ctx, name)
+}
+
+// HealthCheck mocks base method.
+func (m *MockScyllaDBProvider) HealthCheck(arg0 context.Context) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HealthCheck", arg0)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HealthCheck indicates an expected call of HealthCheck.
+func (mr *MockScyllaDBProviderMockRecorder) HealthCheck(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HealthCheck", reflect.TypeOf((*MockScyllaDBProvider)(nil).HealthCheck), arg0)
+}
+
+// NewBatch mocks base method.
+func (m *MockScyllaDBProvider) NewBatch(name string, batchType int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NewBatch", name, batchType)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// NewBatch indicates an expected call of NewBatch.
+func (mr *MockScyllaDBProviderMockRecorder) NewBatch(name, batchType any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewBatch", reflect.TypeOf((*MockScyllaDBProvider)(nil).NewBatch), name, batchType)
+}
+
+// NewBatchWithCtx mocks base method.
+func (m *MockScyllaDBProvider) NewBatchWithCtx(arg0 context.Context, name string, batchType int) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "NewBatchWithCtx", arg0, name, batchType)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// NewBatchWithCtx indicates an expected call of NewBatchWithCtx.
+func (mr *MockScyllaDBProviderMockRecorder) NewBatchWithCtx(arg0, name, batchType any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "NewBatchWithCtx", reflect.TypeOf((*MockScyllaDBProvider)(nil).NewBatchWithCtx), arg0, name, batchType)
+}
+
+// Query mocks base method.
+func (m *MockScyllaDBProvider) Query(dest any, stmt string, values ...any) error {
+	m.ctrl.T.Helper()
+	varargs := []any{dest, stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Query", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Query indicates an expected call of Query.
+func (mr *MockScyllaDBProviderMockRecorder) Query(dest, stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{dest, stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Query", reflect.TypeOf((*MockScyllaDBProvider)(nil).Query), varargs...)
+}
+
+// QueryWithCtx mocks base method.
+func (m *MockScyllaDBProvider) QueryWithCtx(ctx context.Context, dest any, stmt string, values ...any) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, dest, stmt}
+	for _, a := range values {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "QueryWithCtx", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// QueryWithCtx indicates an expected call of QueryWithCtx.
+func (mr *MockScyllaDBProviderMockRecorder) QueryWithCtx(ctx, dest, stmt any, values ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, dest, stmt}, values...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QueryWithCtx", reflect.TypeOf((*MockScyllaDBProvider)(nil).QueryWithCtx), varargs...)
+}
+
+// UseLogger mocks base method.
+func (m *MockScyllaDBProvider) UseLogger(logger any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UseLogger", logger)
+}
+
+// UseLogger indicates an expected call of UseLogger.
+func (mr *MockScyllaDBProviderMockRecorder) UseLogger(logger any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseLogger", reflect.TypeOf((*MockScyllaDBProvider)(nil).UseLogger), logger)
+}
+
+// UseMetrics mocks base method.
+func (m *MockScyllaDBProvider) UseMetrics(metrics any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UseMetrics", metrics)
+}
+
+// UseMetrics indicates an expected call of UseMetrics.
+func (mr *MockScyllaDBProviderMockRecorder) UseMetrics(metrics any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseMetrics", reflect.TypeOf((*MockScyllaDBProvider)(nil).UseMetrics), metrics)
+}
+
+// UseTracer mocks base method.
+func (m *MockScyllaDBProvider) UseTracer(tracer any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UseTracer", tracer)
+}
+
+// UseTracer indicates an expected call of UseTracer.
+func (mr *MockScyllaDBProviderMockRecorder) UseTracer(tracer any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseTracer", reflect.TypeOf((*MockScyllaDBProvider)(nil).UseTracer), tracer)
 }

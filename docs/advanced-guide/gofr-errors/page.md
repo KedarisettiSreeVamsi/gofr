@@ -18,9 +18,9 @@ automatically handle HTTP status code selection. These include:
 - `ErrorPanicRecovery`: Represents an error for request which panicked.
 
 #### Usage:
-To use the predefined http errors,users can simply call them using GoFr's http package:
+To use the predefined HTTP errors, users can simply call them using GoFr's http package:
 ```go
- err := http.ErrorMissingParam{Param: []string{"id"}}
+err := http.ErrorMissingParam{Param: []string{"id"}}
 ```
 
 ## Database Errors
@@ -44,6 +44,8 @@ dbErr2 := datasource.ErrorDB{Message : "database connection timed out!"}
 GoFr's error structs implements an interface with `Error() string` and `StatusCode() int` methods, users can override the 
 status code by implementing it for their custom error.
 
+Users  can optionally define a log level for your error with the `LogLevel() logging.Level` methods
+
 #### Usage:
 ```go
 type customError struct {
@@ -56,5 +58,9 @@ func (c customError) Error() string {
 
 func (c customError) StatusCode() int {
 	return http.StatusMethodNotAllowed
+}
+
+func (c customError) LogLevel() logging.Level {
+	return logging.WARN
 }
 ```
