@@ -2,6 +2,7 @@ package container
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	"github.com/gorilla/websocket"
@@ -18,12 +19,17 @@ import (
 	ws "gofr.dev/pkg/gofr/websocket"
 )
 
+func TestMain(m *testing.M) {
+	os.Setenv("GOFR_TELEMETRY", "false")
+	m.Run()
+}
+
 func Test_newContainerSuccessWithLogger(t *testing.T) {
 	cfg := config.NewEnvFile("", logging.NewMockLogger(logging.DEBUG))
 
 	container := NewContainer(cfg)
 
-	assert.NotNil(t, container.Logger, "TEST, Failed.\nlogger initialisation")
+	assert.NotNil(t, container.Logger, "TEST, Failed.\nlogger initialization")
 }
 
 func Test_newContainerDBInitializationFail(t *testing.T) {
@@ -182,30 +188,67 @@ func Test_GetConnectionFromContext(t *testing.T) {
 	tests := []struct {
 		name     string
 		ctx      context.Context
+		setup    func(c *Container)
 		expected *ws.Connection
 	}{
 		{
 			name:     "no connection in context",
-			ctx:      context.Background(),
+			ctx:      t.Context(),
+			setup:    func(*Container) {},
 			expected: nil,
 		},
 		{
-			name:     "connection in context",
-			ctx:      context.WithValue(context.Background(), ws.WSConnectionKey, &ws.Connection{Conn: &websocket.Conn{}}),
+			name: "connection in context",
+			ctx:  context.WithValue(t.Context(), ws.WSConnectionKey, "test-conn-id"),
+			setup: func(c *Container) {
+				c.WSManager = ws.New()
+				c.WSManager.AddWebsocketConnection("test-conn-id", &ws.Connection{Conn: &websocket.Conn{}})
+			},
 			expected: &ws.Connection{Conn: &websocket.Conn{}},
 		},
 		{
 			name:     "wrong type in context",
-			ctx:      context.WithValue(context.Background(), ws.WSConnectionKey, "wrong-type"),
+			ctx:      context.WithValue(t.Context(), ws.WSConnectionKey, 12345),
+			setup:    func(*Container) {},
 			expected: nil,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			conn := (&Container{}).GetConnectionFromContext(tt.ctx)
+			container := &Container{}
+			tt.setup(container)
+
+			conn := container.GetConnectionFromContext(tt.ctx)
 
 			assert.Equal(t, tt.expected, conn)
 		})
 	}
+}
+
+func TestContainer_CreateSetsAppNameAndVersion(t *testing.T) {
+	// Test case: Explicit values are provided
+	t.Run("explicit config values", func(t *testing.T) {
+		cfg := config.NewMockConfig(map[string]string{
+			"APP_NAME":    "test-app",
+			"APP_VERSION": "v1.0.0",
+		})
+
+		c := &Container{}
+		c.Create(cfg)
+
+		assert.Equal(t, "test-app", c.GetAppName())
+		assert.Equal(t, "v1.0.0", c.GetAppVersion())
+	})
+
+	// Test case: Empty config should use default values
+	t.Run("empty config uses defaults", func(t *testing.T) {
+		cfg := config.NewMockConfig(map[string]string{}) // No values provided
+
+		c := &Container{}
+		c.Create(cfg)
+
+		assert.Equal(t, "gofr-app", c.GetAppName())
+		assert.Equal(t, "dev", c.GetAppVersion())
+	})
 }

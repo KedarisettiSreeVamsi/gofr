@@ -1,9 +1,9 @@
 package middleware
 
 import (
-	"context"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -15,6 +15,11 @@ const (
 	validKey1 string = "valid-key-1"
 	validKey2 string = "valid-key-2"
 )
+
+func TestMain(m *testing.M) {
+	os.Setenv("GOFR_TELEMETRY", "false")
+	m.Run()
+}
 
 func Test_ApiKeyAuthMiddleware(t *testing.T) {
 	testHandler := http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
@@ -28,7 +33,7 @@ func Test_ApiKeyAuthMiddleware(t *testing.T) {
 		return apiKey == validKey2
 	}
 
-	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/", http.NoBody)
+	req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, "/", http.NoBody)
 	if err != nil {
 		t.Fatal(err)
 	}

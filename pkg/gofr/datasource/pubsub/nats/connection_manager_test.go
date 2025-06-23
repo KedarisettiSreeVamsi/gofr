@@ -1,7 +1,6 @@
 package nats
 
 import (
-	"context"
 	"testing"
 	"time"
 
@@ -46,16 +45,15 @@ func TestConnectionManager_Connect(t *testing.T) {
 		mockJSCreator,
 	)
 
-	mockNATSConnector.EXPECT().
-		Connect(gomock.Any(), gomock.Any()).
-		Return(mockConn, nil)
+	mockNATSConnector.EXPECT().Connect(gomock.Any(), gomock.Any()).Return(mockConn, nil)
 
 	// We don't need to expect NATSConn() call anymore, as we're passing mockConn directly to New()
-	mockJSCreator.EXPECT().
-		New(mockConn).
-		Return(mockJS, nil)
+	mockJSCreator.EXPECT().New(mockConn).Return(mockJS, nil)
 
 	err := cm.Connect()
+
+	time.Sleep(100 * time.Millisecond)
+
 	require.NoError(t, err)
 	assert.Equal(t, mockConn, cm.conn)
 	assert.Equal(t, mockJS, cm.jStream)
@@ -72,7 +70,7 @@ func TestConnectionManager_Close(t *testing.T) {
 
 	mockConn.EXPECT().Close()
 
-	ctx := context.Background()
+	ctx := t.Context()
 	cm.Close(ctx)
 }
 
@@ -82,19 +80,24 @@ func TestConnectionManager_Publish(t *testing.T) {
 
 	mockJS := NewMockJetStream(ctrl)
 	mockMetrics := NewMockMetrics(ctrl)
+	mockConn := NewMockConnInterface(ctrl)
 
 	cm := &ConnectionManager{
+		conn:    mockConn,
 		jStream: mockJS,
 		logger:  logging.NewMockLogger(logging.DEBUG),
 	}
 
-	ctx := context.Background()
+	ctx := t.Context()
 	subject := "test.subject"
 	message := []byte("test message")
 
-	mockMetrics.EXPECT().IncrementCounter(ctx, "app_pubsub_publish_total_count", "subject", subject)
-	mockJS.EXPECT().Publish(ctx, subject, message).Return(&jetstream.PubAck{}, nil)
-	mockMetrics.EXPECT().IncrementCounter(ctx, "app_pubsub_publish_success_count", "subject", subject)
+	gomock.InOrder(
+		mockMetrics.EXPECT().IncrementCounter(ctx, "app_pubsub_publish_total_count", "subject", subject),
+		mockConn.EXPECT().Status().Return(nats.CONNECTED),
+		mockJS.EXPECT().Publish(ctx, subject, message).Return(&jetstream.PubAck{}, nil),
+		mockMetrics.EXPECT().IncrementCounter(ctx, "app_pubsub_publish_success_count", "subject", subject),
+	)
 
 	err := cm.Publish(ctx, subject, message, mockMetrics)
 	require.NoError(t, err)

@@ -1,23 +1,23 @@
 # Observability
 
-GoFr by default manages observability in different ways once the server starts:
+GoFr, by default, manages observability in different ways once the server starts:
 
 ## Logs
 
 Logs offer real-time information, providing valuable insights and immediate visibility into the ongoing state and activities of the system.
 It helps in identifying errors, debugging and troubleshooting, monitor performance, analyzing application usage, communications etc.
 
-GoFr logger allows customizing log level which provides flexibility to adjust logs based on specific needs.
+GoFr logger allows customizing the log level, which provides flexibility to adjust logs based on specific needs.
 
-Logs are generated only for events equal to or above the specified log level, by default GoFr logs at _INFO_ level.
+Logs are generated only for events equal to or above the specified log level; by default, GoFr logs at _INFO_ level.
 Log Level can be changed by setting the environment variable `LOG_LEVEL` value to _WARN,DEBUG,ERROR,NOTICE or FATAL_.
 
-When GoFr server runs, it prints log for reading configs, database connection, requests, database queries, missing configs etc.
-They contain information such as request's correlation ID, status codes, request time etc.
+When the GoFr server runs, it prints a log for reading configs, database connection, requests, database queries, missing configs, etc.
+They contain information such as request's correlation ID, status codes, request time, etc.
 
 {% figure src="/quick-start-logs.png" alt="Pretty Printed Logs" /%}
 
-Logs are well-structured, they are of type JSON when exported to a file, such that they can be pushed to logging systems such as {% new-tab-link title="Loki" href="https://grafana.com/oss/loki/" /%}, Elasticsearch etc.
+Logs are well-structured, they are of type JSON when exported to a file, such that they can be pushed to logging systems such as {% new-tab-link title="Loki" href="https://grafana.com/oss/loki/" /%}, Elasticsearch, etc.
 
 ## Metrics
 
@@ -133,9 +133,20 @@ GoFr publishes metrics to port: _2121_ on _/metrics_ endpoint in Prometheus form
 
 {% /table %}
 
-For example: When running application locally, we can access /metrics endpoint on port 2121 from: {% new-tab-link title="http://localhost:2121/metrics" href="http://localhost:2121/metrics" /%}
+For example: When running the application locally, we can access the /metrics endpoint on port 2121 from: {% new-tab-link title="http://localhost:2121/metrics" href="http://localhost:2121/metrics" /%}
 
 GoFr also supports creating {% new-tab-link newtab=false title="custom metrics" href="/docs/advanced-guide/publishing-custom-metrics" /%}.
+
+### Example Dashboard
+
+These metrics can be easily consumed by monitoring systems like {% new-tab-link title="Prometheus" href="https://prometheus.io/" /%}
+and visualized in dashboards using tools like {% new-tab-link title="Grafana" href="https://grafana.com/" /%}.
+
+Here's a sample Grafana dashboard utilizing GoFr's metrics:
+
+{% figure src="/metrics-dashboard.png" alt="Grafana Dashboard showing GoFr metrics including HTTP request rates, 
+response times, etc." caption="Example monitoring dashboard using GoFr's built-in metrics" /%}
+
 
 ## Tracing
 
@@ -195,15 +206,15 @@ TRACER_RATIO=0.1
 LOG_LEVEL=DEBUG
 ```
 
-> **NOTE:** If the value of `TRACER_PORT` is not
-> provided, GoFr uses  port `9411` by default.
+> [!NOTE]
+> If the value of `TRACER_PORT` is not provided, GoFr uses port `9411` by default.
 
 Open {% new-tab-link title="zipkin" href="http://localhost:2005/zipkin/" /%} and search by TraceID (correlationID) to see the trace.
 {% figure src="/quick-start-trace.png" alt="Zipkin traces" /%}
 
 #### 2. [Jaeger](https://www.jaegertracing.io/):
 
-To see the traces install jaeger image using the following Docker command:
+To see the traces, install Jaeger image using the following Docker command:
 
 ```bash
 docker run -d --name jaeger \
@@ -245,8 +256,8 @@ TRACER_RATIO=0.1
 
 #### 4. [GoFr Tracer](https://tracer.gofr.dev/):
 
-GoFr tracer is GoFr's own custom trace exporter as well as collector. User can search a trace by its TraceID (correlationID)
-in GoFr's own tracer service available anywhere, anytime.
+GoFr tracer is GoFr's own custom trace exporter as well as collector. Users can search a trace by its TraceID (correlationID)
+in GoFr's own tracer service, available anywhere, anytime.
 
 Add GoFr Tracer configs in `.env` file, your .env will be updated to
 ```dotenv
@@ -257,6 +268,7 @@ TRACE_EXPORTER=gofr
 TRACER_RATIO=0.1
 ```
 
-> NOTE: `TRACER_RATIO` refers to the proportion of traces that are exported through sampling. It ranges between 0 and 1. By default, this ratio is set to 1, meaning all traces are exported.
-
-Open {% new-tab-link title="gofr-tracer" href="https://tracer.gofr.dev/" /%} and search by TraceID (correlationID) to see the trace.
+> [!NOTE]
+> `TRACER_RATIO` refers to the proportion of traces that are exported through sampling. It ranges between 0 and 1. By default, this ratio is set to 1, meaning all traces are exported.
+>
+> Open {% new-tab-link title="gofr-tracer" href="https://tracer.gofr.dev/" /%} and search by TraceID (correlationID) to see the trace.

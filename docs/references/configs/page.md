@@ -101,6 +101,13 @@ This document lists all the configuration options supported by the GoFr framewor
 -  CMD_LOGS_FILE
 -  File to save the logs in case of a CMD application
 
+---
+
+-  SHUTDOWN_GRACE_PERIOD
+-  Timeout duration for server shutdown process
+-  30s
+
+
 {% /table %}
 
 ## HTTP
@@ -141,7 +148,7 @@ This document lists all the configuration options supported by the GoFr framewor
 ---
 
 -  DB_DIALECT
--  Database dialect. Supported values: mysql, postgres
+-  Database dialect. Supported values: mysql, postgres, supabase
 
 ---
 
@@ -185,6 +192,33 @@ This document lists all the configuration options supported by the GoFr framewor
 -  DB_SSL_MODE
 -  Currently supported only for PostgreSQL, with Default certificate file.
 -  disable
+
+---
+
+- DB_CHARSET
+- The character set for database connection
+- utf8
+
+---
+
+- SUPABASE_CONNECTION_TYPE 
+- Connection type to Supabase. Supported values: direct, session, transaction 
+- direct
+
+---
+
+- SUPABASE_PROJECT_REF 
+- Supabase project reference ID
+
+---
+
+- SUPABASE_REGION 
+- Supabase region for pooled connections
+
+---
+
+- DB_URL 
+- Full PostgreSQL connection string for Supabase (alternative to separate config parameters)
 
 {% /table %}
 
@@ -289,6 +323,57 @@ This document lists all the configuration options supported by the GoFr framewor
 -  CONSUMER_ID
 -  Unique identifier for this consumer
 -  gofr-consumer
+
+---
+
+---
+
+- KAFKA_SECURITY_PROTOCOL
+- Security protocol used to communicate with Kafka (e.g., PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL)
+- PLAINTEXT
+
+---
+
+
+- KAFKA_SASL_MECHANISM
+- SASL mechanism for authentication (e.g. PLAIN, SCRAM-SHA-256, SCRAM-SHA-512)
+- None
+
+---
+
+- KAFKA_SASL_USERNAME
+- Username for SASL authentication
+- None
+
+---
+
+- KAFKA_SASL_PASSWORD
+- Password for SASL authentication
+- None
+
+---
+
+- KAFKA_TLS_CERT_FILE
+- Path to the TLS certificate file
+- None
+
+---
+
+- KAFKA_TLS_KEY_FILE
+- Path to the TLS key file
+- None
+
+---
+
+- KAFKA_TLS_CA_CERT_FILE
+- Path to the TLS CA certificate file
+- None
+
+---
+
+- KAFKA_TLS_INSECURE_SKIP_VERIFY
+- Skip TLS certificate verification
+- false
 
 {% /table %}
 

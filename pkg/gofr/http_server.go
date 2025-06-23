@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"net/http/pprof"
 	"os"
 	"time"
 
@@ -16,12 +15,13 @@ import (
 )
 
 type httpServer struct {
-	router   *gofrHTTP.Router
-	port     int
-	ws       *websocket.Manager
-	srv      *http.Server
-	certFile string
-	keyFile  string
+	router      *gofrHTTP.Router
+	port        int
+	ws          *websocket.Manager
+	srv         *http.Server
+	certFile    string
+	keyFile     string
+	staticFiles map[string]string
 }
 
 var (
@@ -29,15 +29,14 @@ var (
 	errInvalidKeyFile         = errors.New("invalid key file")
 )
 
-func newHTTPServer(c *container.Container, port int, middlewareConfigs map[string]string) *httpServer {
+func newHTTPServer(c *container.Container, port int, middlewareConfigs middleware.Config) *httpServer {
 	r := gofrHTTP.NewRouter()
 	wsManager := websocket.New()
 
 	r.Use(
-		middleware.WSHandlerUpgrade(c, wsManager),
 		middleware.Tracer,
-		middleware.Logging(c.Logger),
-		middleware.CORS(middlewareConfigs, r.RegisteredRoutes),
+		middleware.Logging(middlewareConfigs.LogProbes, c.Logger),
+		middleware.CORS(middlewareConfigs.CorsHeaders, r.RegisteredRoutes),
 		middleware.Metrics(c.Metrics()),
 	)
 
@@ -48,29 +47,17 @@ func newHTTPServer(c *container.Container, port int, middlewareConfigs map[strin
 	}
 }
 
-// RegisterProfilingRoutes registers pprof endpoints on the HTTP server.
-//
-// This method adds the following routes to the server's router:
-//
-//   - /debug/pprof/cmdline
-//   - /debug/pprof/profile
-//   - /debug/pprof/symbol
-//   - /debug/pprof/trace
-//   - /debug/pprof/ (index)
-//
-// These endpoints provide various profiling information for the application,
-// such as command-line arguments, memory profiles, symbol information, and
-// execution traces.
-func (s *httpServer) RegisterProfilingRoutes() {
-	s.router.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
-	s.router.HandleFunc("/debug/pprof/profile", pprof.Profile)
-	s.router.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
-	s.router.HandleFunc("/debug/pprof/trace", pprof.Trace)
+func (s *httpServer) run(c *container.Container) {
+	// Developer Note:
+	//	WebSocket connections do not inherently support authentication mechanisms.
+	//	It is recommended to authenticate users before upgrading to a WebSocket connection.
+	//	Hence, we are registering websocket middleware here, to ensure that authentication or other
+	//	middleware logic is executed during the initial HTTP handshake request, prior to upgrading
+	//	the connection to WebSocket, if any.
+	s.router.Use(
+		middleware.WSHandlerUpgrade(c, s.ws),
+	)
 
-	s.router.NewRoute().Methods(http.MethodGet).PathPrefix("/debug/pprof/").HandlerFunc(pprof.Index)
-}
-
-func (s *httpServer) Run(c *container.Container) {
 	if s.srv != nil {
 		c.Logf("Server already running on port: %d", s.port)
 		return

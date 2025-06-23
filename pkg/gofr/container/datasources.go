@@ -278,6 +278,17 @@ type MongoProvider interface {
 
 // SurrealDB defines an interface representing a SurrealDB client with common database operations.
 type SurrealDB interface {
+	// CreateNamespace creates a new namespace in the SurrealDB instance.
+	CreateNamespace(ctx context.Context, namespace string) error
+
+	// CreateDatabase creates a new database in the SurrealDB instance.
+	CreateDatabase(ctx context.Context, database string) error
+
+	// DropNamespace deletes a namespace from the SurrealDB instance.
+	DropNamespace(ctx context.Context, namespace string) error
+
+	// DropDatabase deletes a database from the SurrealDB instance.
+	DropDatabase(ctx context.Context, database string) error
 
 	// Query executes a Surreal query with the provided variables and returns the query results as a slice of interfaces{}.
 	// It returns an error if the query execution fails.
@@ -373,6 +384,32 @@ type SolrProvider interface {
 
 // Dgraph defines the methods for interacting with a Dgraph database.
 type Dgraph interface {
+	// ApplySchema applies or updates the complete database schema.
+	// Parameters:
+	// - ctx: Context for request cancellation and timeouts
+	// - schema: Schema definition in Dgraph Schema Definition Language (SDL) format
+	// Returns:
+	// - error: An error if the schema application fails
+	ApplySchema(ctx context.Context, schema string) error
+
+	// AddOrUpdateField atomically creates or updates a single field definition.
+	// Parameters:
+	// - ctx: Context for request cancellation and timeouts
+	// - fieldName: Name of the field/predicate to create or update
+	// - fieldType: Dgraph data type (e.g., string, int, datetime)
+	// - directives: Space-separated Dgraph directives (e.g., "@index(hash) @upsert")
+	// Returns:
+	// - error: An error if the field operation fails
+	AddOrUpdateField(ctx context.Context, fieldName, fieldType, directives string) error
+
+	// DropField permanently removes a field/predicate and all its associated data.
+	// Parameters:
+	// - ctx: Context for request cancellation and timeouts
+	// - fieldName: Name of the field/predicate to remove
+	// Returns:
+	// - error: An error if the field removal fails
+	DropField(ctx context.Context, fieldName string) error
+
 	// Query executes a read-only query in the Dgraph database and returns the result.
 	// Parameters:
 	// - ctx: The context for the query, used for controlling timeouts, cancellation, etc.
@@ -572,5 +609,115 @@ type ScyllaDB interface {
 
 type ScyllaDBProvider interface {
 	ScyllaDB
+	provider
+}
+
+type ArangoDB interface {
+	// CreateDB creates a new database in ArangoDB.
+	CreateDB(ctx context.Context, database string) error
+	// DropDB deletes an existing database in ArangoDB.
+	DropDB(ctx context.Context, database string) error
+
+	// CreateCollection creates a new collection in a database with specified type.
+	CreateCollection(ctx context.Context, database, collection string, isEdge bool) error
+	// DropCollection deletes an existing collection from a database.
+	DropCollection(ctx context.Context, database, collection string) error
+
+	// CreateGraph creates a new graph in a database.
+	// Parameters:
+	//   - ctx: Request context for tracing and cancellation.
+	//   - database: Name of the database where the graph will be created.
+	//   - graph: Name of the graph to be created.
+	//   - edgeDefinitions: Pointer to EdgeDefinition struct containing edge definitions.
+	//
+	// Returns an error if the edgeDefinitions parameter is not of type *EdgeDefinition or is nil.
+	CreateGraph(ctx context.Context, database, graph string, edgeDefinitions any) error
+	// DropGraph deletes an existing graph from a database.
+	DropGraph(ctx context.Context, database, graph string) error
+
+	// CreateDocument creates a new document in the specified collection.
+	CreateDocument(ctx context.Context, dbName, collectionName string, document any) (string, error)
+	// GetDocument retrieves a document by its ID from the specified collection.
+	GetDocument(ctx context.Context, dbName, collectionName, documentID string, result any) error
+	// UpdateDocument updates an existing document in the specified collection.
+	UpdateDocument(ctx context.Context, dbName, collectionName, documentID string, document any) error
+	// DeleteDocument deletes a document by its ID from the specified collection.
+	DeleteDocument(ctx context.Context, dbName, collectionName, documentID string) error
+
+	// GetEdges fetches all edges connected to a given vertex in the specified edge collection.
+	//
+	// Parameters:
+	//   - ctx: Request context for tracing and cancellation.
+	//   - dbName: Database name.
+	//   - graphName: Graph name.
+	//   - edgeCollection: Edge collection name.
+	//   - vertexID: Full vertex ID (e.g., "persons/16563").
+	//   - resp: Pointer to `*EdgeDetails` to store results.
+	//
+	// Returns an error if input is invalid, `resp` is of the wrong type, or the query fails.
+	GetEdges(ctx context.Context, dbName, graphName, edgeCollection, vertexID string, resp any) error
+
+	// Query executes an AQL query and binds the results.
+	//
+	// Parameters:
+	//   - ctx: Request context for tracing and cancellation.
+	//   - dbName: Name of the database where the query will be executed.
+	//   - query: AQL query string to be executed.
+	//   - bindVars: Map of bind variables to be used in the query.
+	//   - result: Pointer to a slice of maps where the query results will be stored.
+	//	 - options : A flexible map[string]any to customize query behavior. Keys should be in camelCase
+	//     and correspond to fields in ArangoDB’s QueryOptions and QuerySubOptions structs.
+	//
+	// Returns an error if the database connection fails, the query execution fails, or
+	// the result parameter is not a pointer to a slice of maps.
+	Query(ctx context.Context, dbName string, query string, bindVars map[string]any, result any, options ...map[string]any) error
+
+	HealthChecker
+}
+
+// ArangoDBProvider is an interface that extends ArangoDB with additional methods for logging, metrics, and connection management.
+type ArangoDBProvider interface {
+	ArangoDB
+
+	provider
+}
+
+// Elasticsearch defines all the operations GoFr users need.
+type Elasticsearch interface {
+	// CreateIndex creates a new index with optional mapping/settings.
+	CreateIndex(ctx context.Context, index string, settings map[string]any) error
+
+	// DeleteIndex deletes an existing index.
+	DeleteIndex(ctx context.Context, index string) error
+
+	// IndexDocument indexes (creates or replaces) a single document.
+	IndexDocument(ctx context.Context, index, id string, document any) error
+
+	// GetDocument retrieves a single document by ID.
+	// Returns the raw JSON as a map.
+	GetDocument(ctx context.Context, index, id string) (map[string]any, error)
+
+	// UpdateDocument applies a partial update to an existing document.
+	UpdateDocument(ctx context.Context, index, id string, update map[string]any) error
+
+	// DeleteDocument removes a document by ID.
+	DeleteDocument(ctx context.Context, index, id string) error
+
+	// Search executes a query against one or more indices.
+	// Returns the entire response JSON as a map.
+	Search(ctx context.Context, indices []string, query map[string]any) (map[string]any, error)
+
+	// Bulk executes multiple indexing/updating/deleting operations in one request.
+	// Each entry in `operations` should be a JSON‑serializable object
+	// following the Elasticsearch bulk API format.
+	Bulk(ctx context.Context, operations []map[string]any) (map[string]any, error)
+
+	HealthChecker
+}
+
+// ElasticsearchProvider an interface that extends Elasticsearch with additional methods for logging, metrics, and connection management.
+type ElasticsearchProvider interface {
+	Elasticsearch
+
 	provider
 }

@@ -10,11 +10,16 @@ import (
 	"gofr.dev/pkg/gofr/logging"
 )
 
+func TestMain(m *testing.M) {
+	os.Setenv("GOFR_TELEMETRY", "false")
+	m.Run()
+}
+
 func Test_EnvSuccess(t *testing.T) {
 	envData := map[string]string{
-		"DATABASE_URL": "localhost:5432",
-		"API_KEY":      "your_api_key_here",
-		"small_case":   "small_case_value",
+		"DB_URL":     "localhost:5432",
+		"API_KEY":    "your_api_key_here",
+		"small_case": "small_case_value",
 	}
 
 	logger := logging.NewMockLogger(logging.DEBUG)
@@ -26,7 +31,7 @@ func Test_EnvSuccess(t *testing.T) {
 
 	env := NewEnvFile(dir, logger)
 
-	assert.Equal(t, "localhost:5432", env.Get("DATABASE_URL"), "TEST Failed.\n godotenv success")
+	assert.Equal(t, "localhost:5432", env.Get("DB_URL"), "TEST Failed.\n godotenv success")
 	assert.Equal(t, "your_api_key_here", env.GetOrDefault("API_KEY", "xyz"), "TEST Failed.\n godotenv success")
 	assert.Equal(t, "test", env.GetOrDefault("DATABASE", "test"), "TEST Failed.\n godotenv success")
 	assert.Equal(t, "small_case_value", env.Get("small_case"), "TEST Failed.\n godotenv success")
@@ -36,7 +41,7 @@ func Test_EnvSuccess_AppEnv_Override(t *testing.T) {
 	t.Setenv("APP_ENV", "prod")
 
 	envData := map[string]string{
-		"DATABASE_URL": "localhost:5432",
+		"DB_URL": "localhost:5432",
 	}
 
 	dir := t.TempDir()
@@ -45,13 +50,13 @@ func Test_EnvSuccess_AppEnv_Override(t *testing.T) {
 	createEnvFile(t, dir, ".env", envData)
 
 	// override database url in '.prod.env' file to test if value if being overridden
-	createEnvFile(t, dir, ".prod.env", map[string]string{"DATABASE_URL": "localhost:2001"})
+	createEnvFile(t, dir, ".prod.env", map[string]string{"DB_URL": "localhost:2001"})
 
 	logger := logging.NewMockLogger(logging.DEBUG)
 
 	env := NewEnvFile(dir, logger)
 
-	assert.Equal(t, "localhost:2001", env.Get("DATABASE_URL"), "TEST Failed.\n godotenv success")
+	assert.Equal(t, "localhost:2001", env.Get("DB_URL"), "TEST Failed.\n godotenv success")
 }
 
 func Test_EnvSuccess_Local_Override(t *testing.T) {
@@ -90,11 +95,7 @@ func Test_EnvSuccess_SystemEnv_Override(t *testing.T) {
 	// Create the override file
 	createEnvFile(t, dir, ".local.env", map[string]string{"TEST_ENV": "local"})
 
-	// Set system environment variables
-	err := os.Setenv("TEST_ENV", "system")
-	if err != nil {
-		return
-	}
+	t.Setenv("TEST_ENV", "system")
 
 	logger := logging.NewMockLogger(logging.DEBUG)
 

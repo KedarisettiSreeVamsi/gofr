@@ -4,15 +4,15 @@ import (
 	"context"
 	"fmt"
 	"net/http"
-	"net/http/httptest"
 	"os"
-	"strconv"
 	"testing"
 	"time"
 
+	"github.com/gorilla/mux"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"gofr.dev/pkg/gofr/config"
 	"gofr.dev/pkg/gofr/container"
 	gofrHTTP "gofr.dev/pkg/gofr/http"
 	"gofr.dev/pkg/gofr/logging"
@@ -28,10 +28,24 @@ func TestRun_ServerStartsListening(t *testing.T) {
 		w.WriteHeader(http.StatusOK)
 	}))
 
+	// adding registered routes for applying middlewares
+	var registeredMethods []string
+
+	_ = router.Walk(func(route *mux.Route, _ *mux.Router, _ []*mux.Route) error {
+		met, _ := route.GetMethods()
+		for _, method := range met {
+			if !contains(registeredMethods, method) { // Check for uniqueness before adding
+				registeredMethods = append(registeredMethods, method)
+			}
+		}
+
+		return nil
+	})
+
+	router.RegisteredRoutes = &registeredMethods
+
 	// Create a mock container
-	c := &container.Container{
-		Logger: logging.NewLogger(logging.INFO),
-	}
+	c := container.NewContainer(getConfigs(t))
 
 	// Create an instance of httpServer
 	server := &httpServer{
@@ -40,7 +54,7 @@ func TestRun_ServerStartsListening(t *testing.T) {
 	}
 
 	// Start the server
-	go server.Run(c)
+	go server.run(c)
 
 	// Wait for the server to start listening
 	time.Sleep(100 * time.Millisecond)
@@ -50,7 +64,7 @@ func TestRun_ServerStartsListening(t *testing.T) {
 	}
 
 	// Send a GET request to the server
-	req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet,
+	req, _ := http.NewRequestWithContext(t.Context(), http.MethodGet,
 		fmt.Sprintf("http://localhost:%d", port), http.NoBody)
 	resp, err := netClient.Do(req)
 
@@ -61,38 +75,16 @@ func TestRun_ServerStartsListening(t *testing.T) {
 	resp.Body.Close()
 }
 
-func TestRegisterProfillingRoutes(t *testing.T) {
-	port := testutil.GetFreePort(t)
+func getConfigs(t *testing.T) config.Config {
+	t.Helper()
 
-	c := &container.Container{
-		Logger: logging.NewLogger(logging.INFO),
+	var configLocation string
+
+	if _, err := os.Stat("./configs"); err == nil {
+		configLocation = "./configs"
 	}
 
-	server := &httpServer{
-		router: gofrHTTP.NewRouter(),
-		port:   port,
-	}
-
-	server.RegisterProfilingRoutes()
-
-	go server.Run(c)
-
-	// Test if the expected handlers are registered for the pprof endpoints
-	expectedRoutes := []string{
-		"/debug/pprof/",
-		"/debug/pprof/cmdline",
-		"/debug/pprof/symbol",
-	}
-
-	serverURL := "http://localhost:" + strconv.Itoa(8000)
-
-	for _, route := range expectedRoutes {
-		r := httptest.NewRequest(http.MethodGet, serverURL+route, http.NoBody)
-		rr := httptest.NewRecorder()
-		server.router.ServeHTTP(rr, r)
-
-		assert.Equal(t, http.StatusOK, rr.Code)
-	}
+	return config.NewEnvFile(configLocation, logging.NewLogger(logging.INFO))
 }
 
 func TestShutdown_ServerStopsListening(t *testing.T) {
@@ -114,10 +106,10 @@ func TestShutdown_ServerStopsListening(t *testing.T) {
 	}
 
 	// Start the server
-	go server.Run(c)
+	go server.run(c)
 
 	// Create a context with a timeout to test the shutdown
-	ctx, cancel := context.WithTimeout(context.Background(), 150*time.Millisecond)
+	ctx, cancel := context.WithTimeout(t.Context(), 150*time.Millisecond)
 	defer cancel()
 
 	errChan := make(chan error, 1)
@@ -150,10 +142,10 @@ func TestShutdown_ServerContextDeadline(t *testing.T) {
 	}
 
 	// Start the server
-	go server.Run(c)
+	go server.run(c)
 
 	// Create a context with a timeout to test the shutdown
-	ctx, cancel := context.WithTimeout(context.Background(), 50*time.Millisecond)
+	ctx, cancel := context.WithTimeout(t.Context(), 50*time.Millisecond)
 	defer cancel()
 
 	// Simulate a delay in the shutdown process to trigger context timeout
@@ -215,7 +207,7 @@ func TestValidateCertificateAndKeyFiles_Error(t *testing.T) {
 func createTempKeyFile(t *testing.T) string {
 	t.Helper()
 
-	f, err := os.CreateTemp("", "key-*.pem")
+	f, err := os.CreateTemp(t.TempDir(), "key-*.pem")
 	if err != nil {
 		t.Fatalf("could not create temp key file: %v", err)
 	}
@@ -229,7 +221,7 @@ func createTempKeyFile(t *testing.T) string {
 func createTempCertFile(t *testing.T) string {
 	t.Helper()
 
-	f, err := os.CreateTemp("", "cert-*.pem")
+	f, err := os.CreateTemp(t.TempDir(), "cert-*.pem")
 	if err != nil {
 		t.Fatalf("could not create temp cert file: %v", err)
 	}

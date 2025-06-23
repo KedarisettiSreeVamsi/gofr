@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -11,6 +12,11 @@ import (
 	"gofr.dev/pkg/gofr/testutil"
 )
 
+func TestMain(m *testing.M) {
+	os.Setenv("GOFR_TELEMETRY", "false")
+	m.Run()
+}
+
 type mockMetrics struct {
 }
 
@@ -18,8 +24,8 @@ func (m *mockMetrics) IncrementCounter(ctx context.Context, name string, labels 
 }
 
 func initializeTest(t *testing.T) {
-	c := kafka.New(kafka.Config{
-		Broker:       "localhost:9092",
+	c := kafka.New(&kafka.Config{
+		Brokers:      []string{"localhost:9092"},
 		OffSet:       1,
 		BatchSize:    kafka.DefaultBatchSize,
 		BatchBytes:   kafka.DefaultBatchBytes,

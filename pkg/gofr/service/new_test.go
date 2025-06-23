@@ -1,7 +1,6 @@
 package service
 
 import (
-	"context"
 	"fmt"
 	"io"
 	"net/http"
@@ -37,7 +36,7 @@ func TestNewHTTPService(t *testing.T) {
 func TestHTTPService_createAndSendRequest(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	metrics := NewMockMetrics(ctrl)
-	ctx := context.Background()
+	ctx := t.Context()
 
 	tests := []struct {
 		desc           string
@@ -48,13 +47,13 @@ func TestHTTPService_createAndSendRequest(t *testing.T) {
 		expContentType string
 	}{
 		{"with query params, body and header", map[string]any{"key": "value", "name": []string{"gofr", "test"}},
-			[]byte("{Test Body}"), map[string]string{"header1": "value1"}, "key=value&name=test", "application/json"},
+			[]byte("{Test Body}"), map[string]string{"header1": "value1"}, "key=value&name=gofr&name=test", "application/json"},
 		{"with query params, body, header and content type", map[string]any{"key": "value", "name": []string{"gofr", "test"}},
 			[]byte("{Test Body}"), map[string]string{"header1": "value1", "content-type": "application/json"},
-			"key=value&name=test", "application/json"},
+			"key=value&name=gofr&name=test", "application/json"},
 		{"with query params, body, header and content type xml", map[string]any{"key": "value", "name": []string{"gofr", "test"}},
 			[]byte("{Test Body}"), map[string]string{"header1": "value1", "content-type": "application/xml"},
-			"key=value&name=test", "application/xml"},
+			"key=value&name=gofr&name=test", "application/xml"},
 		{"without query params, body, header and content type", nil, []byte("{Test Body}"),
 			map[string]string{"header1": "value1", "content-type": "application/json"},
 			"", "application/json"},
@@ -113,7 +112,7 @@ func TestHTTPService_Get(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		assert.Equal(t, "/test-path", r.URL.Path)
-		assert.Equal(t, "key=value&name=test", r.URL.RawQuery)
+		assert.Equal(t, "key=value&name=gofr&name=test", r.URL.RawQuery)
 
 		w.WriteHeader(http.StatusOK)
 	}))
@@ -128,7 +127,7 @@ func TestHTTPService_Get(t *testing.T) {
 
 	// TODO : Nil Correlation ID is coming in logs, it has to be fixed
 
-	resp, err := service.Get(context.Background(), "test-path",
+	resp, err := service.Get(t.Context(), "test-path",
 		map[string]any{"key": "value", "name": []string{"gofr", "test"}})
 
 	if resp != nil {
@@ -144,7 +143,7 @@ func TestHTTPService_GetWithHeaders(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		assert.Equal(t, http.MethodGet, r.Method)
 		assert.Equal(t, "/test-path", r.URL.Path)
-		assert.Equal(t, "key=value&name=test", r.URL.RawQuery)
+		assert.Equal(t, "key=value&name=gofr&name=test", r.URL.RawQuery)
 		assert.Contains(t, "value1", r.Header.Get("Header1"))
 
 		w.WriteHeader(http.StatusOK)
@@ -160,7 +159,7 @@ func TestHTTPService_GetWithHeaders(t *testing.T) {
 
 	// TODO : Nil Correlation ID is coming in logs, it has to be fixed
 
-	resp, err := service.GetWithHeaders(context.Background(), "test-path",
+	resp, err := service.GetWithHeaders(t.Context(), "test-path",
 		map[string]any{"key": "value", "name": []string{"gofr", "test"}},
 		map[string]string{"header1": "value1"})
 
@@ -185,7 +184,7 @@ func TestHTTPService_Put(t *testing.T) {
 
 		assert.Equal(t, http.MethodPut, r.Method)
 		assert.Equal(t, "/test-path", r.URL.Path)
-		assert.Equal(t, "key=value&name=test", r.URL.RawQuery)
+		assert.Equal(t, "key=value&name=gofr&name=test", r.URL.RawQuery)
 		assert.Contains(t, "Test Body", string(body))
 
 		w.WriteHeader(http.StatusOK)
@@ -201,7 +200,7 @@ func TestHTTPService_Put(t *testing.T) {
 
 	// TODO : Nil Correlation ID is coming in logs, it has to be fixed
 
-	resp, err := service.Put(context.Background(), "test-path",
+	resp, err := service.Put(t.Context(), "test-path",
 		map[string]any{"key": "value", "name": []string{"gofr", "test"}}, []byte("{Test Body}"))
 
 	if resp != nil {
@@ -225,7 +224,7 @@ func TestHTTPService_PutWithHeaders(t *testing.T) {
 
 		assert.Equal(t, http.MethodPut, r.Method)
 		assert.Equal(t, "/test-path", r.URL.Path)
-		assert.Equal(t, "key=value&name=test", r.URL.RawQuery)
+		assert.Equal(t, "key=value&name=gofr&name=test", r.URL.RawQuery)
 		assert.Contains(t, "value1", r.Header.Get("Header1"))
 		assert.Contains(t, "Test Body", string(body))
 
@@ -242,7 +241,7 @@ func TestHTTPService_PutWithHeaders(t *testing.T) {
 
 	// TODO : Nil Correlation ID is coming in logs, it has to be fixed
 
-	resp, err := service.PutWithHeaders(context.Background(), "test-path",
+	resp, err := service.PutWithHeaders(t.Context(), "test-path",
 		map[string]any{"key": "value", "name": []string{"gofr", "test"}}, []byte("{Test Body}"),
 		map[string]string{"header1": "value1"})
 
@@ -267,7 +266,7 @@ func TestHTTPService_Patch(t *testing.T) {
 
 		assert.Equal(t, http.MethodPatch, r.Method)
 		assert.Equal(t, "/test-path", r.URL.Path)
-		assert.Equal(t, "key=value&name=test", r.URL.RawQuery)
+		assert.Equal(t, "key=value&name=gofr&name=test", r.URL.RawQuery)
 		assert.Contains(t, "Test Body", string(body))
 
 		w.WriteHeader(http.StatusOK)
@@ -283,7 +282,7 @@ func TestHTTPService_Patch(t *testing.T) {
 
 	// TODO : Nil Correlation ID is coming in logs, it has to be fixed
 
-	resp, err := service.Patch(context.Background(), "test-path",
+	resp, err := service.Patch(t.Context(), "test-path",
 		map[string]any{"key": "value", "name": []string{"gofr", "test"}}, []byte("{Test Body}"))
 
 	if resp != nil {
@@ -307,7 +306,7 @@ func TestHTTPService_PatchWithHeaders(t *testing.T) {
 
 		assert.Equal(t, http.MethodPut, r.Method)
 		assert.Equal(t, "/test-path", r.URL.Path)
-		assert.Equal(t, "key=value&name=test", r.URL.RawQuery)
+		assert.Equal(t, "key=value&name=gofr&name=test", r.URL.RawQuery)
 		assert.Contains(t, "value1", r.Header.Get("Header1"))
 		assert.Contains(t, "Test Body", string(body))
 
@@ -324,7 +323,7 @@ func TestHTTPService_PatchWithHeaders(t *testing.T) {
 
 	// TODO : Nil Correlation ID is coming in logs, it has to be fixed
 
-	resp, err := service.PutWithHeaders(context.Background(), "test-path",
+	resp, err := service.PutWithHeaders(t.Context(), "test-path",
 		map[string]any{"key": "value", "name": []string{"gofr", "test"}}, []byte("{Test Body}"),
 		map[string]string{"header1": "value1"})
 
@@ -349,7 +348,7 @@ func TestHTTPService_Post(t *testing.T) {
 
 		assert.Equal(t, http.MethodPost, r.Method)
 		assert.Equal(t, "/test-path", r.URL.Path)
-		assert.Equal(t, "key=value&name=test", r.URL.RawQuery)
+		assert.Equal(t, "key=value&name=gofr&name=test", r.URL.RawQuery)
 		assert.Contains(t, "Test Body", string(body))
 
 		w.WriteHeader(http.StatusOK)
@@ -365,7 +364,7 @@ func TestHTTPService_Post(t *testing.T) {
 
 	// TODO : Nil Correlation ID is coming in logs, it has to be fixed
 
-	resp, err := service.Post(context.Background(), "test-path",
+	resp, err := service.Post(t.Context(), "test-path",
 		map[string]any{"key": "value", "name": []string{"gofr", "test"}}, []byte("{Test Body}"))
 
 	if resp != nil {
@@ -389,7 +388,7 @@ func TestHTTPService_PostWithHeaders(t *testing.T) {
 
 		assert.Equal(t, http.MethodPost, r.Method)
 		assert.Equal(t, "/test-path", r.URL.Path)
-		assert.Equal(t, "key=value&name=test", r.URL.RawQuery)
+		assert.Equal(t, "key=value&name=gofr&name=test", r.URL.RawQuery)
 		assert.Contains(t, "value1", r.Header.Get("Header1"))
 		assert.Contains(t, "Test Body", string(body))
 
@@ -406,7 +405,7 @@ func TestHTTPService_PostWithHeaders(t *testing.T) {
 
 	// TODO : Nil Correlation ID is coming in logs, it has to be fixed
 
-	resp, err := service.PostWithHeaders(context.Background(), "test-path",
+	resp, err := service.PostWithHeaders(t.Context(), "test-path",
 		map[string]any{"key": "value", "name": []string{"gofr", "test"}}, []byte("{Test Body}"),
 		map[string]string{"header1": "value1"})
 
@@ -446,7 +445,7 @@ func TestHTTPService_Delete(t *testing.T) {
 
 	// TODO : Nil Correlation ID is coming in logs, it has to be fixed
 
-	resp, err := service.Delete(context.Background(), "test-path", []byte("{Test Body}"))
+	resp, err := service.Delete(t.Context(), "test-path", []byte("{Test Body}"))
 
 	if resp != nil {
 		defer resp.Body.Close()
@@ -485,7 +484,7 @@ func TestHTTPService_DeleteWithHeaders(t *testing.T) {
 
 	// TODO : Nil Correlation ID is coming in logs, it has to be fixed
 
-	resp, err := service.DeleteWithHeaders(context.Background(), "test-path", []byte("{Test Body}"),
+	resp, err := service.DeleteWithHeaders(t.Context(), "test-path", []byte("{Test Body}"),
 		map[string]string{"header1": "value1"})
 
 	if resp != nil {
@@ -503,7 +502,7 @@ func TestHTTPService_createAndSendRequestCreateRequestFailure(t *testing.T) {
 		Logger: logging.NewMockLogger(logging.INFO),
 	}
 
-	ctx := context.Background()
+	ctx := t.Context()
 	// when params value is of type []string then last value is sent in request
 	resp, err := service.createAndSendRequest(ctx,
 		"!@#$", "test-path", map[string]any{"key": "value", "name": []string{"gofr", "test"}},
@@ -528,7 +527,7 @@ func TestHTTPService_createAndSendRequestServerError(t *testing.T) {
 		Metrics: metrics,
 	}
 
-	ctx := context.Background()
+	ctx := t.Context()
 
 	metrics.EXPECT().RecordHistogram(gomock.Any(), "app_http_service_response", gomock.Any(), "path", gomock.Any(),
 		"method", http.MethodPost, "status", fmt.Sprintf("%v", http.StatusInternalServerError))

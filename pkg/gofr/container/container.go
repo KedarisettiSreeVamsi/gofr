@@ -50,17 +50,21 @@ type Container struct {
 	metricsManager metrics.Manager
 	PubSub         pubsub.Client
 
+	WSManager *websocket.Manager
+
 	Redis Redis
 	SQL   DB
 
-	Cassandra  CassandraWithContext
-	Clickhouse Clickhouse
-	Mongo      Mongo
-	Solr       Solr
-	DGraph     Dgraph
-	OpenTSDB   OpenTSDB
-	ScyllaDB   ScyllaDB
-	SurrealDB  SurrealDB
+	Cassandra     CassandraWithContext
+	Clickhouse    Clickhouse
+	Mongo         Mongo
+	Solr          Solr
+	DGraph        Dgraph
+	OpenTSDB      OpenTSDB
+	ScyllaDB      ScyllaDB
+	SurrealDB     SurrealDB
+	ArangoDB      ArangoDB
+	Elasticsearch Elasticsearch
 
 	KVStore KVStore
 
@@ -83,11 +87,11 @@ func NewContainer(conf config.Config) *Container {
 }
 
 func (c *Container) Create(conf config.Config) {
-	if c.appName != "" {
+	if c.appName == "" {
 		c.appName = conf.GetOrDefault("APP_NAME", "gofr-app")
 	}
 
-	if c.appVersion != "" {
+	if c.appVersion == "" {
 		c.appVersion = conf.GetOrDefault("APP_VERSION", "dev")
 	}
 
@@ -129,14 +133,28 @@ func (c *Container) Create(conf config.Config) {
 			batchBytes, _ := strconv.Atoi(conf.GetOrDefault("KAFKA_BATCH_BYTES", strconv.Itoa(kafka.DefaultBatchBytes)))
 			batchTimeout, _ := strconv.Atoi(conf.GetOrDefault("KAFKA_BATCH_TIMEOUT", strconv.Itoa(kafka.DefaultBatchTimeout)))
 
-			c.PubSub = kafka.New(kafka.Config{
-				Broker:          conf.Get("PUBSUB_BROKER"),
-				Partition:       partition,
-				ConsumerGroupID: conf.Get("CONSUMER_ID"),
-				OffSet:          offSet,
-				BatchSize:       batchSize,
-				BatchBytes:      batchBytes,
-				BatchTimeout:    batchTimeout,
+			tlsConf := kafka.TLSConfig{
+				CertFile:           conf.Get("KAFKA_TLS_CERT_FILE"),
+				KeyFile:            conf.Get("KAFKA_TLS_KEY_FILE"),
+				CACertFile:         conf.Get("KAFKA_TLS_CA_CERT_FILE"),
+				InsecureSkipVerify: conf.Get("KAFKA_TLS_INSECURE_SKIP_VERIFY") == "true",
+			}
+
+			pubsubBrokers := strings.Split(conf.Get("PUBSUB_BROKER"), ",")
+
+			c.PubSub = kafka.New(&kafka.Config{
+				Brokers:          pubsubBrokers,
+				Partition:        partition,
+				ConsumerGroupID:  conf.Get("CONSUMER_ID"),
+				OffSet:           offSet,
+				BatchSize:        batchSize,
+				BatchBytes:       batchBytes,
+				BatchTimeout:     batchTimeout,
+				SecurityProtocol: conf.Get("KAFKA_SECURITY_PROTOCOL"),
+				SASLMechanism:    conf.Get("KAFKA_SASL_MECHANISM"),
+				SASLUser:         conf.Get("KAFKA_SASL_USERNAME"),
+				SASLPassword:     conf.Get("KAFKA_SASL_PASSWORD"),
+				TLS:              tlsConf,
 			}, c.Logger, c.metricsManager)
 		}
 	case "GOOGLE":
@@ -149,6 +167,8 @@ func (c *Container) Create(conf config.Config) {
 	}
 
 	c.File = file.New(c.Logger)
+
+	c.WSManager = websocket.New()
 }
 
 func (c *Container) Close() error {
@@ -164,6 +184,10 @@ func (c *Container) Close() error {
 
 	if !isNil(c.PubSub) {
 		err = errors.Join(err, c.PubSub.Close())
+	}
+
+	for _, conn := range c.WSManager.ListConnections() {
+		c.WSManager.CloseConnection(conn)
 	}
 
 	return err
@@ -267,11 +291,27 @@ func (c *Container) GetSubscriber() pubsub.Subscriber {
 	return c.PubSub
 }
 
-func (*Container) GetConnectionFromContext(ctx context.Context) *websocket.Connection {
-	conn, ok := ctx.Value(websocket.WSConnectionKey).(*websocket.Connection)
+// GetConnectionFromContext retrieves a WebSocket connection from the context using the Manager.
+func (c *Container) GetConnectionFromContext(ctx context.Context) *websocket.Connection {
+	connID, ok := ctx.Value(websocket.WSConnectionKey).(string)
 	if !ok {
 		return nil
 	}
 
-	return conn
+	return c.WSManager.GetWebsocketConnection(connID)
+}
+
+// GetWSConnectionByServiceName retrieves a WebSocket connection by its service name.
+func (c *Container) GetWSConnectionByServiceName(serviceName string) *websocket.Connection {
+	return c.WSManager.GetConnectionByServiceName(serviceName)
+}
+
+// AddConnection adds a WebSocket connection to the Manager.
+func (c *Container) AddConnection(connID string, conn *websocket.Connection) {
+	c.WSManager.AddWebsocketConnection(connID, conn)
+}
+
+// RemoveConnection removes a WebSocket connection from the Manager.
+func (c *Container) RemoveConnection(connID string) {
+	c.WSManager.CloseConnection(connID)
 }

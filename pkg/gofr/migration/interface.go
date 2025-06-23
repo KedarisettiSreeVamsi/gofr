@@ -63,6 +63,70 @@ type Mongo interface {
 	StartSession() (any, error)
 }
 
+// ArangoDB is an interface representing an ArangoDB database client with common CRUD operations.
+type ArangoDB interface {
+	// CreateDB creates a new database in ArangoDB.
+	CreateDB(ctx context.Context, database string) error
+	// DropDB deletes an existing database in ArangoDB.
+	DropDB(ctx context.Context, database string) error
+
+	// CreateCollection creates a new collection in a database with specified type.
+	CreateCollection(ctx context.Context, database, collection string, isEdge bool) error
+	// DropCollection deletes an existing collection from a database.
+	DropCollection(ctx context.Context, database, collection string) error
+
+	// CreateGraph creates a new graph in a database.
+	CreateGraph(ctx context.Context, database, graph string, edgeDefinitions any) error
+	// DropGraph deletes an existing graph from a database.
+	DropGraph(ctx context.Context, database, graph string) error
+}
+
+type SurrealDB interface {
+	// Query executes a Surreal query with the provided variables and returns the query results as a slice of interfaces{}.
+	// It returns an error if the query execution fails.
+	Query(ctx context.Context, query string, vars map[string]any) ([]any, error)
+
+	// CreateNamespace creates a new namespace in the SurrealDB instance.
+	CreateNamespace(ctx context.Context, namespace string) error
+
+	// CreateDatabase creates a new database in the SurrealDB instance.
+	CreateDatabase(ctx context.Context, database string) error
+
+	// DropNamespace deletes a namespace from the SurrealDB instance.
+	DropNamespace(ctx context.Context, namespace string) error
+
+	// DropDatabase deletes a database from the SurrealDB instance.
+	DropDatabase(ctx context.Context, database string) error
+}
+
+type DGraph interface {
+	// ApplySchema applies or updates the complete database schema.
+	// Parameters:
+	// - ctx: Context for request cancellation and timeouts
+	// - schema: Schema definition in Dgraph Schema Definition Language (SDL) format
+	// Returns:
+	// - error: An error if the schema application fails
+	ApplySchema(ctx context.Context, schema string) error
+
+	// AddOrUpdateField atomically creates or updates a single field definition.
+	// Parameters:
+	// - ctx: Context for request cancellation and timeouts
+	// - fieldName: Name of the field/predicate to create or update
+	// - fieldType: Dgraph data type (e.g., string, int, datetime)
+	// - directives: Space-separated Dgraph directives (e.g., "@index(hash) @upsert")
+	// Returns:
+	// - error: An error if the field operation fails
+	AddOrUpdateField(ctx context.Context, fieldName, fieldType, directives string) error
+
+	// DropField permanently removes a field/predicate and all its associated data.
+	// Parameters:
+	// - ctx: Context for request cancellation and timeouts
+	// - fieldName: Name of the field/predicate to remove
+	// Returns:
+	// - error: An error if the field removal fails
+	DropField(ctx context.Context, fieldName string) error
+}
+
 // keeping the migrator interface unexported as, right now it is not being implemented directly, by the externalDB drivers.
 // keeping the implementations for externalDB at one place such that if any change in migration logic, we would change directly here.
 type migrator interface {

@@ -1,12 +1,16 @@
 package cmd
 
 import (
-	"context"
 	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
+
+func TestMain(m *testing.M) {
+	os.Setenv("GOFR_TELEMETRY", "false")
+	m.Run()
+}
 
 func TestRequest_Bind(t *testing.T) {
 	// TODO: Only fields starting with Capital letter can be 'bind' right now.
@@ -39,7 +43,7 @@ func TestRequest_Bind(t *testing.T) {
 
 	osHostName, _ := os.Hostname()
 
-	assert.Equal(t, context.Background(), ctx, "TEST Failed.\n context is not context.Background.")
+	assert.Equal(t, t.Context(), ctx, "TEST Failed.\n context is not context.Background.")
 
 	assert.Equal(t, osHostName, hostName, "TEST Failed.\n Hostname did not match.")
 }

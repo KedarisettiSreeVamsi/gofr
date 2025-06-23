@@ -6,32 +6,99 @@ import (
 	"net"
 	"reflect"
 	"strconv"
+	"strings"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 
+	"gofr.dev/pkg/gofr/config"
 	"gofr.dev/pkg/gofr/container"
 	gofr_grpc "gofr.dev/pkg/gofr/grpc"
 )
 
 type grpcServer struct {
-	server *grpc.Server
-	port   int
+	server             *grpc.Server
+	interceptors       []grpc.UnaryServerInterceptor
+	streamInterceptors []grpc.StreamServerInterceptor
+	options            []grpc.ServerOption
+	port               int
+	config             config.Config
 }
 
-func newGRPCServer(c *container.Container, port int) *grpcServer {
+// AddGRPCServerOptions allows users to add custom gRPC server options such as TLS configuration,
+// timeouts, interceptors, and other server-specific settings in a single call.
+//
+// Example:
+//
+//	// Add TLS credentials and connection timeout in one call
+//	creds, _ := credentials.NewServerTLSFromFile("server-cert.pem", "server-key.pem")
+//	app.AddGRPCServerOptions(
+//		grpc.Creds(creds),
+//		grpc.ConnectionTimeout(10 * time.Second),
+//	)
+//
+// This function accepts a variadic list of gRPC server options (grpc.ServerOption) and appends them
+// to the server's configuration. It allows fine-tuning of the gRPC server's behavior during its initialization.
+func (a *App) AddGRPCServerOptions(grpcOpts ...grpc.ServerOption) {
+	a.grpcServer.options = append(a.grpcServer.options, grpcOpts...)
+}
+
+// AddGRPCUnaryInterceptors allows users to add custom gRPC interceptors.
+// Example:
+//
+//	func loggingInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo,
+//	handler grpc.UnaryHandler) (interface{}, error) {
+//		log.Printf("Received gRPC request: %s", info.FullMethod)
+//		return handler(ctx, req)
+//	}
+//	app.AddGRPCUnaryInterceptors(loggingInterceptor)
+func (a *App) AddGRPCUnaryInterceptors(interceptors ...grpc.UnaryServerInterceptor) {
+	a.grpcServer.interceptors = append(a.grpcServer.interceptors, interceptors...)
+}
+
+func (a *App) AddGRPCServerStreamInterceptors(interceptors ...grpc.StreamServerInterceptor) {
+	a.grpcServer.streamInterceptors = append(a.grpcServer.streamInterceptors, interceptors...)
+}
+
+func newGRPCServer(c *container.Container, port int, cfg config.Config) *grpcServer {
+	middleware := make([]grpc.UnaryServerInterceptor, 0)
+	middleware = append(middleware,
+		grpc_recovery.UnaryServerInterceptor(),
+		gofr_grpc.ObservabilityInterceptor(c.Logger, c.Metrics()))
+
+	streamMiddleware := make([]grpc.StreamServerInterceptor, 0)
+	streamMiddleware = append(streamMiddleware,
+		grpc_recovery.StreamServerInterceptor(),
+		gofr_grpc.StreamObservabilityInterceptor(c.Logger, c.Metrics()))
+
 	return &grpcServer{
-		server: grpc.NewServer(
-			grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(
-				grpc_recovery.UnaryServerInterceptor(),
-				gofr_grpc.ObservabilityInterceptor(c.Logger, c.Metrics()),
-			))),
-		port: port,
+		port:               port,
+		interceptors:       middleware,
+		streamInterceptors: streamMiddleware,
+		config:             cfg,
+	}
+}
+
+func (g *grpcServer) createServer() {
+	interceptorOption := grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(g.interceptors...))
+	streamOpt := grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(g.streamInterceptors...))
+	g.options = append(g.options, interceptorOption, streamOpt)
+
+	g.server = grpc.NewServer(g.options...)
+
+	enabled := strings.ToLower(g.config.GetOrDefault("GRPC_ENABLE_REFLECTION", "false"))
+	if enabled != defaultReflection {
+		reflection.Register(g.server)
 	}
 }
 
 func (g *grpcServer) Run(c *container.Container) {
+	if g.server == nil {
+		g.createServer()
+	}
+
 	addr := ":" + strconv.Itoa(g.port)
 
 	c.Logger.Infof("starting gRPC server at %s", addr)
@@ -50,7 +117,9 @@ func (g *grpcServer) Run(c *container.Container) {
 
 func (g *grpcServer) Shutdown(ctx context.Context) error {
 	return ShutdownWithContext(ctx, func(_ context.Context) error {
-		g.server.GracefulStop()
+		if g.server != nil {
+			g.server.GracefulStop()
+		}
 
 		return nil
 	}, func() error {
@@ -68,6 +137,10 @@ var (
 func (a *App) RegisterService(desc *grpc.ServiceDesc, impl any) {
 	if !a.grpcRegistered && !isPortAvailable(a.grpcServer.port) {
 		a.container.Logger.Fatalf("gRPC port %d is blocked or unreachable", a.grpcServer.port)
+	}
+
+	if !a.grpcRegistered {
+		a.grpcServer.createServer()
 	}
 
 	a.container.Logger.Infof("registering gRPC Server: %s", desc.ServiceName)

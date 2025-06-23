@@ -1,7 +1,7 @@
 package redis
 
 import (
-	"context"
+	"crypto/tls"
 	"testing"
 	"time"
 
@@ -65,7 +65,7 @@ func TestRedis_QueryLogging(t *testing.T) {
 
 		require.NoError(t, err)
 
-		result, err := client.Set(context.TODO(), "key", "value", 1*time.Minute).Result()
+		result, err := client.Set(t.Context(), "key", "value", 1*time.Minute).Result()
 
 		require.NoError(t, err)
 		assert.Equal(t, "OK", result)
@@ -102,11 +102,11 @@ func TestRedis_PipelineQueryLogging(t *testing.T) {
 
 		// Pipeline execution
 		pipe := client.Pipeline()
-		setCmd := pipe.Set(context.TODO(), "key1", "value1", 1*time.Minute)
-		getCmd := pipe.Get(context.TODO(), "key1")
+		setCmd := pipe.Set(t.Context(), "key1", "value1", 1*time.Minute)
+		getCmd := pipe.Get(t.Context(), "key1")
 
 		// Pipeline Exec should return a non-nil error
-		_, err = pipe.Exec(context.TODO())
+		_, err = pipe.Exec(t.Context())
 		require.NoError(t, err)
 
 		// Retrieve results
@@ -147,4 +147,53 @@ func TestRedis_Close(t *testing.T) {
 	err = client.Close()
 
 	require.NoError(t, err)
+}
+
+func Test_TLSConfig(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockLogger := logging.NewMockLogger(logging.ERROR)
+	mockConfig := config.NewMockConfig(map[string]string{
+		"REDIS_HOST":        "localhost",
+		"REDIS_TLS_ENABLED": "true",
+	})
+
+	conf := getRedisConfig(mockConfig, mockLogger)
+	assert.NotNil(t, conf.TLS, "Expected TLS config to be set")
+	assert.EqualValues(t, tls.VersionTLS12, conf.TLS.MinVersion, "Expected TLS 1.2")
+}
+
+func Test_TLSConfigWithDummyPEM(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	mockPEM := getMockPEM()
+	mockKey := getMockKey()
+
+	mockLogger := logging.NewMockLogger(logging.ERROR)
+	mockConfig := config.NewMockConfig(map[string]string{
+		"REDIS_HOST":        "localhost",
+		"REDIS_TLS_ENABLED": "true",
+		"REDIS_TLS_CA_CERT": mockPEM,
+		"REDIS_TLS_CERT":    mockPEM,
+		"REDIS_TLS_KEY":     mockKey,
+	})
+
+	conf := getRedisConfig(mockConfig, mockLogger)
+	assert.NotNil(t, conf.TLS, "Expected TLS config to be set")
+	assert.EqualValues(t, tls.VersionTLS12, conf.TLS.MinVersion, "Expected TLS 1.2")
+}
+
+func getMockPEM() string {
+	const mockPEM = `-----BEGIN CERTIFICATE-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAnzQw\n-----END CERTIFICATE-----`
+
+	return mockPEM
+}
+
+func getMockKey() string {
+	//nolint:gosec // dummy private key for test only, not used in production
+	const mockKey = `-----BEGIN RSA PRIVATE KEY-----\nMIIEpAIBAAKCAQEAnzQw\n-----END RSA PRIVATE KEY-----`
+
+	return mockKey
 }

@@ -1,11 +1,13 @@
 package middleware
 
 import (
+	"bufio"
 	"bytes"
-	"context"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -18,7 +20,7 @@ func Test_getIPAddress(t *testing.T) {
 	{
 		// When RemoteAddr is set
 		addr := "0.0.0.0:8080"
-		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "http://dummy", http.NoBody)
+		req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, "http://dummy", http.NoBody)
 
 		require.NoError(t, err, "TEST Failed.\n")
 
@@ -31,7 +33,7 @@ func Test_getIPAddress(t *testing.T) {
 	{
 		// When `X-Forwarded-For` header is set
 		addr := "192.168.0.1:8080"
-		req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "http://dummy", http.NoBody)
+		req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, "http://dummy", http.NoBody)
 
 		require.NoError(t, err, "TEST Failed.\n")
 
@@ -44,11 +46,14 @@ func Test_getIPAddress(t *testing.T) {
 
 func Test_LoggingMiddleware(t *testing.T) {
 	logs := testutil.StdoutOutputForFunc(func() {
-		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "http://dummy", http.NoBody)
+		req, _ := http.NewRequestWithContext(t.Context(), http.MethodGet, "http://dummy", http.NoBody)
 
 		rr := httptest.NewRecorder()
+		probes := LogProbes{
+			Disabled: false,
+		}
 
-		handler := Logging(logging.NewMockLogger(logging.DEBUG))(http.HandlerFunc(testHandler))
+		handler := Logging(probes, logging.NewMockLogger(logging.DEBUG))(http.HandlerFunc(testHandler))
 
 		handler.ServeHTTP(rr, req)
 	})
@@ -56,13 +61,52 @@ func Test_LoggingMiddleware(t *testing.T) {
 	assert.Contains(t, logs, "GET    200")
 }
 
-func Test_LoggingMiddlewareError(t *testing.T) {
-	logs := testutil.StderrOutputForFunc(func() {
-		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "http://dummy", http.NoBody)
+func Test_LoggingMiddlewareProbesEnable(t *testing.T) {
+	logs := testutil.StdoutOutputForFunc(func() {
+		req, _ := http.NewRequestWithContext(t.Context(), http.MethodGet, "http://dummy/.well-known/alive", http.NoBody)
 
 		rr := httptest.NewRecorder()
+		probes := LogProbes{
+			Disabled: false,
+			Paths:    []string{"/.well-known/alive", "/.well-known/health"},
+		}
 
-		handler := Logging(logging.NewMockLogger(logging.ERROR))(http.HandlerFunc(testHandlerError))
+		handler := Logging(probes, logging.NewMockLogger(logging.DEBUG))(http.HandlerFunc(testHandler))
+
+		handler.ServeHTTP(rr, req)
+	})
+
+	assert.Contains(t, logs, "GET    200")
+}
+
+func Test_LoggingMiddlewareProbesDisable(t *testing.T) {
+	logs := testutil.StdoutOutputForFunc(func() {
+		req, _ := http.NewRequestWithContext(t.Context(), http.MethodGet, "http://dummy/.well-known/alive", http.NoBody)
+
+		rr := httptest.NewRecorder()
+		probes := LogProbes{
+			Disabled: true,
+			Paths:    []string{"/.well-known/alive", "/.well-known/health"},
+		}
+
+		handler := Logging(probes, logging.NewMockLogger(logging.DEBUG))(http.HandlerFunc(testHandler))
+
+		handler.ServeHTTP(rr, req)
+	})
+
+	assert.Empty(t, logs, "TEST Failed.\n")
+}
+
+func Test_LoggingMiddlewareError(t *testing.T) {
+	logs := testutil.StderrOutputForFunc(func() {
+		req, _ := http.NewRequestWithContext(t.Context(), http.MethodGet, "http://dummy", http.NoBody)
+
+		rr := httptest.NewRecorder()
+		probes := LogProbes{
+			Disabled: false,
+		}
+
+		handler := Logging(probes, logging.NewMockLogger(logging.ERROR))(http.HandlerFunc(testHandlerError))
 
 		handler.ServeHTTP(rr, req)
 	})
@@ -84,11 +128,14 @@ func testHandlerError(w http.ResponseWriter, _ *http.Request) {
 
 func Test_LoggingMiddlewareStringPanicHandling(t *testing.T) {
 	logs := testutil.StderrOutputForFunc(func() {
-		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "http://dummy", http.NoBody)
+		req, _ := http.NewRequestWithContext(t.Context(), http.MethodGet, "http://dummy", http.NoBody)
 
 		rr := httptest.NewRecorder()
+		probes := LogProbes{
+			Disabled: false,
+		}
 
-		handler := Logging(logging.NewMockLogger(logging.DEBUG))(http.HandlerFunc(testStringPanicHandler))
+		handler := Logging(probes, logging.NewMockLogger(logging.DEBUG))(http.HandlerFunc(testStringPanicHandler))
 
 		handler.ServeHTTP(rr, req)
 	})
@@ -103,11 +150,14 @@ func testStringPanicHandler(_ http.ResponseWriter, r *http.Request) {
 
 func Test_LoggingMiddlewareErrorPanicHandling(t *testing.T) {
 	logs := testutil.StderrOutputForFunc(func() {
-		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "http://dummy", http.NoBody)
+		req, _ := http.NewRequestWithContext(t.Context(), http.MethodGet, "http://dummy", http.NoBody)
 
 		rr := httptest.NewRecorder()
+		probes := LogProbes{
+			Disabled: false,
+		}
 
-		handler := Logging(logging.NewMockLogger(logging.DEBUG))(http.HandlerFunc(testErrorPanicHandler))
+		handler := Logging(probes, logging.NewMockLogger(logging.DEBUG))(http.HandlerFunc(testErrorPanicHandler))
 
 		handler.ServeHTTP(rr, req)
 	})
@@ -122,11 +172,14 @@ func testErrorPanicHandler(http.ResponseWriter, *http.Request) {
 
 func Test_LoggingMiddlewareUnknownPanicHandling(t *testing.T) {
 	logs := testutil.StderrOutputForFunc(func() {
-		req, _ := http.NewRequestWithContext(context.Background(), http.MethodGet, "http://dummy", http.NoBody)
+		req, _ := http.NewRequestWithContext(t.Context(), http.MethodGet, "http://dummy", http.NoBody)
 
 		rr := httptest.NewRecorder()
+		probes := LogProbes{
+			Disabled: false,
+		}
 
-		handler := Logging(logging.NewMockLogger(logging.DEBUG))(http.HandlerFunc(testUnknownPanicHandler))
+		handler := Logging(probes, logging.NewMockLogger(logging.DEBUG))(http.HandlerFunc(testUnknownPanicHandler))
 
 		handler.ServeHTTP(rr, req)
 	})
@@ -178,3 +231,92 @@ func Test_ColorForStatusCode(t *testing.T) {
 		assert.Equal(t, tc.expOut, out)
 	}
 }
+
+func Test_StatusResponseWriter_WriteHeader(t *testing.T) {
+	tests := []struct {
+		name           string
+		status         int
+		expectedStatus int
+	}{
+		{"WriteHeader 200", 200, 200},
+		{"WriteHeader 404", 404, 404},
+		{"WriteHeader 500", 500, 500},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			rr := httptest.NewRecorder()
+			srw := &StatusResponseWriter{ResponseWriter: rr}
+
+			srw.WriteHeader(tt.status)
+
+			require.Equal(t, tt.expectedStatus, srw.status, "status mismatch")
+			require.True(t, srw.wroteHeader, "expected wroteHeader to be true")
+			require.Equal(t, tt.expectedStatus, rr.Code, "recorder status mismatch")
+		})
+	}
+}
+
+func Test_StatusResponseWriter_WriteHeader_DuplicateCalls(t *testing.T) {
+	rr := httptest.NewRecorder()
+	srw := &StatusResponseWriter{ResponseWriter: rr}
+
+	srw.WriteHeader(http.StatusOK)
+	srw.WriteHeader(http.StatusNotFound) // This should be ignored
+
+	require.Equal(t, http.StatusOK, srw.status, "expected status 200")
+	require.Equal(t, http.StatusOK, rr.Code, "expected recorder status 200")
+}
+
+func Test_StatusResponseWriter_Hijack_Supported(t *testing.T) {
+	rr := httptest.NewRecorder()
+	srw := &StatusResponseWriter{ResponseWriter: rr}
+
+	// Wrap the recorder in a type that supports Hijack
+	hijacker := &hijackableResponseRecorder{rr}
+	srw.ResponseWriter = hijacker
+
+	conn, rw, err := srw.Hijack()
+	require.NoError(t, err, "expected no error during Hijack")
+	require.NotNil(t, conn, "expected conn to be non-nil")
+	require.NotNil(t, rw, "expected rw to be non-nil")
+}
+
+func Test_StatusResponseWriter_Hijack_NotSupported(t *testing.T) {
+	rr := httptest.NewRecorder()
+	srw := &StatusResponseWriter{ResponseWriter: rr}
+
+	_, _, err := srw.Hijack()
+	require.Error(t, err, "expected an error during Hijack")
+	require.ErrorIs(t, err, errHijackNotSupported, "expected error to be errHijackNotSupported")
+}
+
+// hijackableResponseRecorder is a custom ResponseRecorder that supports the Hijack method.
+type hijackableResponseRecorder struct {
+	*httptest.ResponseRecorder
+}
+
+func (*hijackableResponseRecorder) Hijack() (net.Conn, *bufio.ReadWriter, error) {
+	conn := &mockConn{}
+	rw := bufio.NewReadWriter(bufio.NewReader(bytes.NewReader(nil)), bufio.NewWriter(bytes.NewBuffer(nil)))
+
+	return conn, rw, nil
+}
+
+// mockConn is a mock implementation of net.Conn for testing purposes.
+type mockConn struct{}
+
+func (*mockConn) Read([]byte) (n int, err error)   { return 0, nil }
+func (*mockConn) Write([]byte) (n int, err error)  { return 0, nil }
+func (*mockConn) Close() error                     { return nil }
+func (*mockConn) LocalAddr() net.Addr              { return &mockAddr{} }
+func (*mockConn) RemoteAddr() net.Addr             { return &mockAddr{} }
+func (*mockConn) SetDeadline(time.Time) error      { return nil }
+func (*mockConn) SetReadDeadline(time.Time) error  { return nil }
+func (*mockConn) SetWriteDeadline(time.Time) error { return nil }
+
+// mockAddr is a mock implementation of net.Addr for testing purposes.
+type mockAddr struct{}
+
+func (*mockAddr) Network() string { return "tcp" }
+func (*mockAddr) String() string  { return "127.0.0.1:8080" }

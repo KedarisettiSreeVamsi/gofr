@@ -278,6 +278,48 @@ func (m *MockRedis) EXPECT() *MockRedisMockRecorder {
 	return m.recorder
 }
 
+// ACLCat mocks base method.
+func (m *MockRedis) ACLCat(ctx context.Context) *redis.StringSliceCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ACLCat", ctx)
+	ret0, _ := ret[0].(*redis.StringSliceCmd)
+	return ret0
+}
+
+// ACLCat indicates an expected call of ACLCat.
+func (mr *MockRedisMockRecorder) ACLCat(ctx any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ACLCat", reflect.TypeOf((*MockRedis)(nil).ACLCat), ctx)
+}
+
+// ACLCatArgs mocks base method.
+func (m *MockRedis) ACLCatArgs(ctx context.Context, options *redis.ACLCatArgs) *redis.StringSliceCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ACLCatArgs", ctx, options)
+	ret0, _ := ret[0].(*redis.StringSliceCmd)
+	return ret0
+}
+
+// ACLCatArgs indicates an expected call of ACLCatArgs.
+func (mr *MockRedisMockRecorder) ACLCatArgs(ctx, options any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ACLCatArgs", reflect.TypeOf((*MockRedis)(nil).ACLCatArgs), ctx, options)
+}
+
+// ACLDelUser mocks base method.
+func (m *MockRedis) ACLDelUser(ctx context.Context, username string) *redis.IntCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ACLDelUser", ctx, username)
+	ret0, _ := ret[0].(*redis.IntCmd)
+	return ret0
+}
+
+// ACLDelUser indicates an expected call of ACLDelUser.
+func (mr *MockRedisMockRecorder) ACLDelUser(ctx, username any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ACLDelUser", reflect.TypeOf((*MockRedis)(nil).ACLDelUser), ctx, username)
+}
+
 // ACLDryRun mocks base method.
 func (m *MockRedis) ACLDryRun(ctx context.Context, username string, command ...any) *redis.StringCmd {
 	m.ctrl.T.Helper()
@@ -295,6 +337,20 @@ func (mr *MockRedisMockRecorder) ACLDryRun(ctx, username any, command ...any) *g
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]any{ctx, username}, command...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ACLDryRun", reflect.TypeOf((*MockRedis)(nil).ACLDryRun), varargs...)
+}
+
+// ACLList mocks base method.
+func (m *MockRedis) ACLList(ctx context.Context) *redis.StringSliceCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ACLList", ctx)
+	ret0, _ := ret[0].(*redis.StringSliceCmd)
+	return ret0
+}
+
+// ACLList indicates an expected call of ACLList.
+func (mr *MockRedisMockRecorder) ACLList(ctx any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ACLList", reflect.TypeOf((*MockRedis)(nil).ACLList), ctx)
 }
 
 // ACLLog mocks base method.
@@ -323,6 +379,25 @@ func (m *MockRedis) ACLLogReset(ctx context.Context) *redis.StatusCmd {
 func (mr *MockRedisMockRecorder) ACLLogReset(ctx any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ACLLogReset", reflect.TypeOf((*MockRedis)(nil).ACLLogReset), ctx)
+}
+
+// ACLSetUser mocks base method.
+func (m *MockRedis) ACLSetUser(ctx context.Context, username string, rules ...string) *redis.StatusCmd {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, username}
+	for _, a := range rules {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "ACLSetUser", varargs...)
+	ret0, _ := ret[0].(*redis.StatusCmd)
+	return ret0
+}
+
+// ACLSetUser indicates an expected call of ACLSetUser.
+func (mr *MockRedisMockRecorder) ACLSetUser(ctx, username any, rules ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, username}, rules...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ACLSetUser", reflect.TypeOf((*MockRedis)(nil).ACLSetUser), varargs...)
 }
 
 // Append mocks base method.
@@ -1647,6 +1722,20 @@ func (m *MockRedis) ClusterMeet(ctx context.Context, host, port string) *redis.S
 func (mr *MockRedisMockRecorder) ClusterMeet(ctx, host, port any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ClusterMeet", reflect.TypeOf((*MockRedis)(nil).ClusterMeet), ctx, host, port)
+}
+
+// ClusterMyID mocks base method.
+func (m *MockRedis) ClusterMyID(ctx context.Context) *redis.StringCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ClusterMyID", ctx)
+	ret0, _ := ret[0].(*redis.StringCmd)
+	return ret0
+}
+
+// ClusterMyID indicates an expected call of ClusterMyID.
+func (mr *MockRedisMockRecorder) ClusterMyID(ctx any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ClusterMyID", reflect.TypeOf((*MockRedis)(nil).ClusterMyID), ctx)
 }
 
 // ClusterMyShardID mocks base method.
@@ -3276,6 +3365,63 @@ func (mr *MockRedisMockRecorder) HGetAll(ctx, key any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HGetAll", reflect.TypeOf((*MockRedis)(nil).HGetAll), ctx, key)
 }
 
+// HGetDel mocks base method.
+func (m *MockRedis) HGetDel(ctx context.Context, key string, fields ...string) *redis.StringSliceCmd {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, key}
+	for _, a := range fields {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "HGetDel", varargs...)
+	ret0, _ := ret[0].(*redis.StringSliceCmd)
+	return ret0
+}
+
+// HGetDel indicates an expected call of HGetDel.
+func (mr *MockRedisMockRecorder) HGetDel(ctx, key any, fields ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, key}, fields...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HGetDel", reflect.TypeOf((*MockRedis)(nil).HGetDel), varargs...)
+}
+
+// HGetEX mocks base method.
+func (m *MockRedis) HGetEX(ctx context.Context, key string, fields ...string) *redis.StringSliceCmd {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, key}
+	for _, a := range fields {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "HGetEX", varargs...)
+	ret0, _ := ret[0].(*redis.StringSliceCmd)
+	return ret0
+}
+
+// HGetEX indicates an expected call of HGetEX.
+func (mr *MockRedisMockRecorder) HGetEX(ctx, key any, fields ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, key}, fields...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HGetEX", reflect.TypeOf((*MockRedis)(nil).HGetEX), varargs...)
+}
+
+// HGetEXWithArgs mocks base method.
+func (m *MockRedis) HGetEXWithArgs(ctx context.Context, key string, options *redis.HGetEXOptions, fields ...string) *redis.StringSliceCmd {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, key, options}
+	for _, a := range fields {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "HGetEXWithArgs", varargs...)
+	ret0, _ := ret[0].(*redis.StringSliceCmd)
+	return ret0
+}
+
+// HGetEXWithArgs indicates an expected call of HGetEXWithArgs.
+func (mr *MockRedisMockRecorder) HGetEXWithArgs(ctx, key, options any, fields ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, key, options}, fields...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HGetEXWithArgs", reflect.TypeOf((*MockRedis)(nil).HGetEXWithArgs), varargs...)
+}
+
 // HIncrBy mocks base method.
 func (m *MockRedis) HIncrBy(ctx context.Context, key, field string, incr int64) *redis.IntCmd {
 	m.ctrl.T.Helper()
@@ -3578,6 +3724,44 @@ func (mr *MockRedisMockRecorder) HSet(ctx, key any, values ...any) *gomock.Call 
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HSet", reflect.TypeOf((*MockRedis)(nil).HSet), varargs...)
 }
 
+// HSetEX mocks base method.
+func (m *MockRedis) HSetEX(ctx context.Context, key string, fieldsAndValues ...string) *redis.IntCmd {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, key}
+	for _, a := range fieldsAndValues {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "HSetEX", varargs...)
+	ret0, _ := ret[0].(*redis.IntCmd)
+	return ret0
+}
+
+// HSetEX indicates an expected call of HSetEX.
+func (mr *MockRedisMockRecorder) HSetEX(ctx, key any, fieldsAndValues ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, key}, fieldsAndValues...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HSetEX", reflect.TypeOf((*MockRedis)(nil).HSetEX), varargs...)
+}
+
+// HSetEXWithArgs mocks base method.
+func (m *MockRedis) HSetEXWithArgs(ctx context.Context, key string, options *redis.HSetEXOptions, fieldsAndValues ...string) *redis.IntCmd {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, key, options}
+	for _, a := range fieldsAndValues {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "HSetEXWithArgs", varargs...)
+	ret0, _ := ret[0].(*redis.IntCmd)
+	return ret0
+}
+
+// HSetEXWithArgs indicates an expected call of HSetEXWithArgs.
+func (mr *MockRedisMockRecorder) HSetEXWithArgs(ctx, key, options any, fieldsAndValues ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, key, options}, fieldsAndValues...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HSetEXWithArgs", reflect.TypeOf((*MockRedis)(nil).HSetEXWithArgs), varargs...)
+}
+
 // HSetNX mocks base method.
 func (m *MockRedis) HSetNX(ctx context.Context, key, field string, value any) *redis.BoolCmd {
 	m.ctrl.T.Helper()
@@ -3590,6 +3774,20 @@ func (m *MockRedis) HSetNX(ctx context.Context, key, field string, value any) *r
 func (mr *MockRedisMockRecorder) HSetNX(ctx, key, field, value any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HSetNX", reflect.TypeOf((*MockRedis)(nil).HSetNX), ctx, key, field, value)
+}
+
+// HStrLen mocks base method.
+func (m *MockRedis) HStrLen(ctx context.Context, key, field string) *redis.IntCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HStrLen", ctx, key, field)
+	ret0, _ := ret[0].(*redis.IntCmd)
+	return ret0
+}
+
+// HStrLen indicates an expected call of HStrLen.
+func (mr *MockRedisMockRecorder) HStrLen(ctx, key, field any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HStrLen", reflect.TypeOf((*MockRedis)(nil).HStrLen), ctx, key, field)
 }
 
 // HTTL mocks base method.
@@ -5978,132 +6176,6 @@ func (mr *MockRedisMockRecorder) TDigestTrimmedMean(ctx, key, lowCutQuantile, hi
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TDigestTrimmedMean", reflect.TypeOf((*MockRedis)(nil).TDigestTrimmedMean), ctx, key, lowCutQuantile, highCutQuantile)
 }
 
-// TFCall mocks base method.
-func (m *MockRedis) TFCall(ctx context.Context, libName, funcName string, numKeys int) *redis.Cmd {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "TFCall", ctx, libName, funcName, numKeys)
-	ret0, _ := ret[0].(*redis.Cmd)
-	return ret0
-}
-
-// TFCall indicates an expected call of TFCall.
-func (mr *MockRedisMockRecorder) TFCall(ctx, libName, funcName, numKeys any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TFCall", reflect.TypeOf((*MockRedis)(nil).TFCall), ctx, libName, funcName, numKeys)
-}
-
-// TFCallASYNC mocks base method.
-func (m *MockRedis) TFCallASYNC(ctx context.Context, libName, funcName string, numKeys int) *redis.Cmd {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "TFCallASYNC", ctx, libName, funcName, numKeys)
-	ret0, _ := ret[0].(*redis.Cmd)
-	return ret0
-}
-
-// TFCallASYNC indicates an expected call of TFCallASYNC.
-func (mr *MockRedisMockRecorder) TFCallASYNC(ctx, libName, funcName, numKeys any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TFCallASYNC", reflect.TypeOf((*MockRedis)(nil).TFCallASYNC), ctx, libName, funcName, numKeys)
-}
-
-// TFCallASYNCArgs mocks base method.
-func (m *MockRedis) TFCallASYNCArgs(ctx context.Context, libName, funcName string, numKeys int, options *redis.TFCallOptions) *redis.Cmd {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "TFCallASYNCArgs", ctx, libName, funcName, numKeys, options)
-	ret0, _ := ret[0].(*redis.Cmd)
-	return ret0
-}
-
-// TFCallASYNCArgs indicates an expected call of TFCallASYNCArgs.
-func (mr *MockRedisMockRecorder) TFCallASYNCArgs(ctx, libName, funcName, numKeys, options any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TFCallASYNCArgs", reflect.TypeOf((*MockRedis)(nil).TFCallASYNCArgs), ctx, libName, funcName, numKeys, options)
-}
-
-// TFCallArgs mocks base method.
-func (m *MockRedis) TFCallArgs(ctx context.Context, libName, funcName string, numKeys int, options *redis.TFCallOptions) *redis.Cmd {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "TFCallArgs", ctx, libName, funcName, numKeys, options)
-	ret0, _ := ret[0].(*redis.Cmd)
-	return ret0
-}
-
-// TFCallArgs indicates an expected call of TFCallArgs.
-func (mr *MockRedisMockRecorder) TFCallArgs(ctx, libName, funcName, numKeys, options any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TFCallArgs", reflect.TypeOf((*MockRedis)(nil).TFCallArgs), ctx, libName, funcName, numKeys, options)
-}
-
-// TFunctionDelete mocks base method.
-func (m *MockRedis) TFunctionDelete(ctx context.Context, libName string) *redis.StatusCmd {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "TFunctionDelete", ctx, libName)
-	ret0, _ := ret[0].(*redis.StatusCmd)
-	return ret0
-}
-
-// TFunctionDelete indicates an expected call of TFunctionDelete.
-func (mr *MockRedisMockRecorder) TFunctionDelete(ctx, libName any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TFunctionDelete", reflect.TypeOf((*MockRedis)(nil).TFunctionDelete), ctx, libName)
-}
-
-// TFunctionList mocks base method.
-func (m *MockRedis) TFunctionList(ctx context.Context) *redis.MapStringInterfaceSliceCmd {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "TFunctionList", ctx)
-	ret0, _ := ret[0].(*redis.MapStringInterfaceSliceCmd)
-	return ret0
-}
-
-// TFunctionList indicates an expected call of TFunctionList.
-func (mr *MockRedisMockRecorder) TFunctionList(ctx any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TFunctionList", reflect.TypeOf((*MockRedis)(nil).TFunctionList), ctx)
-}
-
-// TFunctionListArgs mocks base method.
-func (m *MockRedis) TFunctionListArgs(ctx context.Context, options *redis.TFunctionListOptions) *redis.MapStringInterfaceSliceCmd {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "TFunctionListArgs", ctx, options)
-	ret0, _ := ret[0].(*redis.MapStringInterfaceSliceCmd)
-	return ret0
-}
-
-// TFunctionListArgs indicates an expected call of TFunctionListArgs.
-func (mr *MockRedisMockRecorder) TFunctionListArgs(ctx, options any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TFunctionListArgs", reflect.TypeOf((*MockRedis)(nil).TFunctionListArgs), ctx, options)
-}
-
-// TFunctionLoad mocks base method.
-func (m *MockRedis) TFunctionLoad(ctx context.Context, lib string) *redis.StatusCmd {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "TFunctionLoad", ctx, lib)
-	ret0, _ := ret[0].(*redis.StatusCmd)
-	return ret0
-}
-
-// TFunctionLoad indicates an expected call of TFunctionLoad.
-func (mr *MockRedisMockRecorder) TFunctionLoad(ctx, lib any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TFunctionLoad", reflect.TypeOf((*MockRedis)(nil).TFunctionLoad), ctx, lib)
-}
-
-// TFunctionLoadArgs mocks base method.
-func (m *MockRedis) TFunctionLoadArgs(ctx context.Context, lib string, options *redis.TFunctionLoadOptions) *redis.StatusCmd {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "TFunctionLoadArgs", ctx, lib, options)
-	ret0, _ := ret[0].(*redis.StatusCmd)
-	return ret0
-}
-
-// TFunctionLoadArgs indicates an expected call of TFunctionLoadArgs.
-func (mr *MockRedisMockRecorder) TFunctionLoadArgs(ctx, lib, options any) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TFunctionLoadArgs", reflect.TypeOf((*MockRedis)(nil).TFunctionLoadArgs), ctx, lib, options)
-}
-
 // TSAdd mocks base method.
 func (m *MockRedis) TSAdd(ctx context.Context, key string, timestamp any, value float64) *redis.IntCmd {
 	m.ctrl.T.Helper()
@@ -6763,6 +6835,258 @@ func (mr *MockRedisMockRecorder) Unlink(ctx any, keys ...any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	varargs := append([]any{ctx}, keys...)
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Unlink", reflect.TypeOf((*MockRedis)(nil).Unlink), varargs...)
+}
+
+// VAdd mocks base method.
+func (m *MockRedis) VAdd(ctx context.Context, key, element string, val redis.Vector) *redis.BoolCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "VAdd", ctx, key, element, val)
+	ret0, _ := ret[0].(*redis.BoolCmd)
+	return ret0
+}
+
+// VAdd indicates an expected call of VAdd.
+func (mr *MockRedisMockRecorder) VAdd(ctx, key, element, val any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VAdd", reflect.TypeOf((*MockRedis)(nil).VAdd), ctx, key, element, val)
+}
+
+// VAddWithArgs mocks base method.
+func (m *MockRedis) VAddWithArgs(ctx context.Context, key, element string, val redis.Vector, addArgs *redis.VAddArgs) *redis.BoolCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "VAddWithArgs", ctx, key, element, val, addArgs)
+	ret0, _ := ret[0].(*redis.BoolCmd)
+	return ret0
+}
+
+// VAddWithArgs indicates an expected call of VAddWithArgs.
+func (mr *MockRedisMockRecorder) VAddWithArgs(ctx, key, element, val, addArgs any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VAddWithArgs", reflect.TypeOf((*MockRedis)(nil).VAddWithArgs), ctx, key, element, val, addArgs)
+}
+
+// VCard mocks base method.
+func (m *MockRedis) VCard(ctx context.Context, key string) *redis.IntCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "VCard", ctx, key)
+	ret0, _ := ret[0].(*redis.IntCmd)
+	return ret0
+}
+
+// VCard indicates an expected call of VCard.
+func (mr *MockRedisMockRecorder) VCard(ctx, key any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VCard", reflect.TypeOf((*MockRedis)(nil).VCard), ctx, key)
+}
+
+// VClearAttributes mocks base method.
+func (m *MockRedis) VClearAttributes(ctx context.Context, key, element string) *redis.BoolCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "VClearAttributes", ctx, key, element)
+	ret0, _ := ret[0].(*redis.BoolCmd)
+	return ret0
+}
+
+// VClearAttributes indicates an expected call of VClearAttributes.
+func (mr *MockRedisMockRecorder) VClearAttributes(ctx, key, element any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VClearAttributes", reflect.TypeOf((*MockRedis)(nil).VClearAttributes), ctx, key, element)
+}
+
+// VDim mocks base method.
+func (m *MockRedis) VDim(ctx context.Context, key string) *redis.IntCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "VDim", ctx, key)
+	ret0, _ := ret[0].(*redis.IntCmd)
+	return ret0
+}
+
+// VDim indicates an expected call of VDim.
+func (mr *MockRedisMockRecorder) VDim(ctx, key any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VDim", reflect.TypeOf((*MockRedis)(nil).VDim), ctx, key)
+}
+
+// VEmb mocks base method.
+func (m *MockRedis) VEmb(ctx context.Context, key, element string, raw bool) *redis.SliceCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "VEmb", ctx, key, element, raw)
+	ret0, _ := ret[0].(*redis.SliceCmd)
+	return ret0
+}
+
+// VEmb indicates an expected call of VEmb.
+func (mr *MockRedisMockRecorder) VEmb(ctx, key, element, raw any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VEmb", reflect.TypeOf((*MockRedis)(nil).VEmb), ctx, key, element, raw)
+}
+
+// VGetAttr mocks base method.
+func (m *MockRedis) VGetAttr(ctx context.Context, key, element string) *redis.StringCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "VGetAttr", ctx, key, element)
+	ret0, _ := ret[0].(*redis.StringCmd)
+	return ret0
+}
+
+// VGetAttr indicates an expected call of VGetAttr.
+func (mr *MockRedisMockRecorder) VGetAttr(ctx, key, element any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VGetAttr", reflect.TypeOf((*MockRedis)(nil).VGetAttr), ctx, key, element)
+}
+
+// VInfo mocks base method.
+func (m *MockRedis) VInfo(ctx context.Context, key string) *redis.MapStringInterfaceCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "VInfo", ctx, key)
+	ret0, _ := ret[0].(*redis.MapStringInterfaceCmd)
+	return ret0
+}
+
+// VInfo indicates an expected call of VInfo.
+func (mr *MockRedisMockRecorder) VInfo(ctx, key any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VInfo", reflect.TypeOf((*MockRedis)(nil).VInfo), ctx, key)
+}
+
+// VLinks mocks base method.
+func (m *MockRedis) VLinks(ctx context.Context, key, element string) *redis.StringSliceCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "VLinks", ctx, key, element)
+	ret0, _ := ret[0].(*redis.StringSliceCmd)
+	return ret0
+}
+
+// VLinks indicates an expected call of VLinks.
+func (mr *MockRedisMockRecorder) VLinks(ctx, key, element any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VLinks", reflect.TypeOf((*MockRedis)(nil).VLinks), ctx, key, element)
+}
+
+// VLinksWithScores mocks base method.
+func (m *MockRedis) VLinksWithScores(ctx context.Context, key, element string) *redis.VectorScoreSliceCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "VLinksWithScores", ctx, key, element)
+	ret0, _ := ret[0].(*redis.VectorScoreSliceCmd)
+	return ret0
+}
+
+// VLinksWithScores indicates an expected call of VLinksWithScores.
+func (mr *MockRedisMockRecorder) VLinksWithScores(ctx, key, element any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VLinksWithScores", reflect.TypeOf((*MockRedis)(nil).VLinksWithScores), ctx, key, element)
+}
+
+// VRandMember mocks base method.
+func (m *MockRedis) VRandMember(ctx context.Context, key string) *redis.StringCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "VRandMember", ctx, key)
+	ret0, _ := ret[0].(*redis.StringCmd)
+	return ret0
+}
+
+// VRandMember indicates an expected call of VRandMember.
+func (mr *MockRedisMockRecorder) VRandMember(ctx, key any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VRandMember", reflect.TypeOf((*MockRedis)(nil).VRandMember), ctx, key)
+}
+
+// VRandMemberCount mocks base method.
+func (m *MockRedis) VRandMemberCount(ctx context.Context, key string, count int) *redis.StringSliceCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "VRandMemberCount", ctx, key, count)
+	ret0, _ := ret[0].(*redis.StringSliceCmd)
+	return ret0
+}
+
+// VRandMemberCount indicates an expected call of VRandMemberCount.
+func (mr *MockRedisMockRecorder) VRandMemberCount(ctx, key, count any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VRandMemberCount", reflect.TypeOf((*MockRedis)(nil).VRandMemberCount), ctx, key, count)
+}
+
+// VRem mocks base method.
+func (m *MockRedis) VRem(ctx context.Context, key, element string) *redis.BoolCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "VRem", ctx, key, element)
+	ret0, _ := ret[0].(*redis.BoolCmd)
+	return ret0
+}
+
+// VRem indicates an expected call of VRem.
+func (mr *MockRedisMockRecorder) VRem(ctx, key, element any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VRem", reflect.TypeOf((*MockRedis)(nil).VRem), ctx, key, element)
+}
+
+// VSetAttr mocks base method.
+func (m *MockRedis) VSetAttr(ctx context.Context, key, element string, attr any) *redis.BoolCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "VSetAttr", ctx, key, element, attr)
+	ret0, _ := ret[0].(*redis.BoolCmd)
+	return ret0
+}
+
+// VSetAttr indicates an expected call of VSetAttr.
+func (mr *MockRedisMockRecorder) VSetAttr(ctx, key, element, attr any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VSetAttr", reflect.TypeOf((*MockRedis)(nil).VSetAttr), ctx, key, element, attr)
+}
+
+// VSim mocks base method.
+func (m *MockRedis) VSim(ctx context.Context, key string, val redis.Vector) *redis.StringSliceCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "VSim", ctx, key, val)
+	ret0, _ := ret[0].(*redis.StringSliceCmd)
+	return ret0
+}
+
+// VSim indicates an expected call of VSim.
+func (mr *MockRedisMockRecorder) VSim(ctx, key, val any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VSim", reflect.TypeOf((*MockRedis)(nil).VSim), ctx, key, val)
+}
+
+// VSimWithArgs mocks base method.
+func (m *MockRedis) VSimWithArgs(ctx context.Context, key string, val redis.Vector, args *redis.VSimArgs) *redis.StringSliceCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "VSimWithArgs", ctx, key, val, args)
+	ret0, _ := ret[0].(*redis.StringSliceCmd)
+	return ret0
+}
+
+// VSimWithArgs indicates an expected call of VSimWithArgs.
+func (mr *MockRedisMockRecorder) VSimWithArgs(ctx, key, val, args any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VSimWithArgs", reflect.TypeOf((*MockRedis)(nil).VSimWithArgs), ctx, key, val, args)
+}
+
+// VSimWithArgsWithScores mocks base method.
+func (m *MockRedis) VSimWithArgsWithScores(ctx context.Context, key string, val redis.Vector, args *redis.VSimArgs) *redis.VectorScoreSliceCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "VSimWithArgsWithScores", ctx, key, val, args)
+	ret0, _ := ret[0].(*redis.VectorScoreSliceCmd)
+	return ret0
+}
+
+// VSimWithArgsWithScores indicates an expected call of VSimWithArgsWithScores.
+func (mr *MockRedisMockRecorder) VSimWithArgsWithScores(ctx, key, val, args any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VSimWithArgsWithScores", reflect.TypeOf((*MockRedis)(nil).VSimWithArgsWithScores), ctx, key, val, args)
+}
+
+// VSimWithScores mocks base method.
+func (m *MockRedis) VSimWithScores(ctx context.Context, key string, val redis.Vector) *redis.VectorScoreSliceCmd {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "VSimWithScores", ctx, key, val)
+	ret0, _ := ret[0].(*redis.VectorScoreSliceCmd)
+	return ret0
+}
+
+// VSimWithScores indicates an expected call of VSimWithScores.
+func (mr *MockRedisMockRecorder) VSimWithScores(ctx, key, val any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "VSimWithScores", reflect.TypeOf((*MockRedis)(nil).VSimWithScores), ctx, key, val)
 }
 
 // XAck mocks base method.
@@ -9752,6 +10076,394 @@ func (mr *MockMongoProviderMockRecorder) UseTracer(tracer any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseTracer", reflect.TypeOf((*MockMongoProvider)(nil).UseTracer), tracer)
 }
 
+// MockSurrealDB is a mock of SurrealDB interface.
+type MockSurrealDB struct {
+	ctrl     *gomock.Controller
+	recorder *MockSurrealDBMockRecorder
+	isgomock struct{}
+}
+
+// MockSurrealDBMockRecorder is the mock recorder for MockSurrealDB.
+type MockSurrealDBMockRecorder struct {
+	mock *MockSurrealDB
+}
+
+// NewMockSurrealDB creates a new mock instance.
+func NewMockSurrealDB(ctrl *gomock.Controller) *MockSurrealDB {
+	mock := &MockSurrealDB{ctrl: ctrl}
+	mock.recorder = &MockSurrealDBMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockSurrealDB) EXPECT() *MockSurrealDBMockRecorder {
+	return m.recorder
+}
+
+// Create mocks base method.
+func (m *MockSurrealDB) Create(ctx context.Context, table string, data any) (map[string]any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Create", ctx, table, data)
+	ret0, _ := ret[0].(map[string]any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Create indicates an expected call of Create.
+func (mr *MockSurrealDBMockRecorder) Create(ctx, table, data any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockSurrealDB)(nil).Create), ctx, table, data)
+}
+
+// CreateDatabase mocks base method.
+func (m *MockSurrealDB) CreateDatabase(ctx context.Context, database string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateDatabase", ctx, database)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateDatabase indicates an expected call of CreateDatabase.
+func (mr *MockSurrealDBMockRecorder) CreateDatabase(ctx, database any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDatabase", reflect.TypeOf((*MockSurrealDB)(nil).CreateDatabase), ctx, database)
+}
+
+// CreateNamespace mocks base method.
+func (m *MockSurrealDB) CreateNamespace(ctx context.Context, namespace string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateNamespace", ctx, namespace)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateNamespace indicates an expected call of CreateNamespace.
+func (mr *MockSurrealDBMockRecorder) CreateNamespace(ctx, namespace any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateNamespace", reflect.TypeOf((*MockSurrealDB)(nil).CreateNamespace), ctx, namespace)
+}
+
+// Delete mocks base method.
+func (m *MockSurrealDB) Delete(ctx context.Context, table, id string) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Delete", ctx, table, id)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Delete indicates an expected call of Delete.
+func (mr *MockSurrealDBMockRecorder) Delete(ctx, table, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockSurrealDB)(nil).Delete), ctx, table, id)
+}
+
+// DropDatabase mocks base method.
+func (m *MockSurrealDB) DropDatabase(ctx context.Context, database string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DropDatabase", ctx, database)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DropDatabase indicates an expected call of DropDatabase.
+func (mr *MockSurrealDBMockRecorder) DropDatabase(ctx, database any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DropDatabase", reflect.TypeOf((*MockSurrealDB)(nil).DropDatabase), ctx, database)
+}
+
+// DropNamespace mocks base method.
+func (m *MockSurrealDB) DropNamespace(ctx context.Context, namespace string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DropNamespace", ctx, namespace)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DropNamespace indicates an expected call of DropNamespace.
+func (mr *MockSurrealDBMockRecorder) DropNamespace(ctx, namespace any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DropNamespace", reflect.TypeOf((*MockSurrealDB)(nil).DropNamespace), ctx, namespace)
+}
+
+// HealthCheck mocks base method.
+func (m *MockSurrealDB) HealthCheck(arg0 context.Context) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HealthCheck", arg0)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HealthCheck indicates an expected call of HealthCheck.
+func (mr *MockSurrealDBMockRecorder) HealthCheck(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HealthCheck", reflect.TypeOf((*MockSurrealDB)(nil).HealthCheck), arg0)
+}
+
+// Query mocks base method.
+func (m *MockSurrealDB) Query(ctx context.Context, query string, vars map[string]any) ([]any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Query", ctx, query, vars)
+	ret0, _ := ret[0].([]any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Query indicates an expected call of Query.
+func (mr *MockSurrealDBMockRecorder) Query(ctx, query, vars any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Query", reflect.TypeOf((*MockSurrealDB)(nil).Query), ctx, query, vars)
+}
+
+// Select mocks base method.
+func (m *MockSurrealDB) Select(ctx context.Context, table string) ([]map[string]any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Select", ctx, table)
+	ret0, _ := ret[0].([]map[string]any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Select indicates an expected call of Select.
+func (mr *MockSurrealDBMockRecorder) Select(ctx, table any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Select", reflect.TypeOf((*MockSurrealDB)(nil).Select), ctx, table)
+}
+
+// Update mocks base method.
+func (m *MockSurrealDB) Update(ctx context.Context, table, id string, data any) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Update", ctx, table, id, data)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Update indicates an expected call of Update.
+func (mr *MockSurrealDBMockRecorder) Update(ctx, table, id, data any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockSurrealDB)(nil).Update), ctx, table, id, data)
+}
+
+// MockSurrealBDProvider is a mock of SurrealBDProvider interface.
+type MockSurrealBDProvider struct {
+	ctrl     *gomock.Controller
+	recorder *MockSurrealBDProviderMockRecorder
+	isgomock struct{}
+}
+
+// MockSurrealBDProviderMockRecorder is the mock recorder for MockSurrealBDProvider.
+type MockSurrealBDProviderMockRecorder struct {
+	mock *MockSurrealBDProvider
+}
+
+// NewMockSurrealBDProvider creates a new mock instance.
+func NewMockSurrealBDProvider(ctrl *gomock.Controller) *MockSurrealBDProvider {
+	mock := &MockSurrealBDProvider{ctrl: ctrl}
+	mock.recorder = &MockSurrealBDProviderMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockSurrealBDProvider) EXPECT() *MockSurrealBDProviderMockRecorder {
+	return m.recorder
+}
+
+// Connect mocks base method.
+func (m *MockSurrealBDProvider) Connect() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Connect")
+}
+
+// Connect indicates an expected call of Connect.
+func (mr *MockSurrealBDProviderMockRecorder) Connect() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockSurrealBDProvider)(nil).Connect))
+}
+
+// Create mocks base method.
+func (m *MockSurrealBDProvider) Create(ctx context.Context, table string, data any) (map[string]any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Create", ctx, table, data)
+	ret0, _ := ret[0].(map[string]any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Create indicates an expected call of Create.
+func (mr *MockSurrealBDProviderMockRecorder) Create(ctx, table, data any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Create", reflect.TypeOf((*MockSurrealBDProvider)(nil).Create), ctx, table, data)
+}
+
+// CreateDatabase mocks base method.
+func (m *MockSurrealBDProvider) CreateDatabase(ctx context.Context, database string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateDatabase", ctx, database)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateDatabase indicates an expected call of CreateDatabase.
+func (mr *MockSurrealBDProviderMockRecorder) CreateDatabase(ctx, database any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDatabase", reflect.TypeOf((*MockSurrealBDProvider)(nil).CreateDatabase), ctx, database)
+}
+
+// CreateNamespace mocks base method.
+func (m *MockSurrealBDProvider) CreateNamespace(ctx context.Context, namespace string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateNamespace", ctx, namespace)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateNamespace indicates an expected call of CreateNamespace.
+func (mr *MockSurrealBDProviderMockRecorder) CreateNamespace(ctx, namespace any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateNamespace", reflect.TypeOf((*MockSurrealBDProvider)(nil).CreateNamespace), ctx, namespace)
+}
+
+// Delete mocks base method.
+func (m *MockSurrealBDProvider) Delete(ctx context.Context, table, id string) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Delete", ctx, table, id)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Delete indicates an expected call of Delete.
+func (mr *MockSurrealBDProviderMockRecorder) Delete(ctx, table, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Delete", reflect.TypeOf((*MockSurrealBDProvider)(nil).Delete), ctx, table, id)
+}
+
+// DropDatabase mocks base method.
+func (m *MockSurrealBDProvider) DropDatabase(ctx context.Context, database string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DropDatabase", ctx, database)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DropDatabase indicates an expected call of DropDatabase.
+func (mr *MockSurrealBDProviderMockRecorder) DropDatabase(ctx, database any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DropDatabase", reflect.TypeOf((*MockSurrealBDProvider)(nil).DropDatabase), ctx, database)
+}
+
+// DropNamespace mocks base method.
+func (m *MockSurrealBDProvider) DropNamespace(ctx context.Context, namespace string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DropNamespace", ctx, namespace)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DropNamespace indicates an expected call of DropNamespace.
+func (mr *MockSurrealBDProviderMockRecorder) DropNamespace(ctx, namespace any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DropNamespace", reflect.TypeOf((*MockSurrealBDProvider)(nil).DropNamespace), ctx, namespace)
+}
+
+// HealthCheck mocks base method.
+func (m *MockSurrealBDProvider) HealthCheck(arg0 context.Context) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HealthCheck", arg0)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HealthCheck indicates an expected call of HealthCheck.
+func (mr *MockSurrealBDProviderMockRecorder) HealthCheck(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HealthCheck", reflect.TypeOf((*MockSurrealBDProvider)(nil).HealthCheck), arg0)
+}
+
+// Query mocks base method.
+func (m *MockSurrealBDProvider) Query(ctx context.Context, query string, vars map[string]any) ([]any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Query", ctx, query, vars)
+	ret0, _ := ret[0].([]any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Query indicates an expected call of Query.
+func (mr *MockSurrealBDProviderMockRecorder) Query(ctx, query, vars any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Query", reflect.TypeOf((*MockSurrealBDProvider)(nil).Query), ctx, query, vars)
+}
+
+// Select mocks base method.
+func (m *MockSurrealBDProvider) Select(ctx context.Context, table string) ([]map[string]any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Select", ctx, table)
+	ret0, _ := ret[0].([]map[string]any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Select indicates an expected call of Select.
+func (mr *MockSurrealBDProviderMockRecorder) Select(ctx, table any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Select", reflect.TypeOf((*MockSurrealBDProvider)(nil).Select), ctx, table)
+}
+
+// Update mocks base method.
+func (m *MockSurrealBDProvider) Update(ctx context.Context, table, id string, data any) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Update", ctx, table, id, data)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Update indicates an expected call of Update.
+func (mr *MockSurrealBDProviderMockRecorder) Update(ctx, table, id, data any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockSurrealBDProvider)(nil).Update), ctx, table, id, data)
+}
+
+// UseLogger mocks base method.
+func (m *MockSurrealBDProvider) UseLogger(logger any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UseLogger", logger)
+}
+
+// UseLogger indicates an expected call of UseLogger.
+func (mr *MockSurrealBDProviderMockRecorder) UseLogger(logger any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseLogger", reflect.TypeOf((*MockSurrealBDProvider)(nil).UseLogger), logger)
+}
+
+// UseMetrics mocks base method.
+func (m *MockSurrealBDProvider) UseMetrics(metrics any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UseMetrics", metrics)
+}
+
+// UseMetrics indicates an expected call of UseMetrics.
+func (mr *MockSurrealBDProviderMockRecorder) UseMetrics(metrics any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseMetrics", reflect.TypeOf((*MockSurrealBDProvider)(nil).UseMetrics), metrics)
+}
+
+// UseTracer mocks base method.
+func (m *MockSurrealBDProvider) UseTracer(tracer any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UseTracer", tracer)
+}
+
+// UseTracer indicates an expected call of UseTracer.
+func (mr *MockSurrealBDProviderMockRecorder) UseTracer(tracer any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseTracer", reflect.TypeOf((*MockSurrealBDProvider)(nil).UseTracer), tracer)
+}
+
 // Mockprovider is a mock of provider interface.
 type Mockprovider struct {
 	ctrl     *gomock.Controller
@@ -10126,31 +10838,31 @@ func (mr *MockPubSubProviderMockRecorder) Connect() *gomock.Call {
 }
 
 // CreateTopic mocks base method.
-func (m *MockPubSubProvider) CreateTopic(context context.Context, name string) error {
+func (m *MockPubSubProvider) CreateTopic(arg0 context.Context, name string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CreateTopic", context, name)
+	ret := m.ctrl.Call(m, "CreateTopic", arg0, name)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // CreateTopic indicates an expected call of CreateTopic.
-func (mr *MockPubSubProviderMockRecorder) CreateTopic(context, name any) *gomock.Call {
+func (mr *MockPubSubProviderMockRecorder) CreateTopic(arg0, name any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateTopic", reflect.TypeOf((*MockPubSubProvider)(nil).CreateTopic), context, name)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateTopic", reflect.TypeOf((*MockPubSubProvider)(nil).CreateTopic), arg0, name)
 }
 
 // DeleteTopic mocks base method.
-func (m *MockPubSubProvider) DeleteTopic(context context.Context, name string) error {
+func (m *MockPubSubProvider) DeleteTopic(arg0 context.Context, name string) error {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DeleteTopic", context, name)
+	ret := m.ctrl.Call(m, "DeleteTopic", arg0, name)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
 // DeleteTopic indicates an expected call of DeleteTopic.
-func (mr *MockPubSubProviderMockRecorder) DeleteTopic(context, name any) *gomock.Call {
+func (mr *MockPubSubProviderMockRecorder) DeleteTopic(arg0, name any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteTopic", reflect.TypeOf((*MockPubSubProvider)(nil).DeleteTopic), context, name)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteTopic", reflect.TypeOf((*MockPubSubProvider)(nil).DeleteTopic), arg0, name)
 }
 
 // Health mocks base method.
@@ -10652,6 +11364,20 @@ func (m *MockDgraph) EXPECT() *MockDgraphMockRecorder {
 	return m.recorder
 }
 
+// AddOrUpdateField mocks base method.
+func (m *MockDgraph) AddOrUpdateField(ctx context.Context, fieldName, fieldType, directives string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddOrUpdateField", ctx, fieldName, fieldType, directives)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AddOrUpdateField indicates an expected call of AddOrUpdateField.
+func (mr *MockDgraphMockRecorder) AddOrUpdateField(ctx, fieldName, fieldType, directives any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddOrUpdateField", reflect.TypeOf((*MockDgraph)(nil).AddOrUpdateField), ctx, fieldName, fieldType, directives)
+}
+
 // Alter mocks base method.
 func (m *MockDgraph) Alter(ctx context.Context, op any) error {
 	m.ctrl.T.Helper()
@@ -10664,6 +11390,34 @@ func (m *MockDgraph) Alter(ctx context.Context, op any) error {
 func (mr *MockDgraphMockRecorder) Alter(ctx, op any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Alter", reflect.TypeOf((*MockDgraph)(nil).Alter), ctx, op)
+}
+
+// ApplySchema mocks base method.
+func (m *MockDgraph) ApplySchema(ctx context.Context, schema string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ApplySchema", ctx, schema)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ApplySchema indicates an expected call of ApplySchema.
+func (mr *MockDgraphMockRecorder) ApplySchema(ctx, schema any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ApplySchema", reflect.TypeOf((*MockDgraph)(nil).ApplySchema), ctx, schema)
+}
+
+// DropField mocks base method.
+func (m *MockDgraph) DropField(ctx context.Context, fieldName string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DropField", ctx, fieldName)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DropField indicates an expected call of DropField.
+func (mr *MockDgraphMockRecorder) DropField(ctx, fieldName any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DropField", reflect.TypeOf((*MockDgraph)(nil).DropField), ctx, fieldName)
 }
 
 // HealthCheck mocks base method.
@@ -10778,6 +11532,20 @@ func (m *MockDgraphProvider) EXPECT() *MockDgraphProviderMockRecorder {
 	return m.recorder
 }
 
+// AddOrUpdateField mocks base method.
+func (m *MockDgraphProvider) AddOrUpdateField(ctx context.Context, fieldName, fieldType, directives string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "AddOrUpdateField", ctx, fieldName, fieldType, directives)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// AddOrUpdateField indicates an expected call of AddOrUpdateField.
+func (mr *MockDgraphProviderMockRecorder) AddOrUpdateField(ctx, fieldName, fieldType, directives any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "AddOrUpdateField", reflect.TypeOf((*MockDgraphProvider)(nil).AddOrUpdateField), ctx, fieldName, fieldType, directives)
+}
+
 // Alter mocks base method.
 func (m *MockDgraphProvider) Alter(ctx context.Context, op any) error {
 	m.ctrl.T.Helper()
@@ -10792,6 +11560,20 @@ func (mr *MockDgraphProviderMockRecorder) Alter(ctx, op any) *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Alter", reflect.TypeOf((*MockDgraphProvider)(nil).Alter), ctx, op)
 }
 
+// ApplySchema mocks base method.
+func (m *MockDgraphProvider) ApplySchema(ctx context.Context, schema string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ApplySchema", ctx, schema)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ApplySchema indicates an expected call of ApplySchema.
+func (mr *MockDgraphProviderMockRecorder) ApplySchema(ctx, schema any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ApplySchema", reflect.TypeOf((*MockDgraphProvider)(nil).ApplySchema), ctx, schema)
+}
+
 // Connect mocks base method.
 func (m *MockDgraphProvider) Connect() {
 	m.ctrl.T.Helper()
@@ -10802,6 +11584,20 @@ func (m *MockDgraphProvider) Connect() {
 func (mr *MockDgraphProviderMockRecorder) Connect() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockDgraphProvider)(nil).Connect))
+}
+
+// DropField mocks base method.
+func (m *MockDgraphProvider) DropField(ctx context.Context, fieldName string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DropField", ctx, fieldName)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DropField indicates an expected call of DropField.
+func (mr *MockDgraphProviderMockRecorder) DropField(ctx, fieldName any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DropField", reflect.TypeOf((*MockDgraphProvider)(nil).DropField), ctx, fieldName)
 }
 
 // HealthCheck mocks base method.
@@ -11754,4 +12550,834 @@ func (m *MockScyllaDBProvider) UseTracer(tracer any) {
 func (mr *MockScyllaDBProviderMockRecorder) UseTracer(tracer any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseTracer", reflect.TypeOf((*MockScyllaDBProvider)(nil).UseTracer), tracer)
+}
+
+// MockArangoDB is a mock of ArangoDB interface.
+type MockArangoDB struct {
+	ctrl     *gomock.Controller
+	recorder *MockArangoDBMockRecorder
+	isgomock struct{}
+}
+
+// MockArangoDBMockRecorder is the mock recorder for MockArangoDB.
+type MockArangoDBMockRecorder struct {
+	mock *MockArangoDB
+}
+
+// NewMockArangoDB creates a new mock instance.
+func NewMockArangoDB(ctrl *gomock.Controller) *MockArangoDB {
+	mock := &MockArangoDB{ctrl: ctrl}
+	mock.recorder = &MockArangoDBMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockArangoDB) EXPECT() *MockArangoDBMockRecorder {
+	return m.recorder
+}
+
+// CreateCollection mocks base method.
+func (m *MockArangoDB) CreateCollection(ctx context.Context, database, collection string, isEdge bool) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateCollection", ctx, database, collection, isEdge)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateCollection indicates an expected call of CreateCollection.
+func (mr *MockArangoDBMockRecorder) CreateCollection(ctx, database, collection, isEdge any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCollection", reflect.TypeOf((*MockArangoDB)(nil).CreateCollection), ctx, database, collection, isEdge)
+}
+
+// CreateDB mocks base method.
+func (m *MockArangoDB) CreateDB(ctx context.Context, database string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateDB", ctx, database)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateDB indicates an expected call of CreateDB.
+func (mr *MockArangoDBMockRecorder) CreateDB(ctx, database any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDB", reflect.TypeOf((*MockArangoDB)(nil).CreateDB), ctx, database)
+}
+
+// CreateDocument mocks base method.
+func (m *MockArangoDB) CreateDocument(ctx context.Context, dbName, collectionName string, document any) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateDocument", ctx, dbName, collectionName, document)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateDocument indicates an expected call of CreateDocument.
+func (mr *MockArangoDBMockRecorder) CreateDocument(ctx, dbName, collectionName, document any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDocument", reflect.TypeOf((*MockArangoDB)(nil).CreateDocument), ctx, dbName, collectionName, document)
+}
+
+// CreateGraph mocks base method.
+func (m *MockArangoDB) CreateGraph(ctx context.Context, database, graph string, edgeDefinitions any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateGraph", ctx, database, graph, edgeDefinitions)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateGraph indicates an expected call of CreateGraph.
+func (mr *MockArangoDBMockRecorder) CreateGraph(ctx, database, graph, edgeDefinitions any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateGraph", reflect.TypeOf((*MockArangoDB)(nil).CreateGraph), ctx, database, graph, edgeDefinitions)
+}
+
+// DeleteDocument mocks base method.
+func (m *MockArangoDB) DeleteDocument(ctx context.Context, dbName, collectionName, documentID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteDocument", ctx, dbName, collectionName, documentID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteDocument indicates an expected call of DeleteDocument.
+func (mr *MockArangoDBMockRecorder) DeleteDocument(ctx, dbName, collectionName, documentID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteDocument", reflect.TypeOf((*MockArangoDB)(nil).DeleteDocument), ctx, dbName, collectionName, documentID)
+}
+
+// DropCollection mocks base method.
+func (m *MockArangoDB) DropCollection(ctx context.Context, database, collection string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DropCollection", ctx, database, collection)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DropCollection indicates an expected call of DropCollection.
+func (mr *MockArangoDBMockRecorder) DropCollection(ctx, database, collection any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DropCollection", reflect.TypeOf((*MockArangoDB)(nil).DropCollection), ctx, database, collection)
+}
+
+// DropDB mocks base method.
+func (m *MockArangoDB) DropDB(ctx context.Context, database string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DropDB", ctx, database)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DropDB indicates an expected call of DropDB.
+func (mr *MockArangoDBMockRecorder) DropDB(ctx, database any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DropDB", reflect.TypeOf((*MockArangoDB)(nil).DropDB), ctx, database)
+}
+
+// DropGraph mocks base method.
+func (m *MockArangoDB) DropGraph(ctx context.Context, database, graph string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DropGraph", ctx, database, graph)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DropGraph indicates an expected call of DropGraph.
+func (mr *MockArangoDBMockRecorder) DropGraph(ctx, database, graph any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DropGraph", reflect.TypeOf((*MockArangoDB)(nil).DropGraph), ctx, database, graph)
+}
+
+// GetDocument mocks base method.
+func (m *MockArangoDB) GetDocument(ctx context.Context, dbName, collectionName, documentID string, result any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDocument", ctx, dbName, collectionName, documentID, result)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// GetDocument indicates an expected call of GetDocument.
+func (mr *MockArangoDBMockRecorder) GetDocument(ctx, dbName, collectionName, documentID, result any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDocument", reflect.TypeOf((*MockArangoDB)(nil).GetDocument), ctx, dbName, collectionName, documentID, result)
+}
+
+// GetEdges mocks base method.
+func (m *MockArangoDB) GetEdges(ctx context.Context, dbName, graphName, edgeCollection, vertexID string, resp any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetEdges", ctx, dbName, graphName, edgeCollection, vertexID, resp)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// GetEdges indicates an expected call of GetEdges.
+func (mr *MockArangoDBMockRecorder) GetEdges(ctx, dbName, graphName, edgeCollection, vertexID, resp any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEdges", reflect.TypeOf((*MockArangoDB)(nil).GetEdges), ctx, dbName, graphName, edgeCollection, vertexID, resp)
+}
+
+// HealthCheck mocks base method.
+func (m *MockArangoDB) HealthCheck(arg0 context.Context) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HealthCheck", arg0)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HealthCheck indicates an expected call of HealthCheck.
+func (mr *MockArangoDBMockRecorder) HealthCheck(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HealthCheck", reflect.TypeOf((*MockArangoDB)(nil).HealthCheck), arg0)
+}
+
+// Query mocks base method.
+func (m *MockArangoDB) Query(ctx context.Context, dbName, query string, bindVars map[string]any, result any, options ...map[string]any) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, dbName, query, bindVars, result}
+	for _, a := range options {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Query", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Query indicates an expected call of Query.
+func (mr *MockArangoDBMockRecorder) Query(ctx, dbName, query, bindVars, result any, options ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, dbName, query, bindVars, result}, options...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Query", reflect.TypeOf((*MockArangoDB)(nil).Query), varargs...)
+}
+
+// UpdateDocument mocks base method.
+func (m *MockArangoDB) UpdateDocument(ctx context.Context, dbName, collectionName, documentID string, document any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateDocument", ctx, dbName, collectionName, documentID, document)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateDocument indicates an expected call of UpdateDocument.
+func (mr *MockArangoDBMockRecorder) UpdateDocument(ctx, dbName, collectionName, documentID, document any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDocument", reflect.TypeOf((*MockArangoDB)(nil).UpdateDocument), ctx, dbName, collectionName, documentID, document)
+}
+
+// MockArangoDBProvider is a mock of ArangoDBProvider interface.
+type MockArangoDBProvider struct {
+	ctrl     *gomock.Controller
+	recorder *MockArangoDBProviderMockRecorder
+	isgomock struct{}
+}
+
+// MockArangoDBProviderMockRecorder is the mock recorder for MockArangoDBProvider.
+type MockArangoDBProviderMockRecorder struct {
+	mock *MockArangoDBProvider
+}
+
+// NewMockArangoDBProvider creates a new mock instance.
+func NewMockArangoDBProvider(ctrl *gomock.Controller) *MockArangoDBProvider {
+	mock := &MockArangoDBProvider{ctrl: ctrl}
+	mock.recorder = &MockArangoDBProviderMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockArangoDBProvider) EXPECT() *MockArangoDBProviderMockRecorder {
+	return m.recorder
+}
+
+// Connect mocks base method.
+func (m *MockArangoDBProvider) Connect() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Connect")
+}
+
+// Connect indicates an expected call of Connect.
+func (mr *MockArangoDBProviderMockRecorder) Connect() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockArangoDBProvider)(nil).Connect))
+}
+
+// CreateCollection mocks base method.
+func (m *MockArangoDBProvider) CreateCollection(ctx context.Context, database, collection string, isEdge bool) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateCollection", ctx, database, collection, isEdge)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateCollection indicates an expected call of CreateCollection.
+func (mr *MockArangoDBProviderMockRecorder) CreateCollection(ctx, database, collection, isEdge any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateCollection", reflect.TypeOf((*MockArangoDBProvider)(nil).CreateCollection), ctx, database, collection, isEdge)
+}
+
+// CreateDB mocks base method.
+func (m *MockArangoDBProvider) CreateDB(ctx context.Context, database string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateDB", ctx, database)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateDB indicates an expected call of CreateDB.
+func (mr *MockArangoDBProviderMockRecorder) CreateDB(ctx, database any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDB", reflect.TypeOf((*MockArangoDBProvider)(nil).CreateDB), ctx, database)
+}
+
+// CreateDocument mocks base method.
+func (m *MockArangoDBProvider) CreateDocument(ctx context.Context, dbName, collectionName string, document any) (string, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateDocument", ctx, dbName, collectionName, document)
+	ret0, _ := ret[0].(string)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CreateDocument indicates an expected call of CreateDocument.
+func (mr *MockArangoDBProviderMockRecorder) CreateDocument(ctx, dbName, collectionName, document any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateDocument", reflect.TypeOf((*MockArangoDBProvider)(nil).CreateDocument), ctx, dbName, collectionName, document)
+}
+
+// CreateGraph mocks base method.
+func (m *MockArangoDBProvider) CreateGraph(ctx context.Context, database, graph string, edgeDefinitions any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateGraph", ctx, database, graph, edgeDefinitions)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateGraph indicates an expected call of CreateGraph.
+func (mr *MockArangoDBProviderMockRecorder) CreateGraph(ctx, database, graph, edgeDefinitions any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateGraph", reflect.TypeOf((*MockArangoDBProvider)(nil).CreateGraph), ctx, database, graph, edgeDefinitions)
+}
+
+// DeleteDocument mocks base method.
+func (m *MockArangoDBProvider) DeleteDocument(ctx context.Context, dbName, collectionName, documentID string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteDocument", ctx, dbName, collectionName, documentID)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteDocument indicates an expected call of DeleteDocument.
+func (mr *MockArangoDBProviderMockRecorder) DeleteDocument(ctx, dbName, collectionName, documentID any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteDocument", reflect.TypeOf((*MockArangoDBProvider)(nil).DeleteDocument), ctx, dbName, collectionName, documentID)
+}
+
+// DropCollection mocks base method.
+func (m *MockArangoDBProvider) DropCollection(ctx context.Context, database, collection string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DropCollection", ctx, database, collection)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DropCollection indicates an expected call of DropCollection.
+func (mr *MockArangoDBProviderMockRecorder) DropCollection(ctx, database, collection any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DropCollection", reflect.TypeOf((*MockArangoDBProvider)(nil).DropCollection), ctx, database, collection)
+}
+
+// DropDB mocks base method.
+func (m *MockArangoDBProvider) DropDB(ctx context.Context, database string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DropDB", ctx, database)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DropDB indicates an expected call of DropDB.
+func (mr *MockArangoDBProviderMockRecorder) DropDB(ctx, database any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DropDB", reflect.TypeOf((*MockArangoDBProvider)(nil).DropDB), ctx, database)
+}
+
+// DropGraph mocks base method.
+func (m *MockArangoDBProvider) DropGraph(ctx context.Context, database, graph string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DropGraph", ctx, database, graph)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DropGraph indicates an expected call of DropGraph.
+func (mr *MockArangoDBProviderMockRecorder) DropGraph(ctx, database, graph any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DropGraph", reflect.TypeOf((*MockArangoDBProvider)(nil).DropGraph), ctx, database, graph)
+}
+
+// GetDocument mocks base method.
+func (m *MockArangoDBProvider) GetDocument(ctx context.Context, dbName, collectionName, documentID string, result any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDocument", ctx, dbName, collectionName, documentID, result)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// GetDocument indicates an expected call of GetDocument.
+func (mr *MockArangoDBProviderMockRecorder) GetDocument(ctx, dbName, collectionName, documentID, result any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDocument", reflect.TypeOf((*MockArangoDBProvider)(nil).GetDocument), ctx, dbName, collectionName, documentID, result)
+}
+
+// GetEdges mocks base method.
+func (m *MockArangoDBProvider) GetEdges(ctx context.Context, dbName, graphName, edgeCollection, vertexID string, resp any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetEdges", ctx, dbName, graphName, edgeCollection, vertexID, resp)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// GetEdges indicates an expected call of GetEdges.
+func (mr *MockArangoDBProviderMockRecorder) GetEdges(ctx, dbName, graphName, edgeCollection, vertexID, resp any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetEdges", reflect.TypeOf((*MockArangoDBProvider)(nil).GetEdges), ctx, dbName, graphName, edgeCollection, vertexID, resp)
+}
+
+// HealthCheck mocks base method.
+func (m *MockArangoDBProvider) HealthCheck(arg0 context.Context) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HealthCheck", arg0)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HealthCheck indicates an expected call of HealthCheck.
+func (mr *MockArangoDBProviderMockRecorder) HealthCheck(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HealthCheck", reflect.TypeOf((*MockArangoDBProvider)(nil).HealthCheck), arg0)
+}
+
+// Query mocks base method.
+func (m *MockArangoDBProvider) Query(ctx context.Context, dbName, query string, bindVars map[string]any, result any, options ...map[string]any) error {
+	m.ctrl.T.Helper()
+	varargs := []any{ctx, dbName, query, bindVars, result}
+	for _, a := range options {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "Query", varargs...)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// Query indicates an expected call of Query.
+func (mr *MockArangoDBProviderMockRecorder) Query(ctx, dbName, query, bindVars, result any, options ...any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]any{ctx, dbName, query, bindVars, result}, options...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Query", reflect.TypeOf((*MockArangoDBProvider)(nil).Query), varargs...)
+}
+
+// UpdateDocument mocks base method.
+func (m *MockArangoDBProvider) UpdateDocument(ctx context.Context, dbName, collectionName, documentID string, document any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateDocument", ctx, dbName, collectionName, documentID, document)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateDocument indicates an expected call of UpdateDocument.
+func (mr *MockArangoDBProviderMockRecorder) UpdateDocument(ctx, dbName, collectionName, documentID, document any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDocument", reflect.TypeOf((*MockArangoDBProvider)(nil).UpdateDocument), ctx, dbName, collectionName, documentID, document)
+}
+
+// UseLogger mocks base method.
+func (m *MockArangoDBProvider) UseLogger(logger any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UseLogger", logger)
+}
+
+// UseLogger indicates an expected call of UseLogger.
+func (mr *MockArangoDBProviderMockRecorder) UseLogger(logger any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseLogger", reflect.TypeOf((*MockArangoDBProvider)(nil).UseLogger), logger)
+}
+
+// UseMetrics mocks base method.
+func (m *MockArangoDBProvider) UseMetrics(metrics any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UseMetrics", metrics)
+}
+
+// UseMetrics indicates an expected call of UseMetrics.
+func (mr *MockArangoDBProviderMockRecorder) UseMetrics(metrics any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseMetrics", reflect.TypeOf((*MockArangoDBProvider)(nil).UseMetrics), metrics)
+}
+
+// UseTracer mocks base method.
+func (m *MockArangoDBProvider) UseTracer(tracer any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UseTracer", tracer)
+}
+
+// UseTracer indicates an expected call of UseTracer.
+func (mr *MockArangoDBProviderMockRecorder) UseTracer(tracer any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseTracer", reflect.TypeOf((*MockArangoDBProvider)(nil).UseTracer), tracer)
+}
+
+// MockElasticsearch is a mock of Elasticsearch interface.
+type MockElasticsearch struct {
+	ctrl     *gomock.Controller
+	recorder *MockElasticsearchMockRecorder
+	isgomock struct{}
+}
+
+// MockElasticsearchMockRecorder is the mock recorder for MockElasticsearch.
+type MockElasticsearchMockRecorder struct {
+	mock *MockElasticsearch
+}
+
+// NewMockElasticsearch creates a new mock instance.
+func NewMockElasticsearch(ctrl *gomock.Controller) *MockElasticsearch {
+	mock := &MockElasticsearch{ctrl: ctrl}
+	mock.recorder = &MockElasticsearchMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockElasticsearch) EXPECT() *MockElasticsearchMockRecorder {
+	return m.recorder
+}
+
+// Bulk mocks base method.
+func (m *MockElasticsearch) Bulk(ctx context.Context, operations []map[string]any) (map[string]any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Bulk", ctx, operations)
+	ret0, _ := ret[0].(map[string]any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Bulk indicates an expected call of Bulk.
+func (mr *MockElasticsearchMockRecorder) Bulk(ctx, operations any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Bulk", reflect.TypeOf((*MockElasticsearch)(nil).Bulk), ctx, operations)
+}
+
+// CreateIndex mocks base method.
+func (m *MockElasticsearch) CreateIndex(ctx context.Context, index string, settings map[string]any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateIndex", ctx, index, settings)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateIndex indicates an expected call of CreateIndex.
+func (mr *MockElasticsearchMockRecorder) CreateIndex(ctx, index, settings any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateIndex", reflect.TypeOf((*MockElasticsearch)(nil).CreateIndex), ctx, index, settings)
+}
+
+// DeleteDocument mocks base method.
+func (m *MockElasticsearch) DeleteDocument(ctx context.Context, index, id string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteDocument", ctx, index, id)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteDocument indicates an expected call of DeleteDocument.
+func (mr *MockElasticsearchMockRecorder) DeleteDocument(ctx, index, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteDocument", reflect.TypeOf((*MockElasticsearch)(nil).DeleteDocument), ctx, index, id)
+}
+
+// DeleteIndex mocks base method.
+func (m *MockElasticsearch) DeleteIndex(ctx context.Context, index string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteIndex", ctx, index)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteIndex indicates an expected call of DeleteIndex.
+func (mr *MockElasticsearchMockRecorder) DeleteIndex(ctx, index any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteIndex", reflect.TypeOf((*MockElasticsearch)(nil).DeleteIndex), ctx, index)
+}
+
+// GetDocument mocks base method.
+func (m *MockElasticsearch) GetDocument(ctx context.Context, index, id string) (map[string]any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDocument", ctx, index, id)
+	ret0, _ := ret[0].(map[string]any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDocument indicates an expected call of GetDocument.
+func (mr *MockElasticsearchMockRecorder) GetDocument(ctx, index, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDocument", reflect.TypeOf((*MockElasticsearch)(nil).GetDocument), ctx, index, id)
+}
+
+// HealthCheck mocks base method.
+func (m *MockElasticsearch) HealthCheck(arg0 context.Context) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HealthCheck", arg0)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HealthCheck indicates an expected call of HealthCheck.
+func (mr *MockElasticsearchMockRecorder) HealthCheck(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HealthCheck", reflect.TypeOf((*MockElasticsearch)(nil).HealthCheck), arg0)
+}
+
+// IndexDocument mocks base method.
+func (m *MockElasticsearch) IndexDocument(ctx context.Context, index, id string, document any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IndexDocument", ctx, index, id, document)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// IndexDocument indicates an expected call of IndexDocument.
+func (mr *MockElasticsearchMockRecorder) IndexDocument(ctx, index, id, document any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IndexDocument", reflect.TypeOf((*MockElasticsearch)(nil).IndexDocument), ctx, index, id, document)
+}
+
+// Search mocks base method.
+func (m *MockElasticsearch) Search(ctx context.Context, indices []string, query map[string]any) (map[string]any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Search", ctx, indices, query)
+	ret0, _ := ret[0].(map[string]any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Search indicates an expected call of Search.
+func (mr *MockElasticsearchMockRecorder) Search(ctx, indices, query any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Search", reflect.TypeOf((*MockElasticsearch)(nil).Search), ctx, indices, query)
+}
+
+// UpdateDocument mocks base method.
+func (m *MockElasticsearch) UpdateDocument(ctx context.Context, index, id string, update map[string]any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateDocument", ctx, index, id, update)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateDocument indicates an expected call of UpdateDocument.
+func (mr *MockElasticsearchMockRecorder) UpdateDocument(ctx, index, id, update any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDocument", reflect.TypeOf((*MockElasticsearch)(nil).UpdateDocument), ctx, index, id, update)
+}
+
+// MockElasticsearchProvider is a mock of ElasticsearchProvider interface.
+type MockElasticsearchProvider struct {
+	ctrl     *gomock.Controller
+	recorder *MockElasticsearchProviderMockRecorder
+	isgomock struct{}
+}
+
+// MockElasticsearchProviderMockRecorder is the mock recorder for MockElasticsearchProvider.
+type MockElasticsearchProviderMockRecorder struct {
+	mock *MockElasticsearchProvider
+}
+
+// NewMockElasticsearchProvider creates a new mock instance.
+func NewMockElasticsearchProvider(ctrl *gomock.Controller) *MockElasticsearchProvider {
+	mock := &MockElasticsearchProvider{ctrl: ctrl}
+	mock.recorder = &MockElasticsearchProviderMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockElasticsearchProvider) EXPECT() *MockElasticsearchProviderMockRecorder {
+	return m.recorder
+}
+
+// Bulk mocks base method.
+func (m *MockElasticsearchProvider) Bulk(ctx context.Context, operations []map[string]any) (map[string]any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Bulk", ctx, operations)
+	ret0, _ := ret[0].(map[string]any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Bulk indicates an expected call of Bulk.
+func (mr *MockElasticsearchProviderMockRecorder) Bulk(ctx, operations any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Bulk", reflect.TypeOf((*MockElasticsearchProvider)(nil).Bulk), ctx, operations)
+}
+
+// Connect mocks base method.
+func (m *MockElasticsearchProvider) Connect() {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "Connect")
+}
+
+// Connect indicates an expected call of Connect.
+func (mr *MockElasticsearchProviderMockRecorder) Connect() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Connect", reflect.TypeOf((*MockElasticsearchProvider)(nil).Connect))
+}
+
+// CreateIndex mocks base method.
+func (m *MockElasticsearchProvider) CreateIndex(ctx context.Context, index string, settings map[string]any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CreateIndex", ctx, index, settings)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// CreateIndex indicates an expected call of CreateIndex.
+func (mr *MockElasticsearchProviderMockRecorder) CreateIndex(ctx, index, settings any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateIndex", reflect.TypeOf((*MockElasticsearchProvider)(nil).CreateIndex), ctx, index, settings)
+}
+
+// DeleteDocument mocks base method.
+func (m *MockElasticsearchProvider) DeleteDocument(ctx context.Context, index, id string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteDocument", ctx, index, id)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteDocument indicates an expected call of DeleteDocument.
+func (mr *MockElasticsearchProviderMockRecorder) DeleteDocument(ctx, index, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteDocument", reflect.TypeOf((*MockElasticsearchProvider)(nil).DeleteDocument), ctx, index, id)
+}
+
+// DeleteIndex mocks base method.
+func (m *MockElasticsearchProvider) DeleteIndex(ctx context.Context, index string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteIndex", ctx, index)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteIndex indicates an expected call of DeleteIndex.
+func (mr *MockElasticsearchProviderMockRecorder) DeleteIndex(ctx, index any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteIndex", reflect.TypeOf((*MockElasticsearchProvider)(nil).DeleteIndex), ctx, index)
+}
+
+// GetDocument mocks base method.
+func (m *MockElasticsearchProvider) GetDocument(ctx context.Context, index, id string) (map[string]any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetDocument", ctx, index, id)
+	ret0, _ := ret[0].(map[string]any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetDocument indicates an expected call of GetDocument.
+func (mr *MockElasticsearchProviderMockRecorder) GetDocument(ctx, index, id any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetDocument", reflect.TypeOf((*MockElasticsearchProvider)(nil).GetDocument), ctx, index, id)
+}
+
+// HealthCheck mocks base method.
+func (m *MockElasticsearchProvider) HealthCheck(arg0 context.Context) (any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HealthCheck", arg0)
+	ret0, _ := ret[0].(any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// HealthCheck indicates an expected call of HealthCheck.
+func (mr *MockElasticsearchProviderMockRecorder) HealthCheck(arg0 any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HealthCheck", reflect.TypeOf((*MockElasticsearchProvider)(nil).HealthCheck), arg0)
+}
+
+// IndexDocument mocks base method.
+func (m *MockElasticsearchProvider) IndexDocument(ctx context.Context, index, id string, document any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "IndexDocument", ctx, index, id, document)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// IndexDocument indicates an expected call of IndexDocument.
+func (mr *MockElasticsearchProviderMockRecorder) IndexDocument(ctx, index, id, document any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "IndexDocument", reflect.TypeOf((*MockElasticsearchProvider)(nil).IndexDocument), ctx, index, id, document)
+}
+
+// Search mocks base method.
+func (m *MockElasticsearchProvider) Search(ctx context.Context, indices []string, query map[string]any) (map[string]any, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Search", ctx, indices, query)
+	ret0, _ := ret[0].(map[string]any)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Search indicates an expected call of Search.
+func (mr *MockElasticsearchProviderMockRecorder) Search(ctx, indices, query any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Search", reflect.TypeOf((*MockElasticsearchProvider)(nil).Search), ctx, indices, query)
+}
+
+// UpdateDocument mocks base method.
+func (m *MockElasticsearchProvider) UpdateDocument(ctx context.Context, index, id string, update map[string]any) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UpdateDocument", ctx, index, id, update)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// UpdateDocument indicates an expected call of UpdateDocument.
+func (mr *MockElasticsearchProviderMockRecorder) UpdateDocument(ctx, index, id, update any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateDocument", reflect.TypeOf((*MockElasticsearchProvider)(nil).UpdateDocument), ctx, index, id, update)
+}
+
+// UseLogger mocks base method.
+func (m *MockElasticsearchProvider) UseLogger(logger any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UseLogger", logger)
+}
+
+// UseLogger indicates an expected call of UseLogger.
+func (mr *MockElasticsearchProviderMockRecorder) UseLogger(logger any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseLogger", reflect.TypeOf((*MockElasticsearchProvider)(nil).UseLogger), logger)
+}
+
+// UseMetrics mocks base method.
+func (m *MockElasticsearchProvider) UseMetrics(metrics any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UseMetrics", metrics)
+}
+
+// UseMetrics indicates an expected call of UseMetrics.
+func (mr *MockElasticsearchProviderMockRecorder) UseMetrics(metrics any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseMetrics", reflect.TypeOf((*MockElasticsearchProvider)(nil).UseMetrics), metrics)
+}
+
+// UseTracer mocks base method.
+func (m *MockElasticsearchProvider) UseTracer(tracer any) {
+	m.ctrl.T.Helper()
+	m.ctrl.Call(m, "UseTracer", tracer)
+}
+
+// UseTracer indicates an expected call of UseTracer.
+func (mr *MockElasticsearchProviderMockRecorder) UseTracer(tracer any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UseTracer", reflect.TypeOf((*MockElasticsearchProvider)(nil).UseTracer), tracer)
 }

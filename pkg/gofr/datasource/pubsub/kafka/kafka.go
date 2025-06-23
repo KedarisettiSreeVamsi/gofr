@@ -14,34 +14,38 @@ import (
 	"gofr.dev/pkg/gofr/datasource/pubsub"
 )
 
-var (
-	ErrConsumerGroupNotProvided = errors.New("consumer group id not provided")
-	errBrokerNotProvided        = errors.New("kafka broker address not provided")
-	errPublisherNotConfigured   = errors.New("can't publish message. Publisher not configured or topic is empty")
-	errBatchSize                = errors.New("KAFKA_BATCH_SIZE must be greater than 0")
-	errBatchBytes               = errors.New("KAFKA_BATCH_BYTES must be greater than 0")
-	errBatchTimeout             = errors.New("KAFKA_BATCH_TIMEOUT must be greater than 0")
-)
-
 const (
-	DefaultBatchSize    = 100
-	DefaultBatchBytes   = 1048576
-	DefaultBatchTimeout = 1000
+	DefaultBatchSize       = 100
+	DefaultBatchBytes      = 1048576
+	DefaultBatchTimeout    = 1000
+	defaultRetryTimeout    = 10 * time.Second
+	protocolPlainText      = "PLAINTEXT"
+	protocolSASL           = "SASL_PLAINTEXT"
+	protocolSSL            = "SSL"
+	protocolSASLSSL        = "SASL_SSL"
+	messageMultipleBrokers = "MULTIPLE_BROKERS"
+	brokerStatusUp         = "UP"
 )
 
 type Config struct {
-	Broker          string
-	Partition       int
-	ConsumerGroupID string
-	OffSet          int
-	BatchSize       int
-	BatchBytes      int
-	BatchTimeout    int
+	Brokers          []string
+	Partition        int
+	ConsumerGroupID  string
+	OffSet           int
+	BatchSize        int
+	BatchBytes       int
+	BatchTimeout     int
+	RetryTimeout     time.Duration
+	SASLMechanism    string
+	SASLUser         string
+	SASLPassword     string
+	SecurityProtocol string
+	TLS              TLSConfig
 }
 
 type kafkaClient struct {
 	dialer *kafka.Dialer
-	conn   Connection
+	conn   *multiConn
 
 	writer Writer
 	reader map[string]Reader
@@ -53,8 +57,8 @@ type kafkaClient struct {
 	metrics Metrics
 }
 
-//nolint:revive // We do not want anyone using the client without initialization steps.
-func New(conf Config, logger pubsub.Logger, metrics Metrics) *kafkaClient {
+func New(conf *Config, logger pubsub.Logger, metrics Metrics) *kafkaClient { //nolint:revive // New allows
+	// returning unexported types as intended.
 	err := validateConfigs(conf)
 	if err != nil {
 		logger.Errorf("could not initialize kafka, error: %v", err)
@@ -62,66 +66,31 @@ func New(conf Config, logger pubsub.Logger, metrics Metrics) *kafkaClient {
 		return nil
 	}
 
-	logger.Debugf("connecting to Kafka broker '%s'", conf.Broker)
-
-	conn, err := kafka.Dial("tcp", conf.Broker)
-	if err != nil {
-		logger.Errorf("failed to connect to kafka at %v, error: %v", conf.Broker, err)
-
-		return &kafkaClient{
-			logger:  logger,
-			config:  Config{},
-			metrics: metrics,
-		}
+	if len(conf.Brokers) == 1 {
+		logger.Debugf("connecting to Kafka broker: '%s'", conf.Brokers[0])
+	} else {
+		logger.Debugf("connecting to Kafka brokers: %v", conf.Brokers)
 	}
 
-	dialer := &kafka.Dialer{
-		Timeout:   10 * time.Second,
-		DualStack: true,
-	}
-
-	writer := kafka.NewWriter(kafka.WriterConfig{
-		Brokers:      []string{conf.Broker},
-		Dialer:       dialer,
-		BatchSize:    conf.BatchSize,
-		BatchBytes:   conf.BatchBytes,
-		BatchTimeout: time.Duration(conf.BatchTimeout),
-	})
-
-	reader := make(map[string]Reader)
-
-	logger.Logf("connected to Kafka broker '%s'", conf.Broker)
-
-	return &kafkaClient{
-		config:  conf,
-		dialer:  dialer,
-		reader:  reader,
-		conn:    conn,
+	client := &kafkaClient{
 		logger:  logger,
-		writer:  writer,
-		mu:      &sync.RWMutex{},
+		config:  *conf,
 		metrics: metrics,
+		mu:      &sync.RWMutex{},
 	}
-}
+	ctx := context.Background()
 
-func validateConfigs(conf Config) error {
-	if conf.Broker == "" {
-		return errBrokerNotProvided
-	}
+	err = client.initialize(ctx)
 
-	if conf.BatchSize <= 0 {
-		return errBatchSize
-	}
+	if err != nil {
+		logger.Errorf("failed to connect to kafka at %v, error: %v", conf.Brokers, err)
 
-	if conf.BatchBytes <= 0 {
-		return errBatchBytes
+		go client.retryConnect(ctx)
+
+		return client
 	}
 
-	if conf.BatchTimeout <= 0 {
-		return errBatchTimeout
-	}
-
-	return nil
+	return client
 }
 
 func (k *kafkaClient) Publish(ctx context.Context, topic string, message []byte) error {
@@ -149,12 +118,20 @@ func (k *kafkaClient) Publish(ctx context.Context, topic string, message []byte)
 		return err
 	}
 
+	var hostName string
+
+	if len(k.config.Brokers) > 1 {
+		hostName = messageMultipleBrokers
+	} else {
+		hostName = k.config.Brokers[0]
+	}
+
 	k.logger.Debug(&pubsub.Log{
 		Mode:          "PUB",
 		CorrelationID: span.SpanContext().TraceID().String(),
 		MessageValue:  string(message),
 		Topic:         topic,
-		Host:          k.config.Broker,
+		Host:          hostName,
 		PubSubBackend: "KAFKA",
 		Time:          end.Microseconds(),
 	})
@@ -165,6 +142,12 @@ func (k *kafkaClient) Publish(ctx context.Context, topic string, message []byte)
 }
 
 func (k *kafkaClient) Subscribe(ctx context.Context, topic string) (*pubsub.Message, error) {
+	if !k.isConnected() {
+		time.Sleep(defaultRetryTimeout)
+
+		return nil, errClientNotConnected
+	}
+
 	if k.config.ConsumerGroupID == "" {
 		k.logger.Error("cannot subscribe as consumer_id is not provided in configs")
 
@@ -179,6 +162,10 @@ func (k *kafkaClient) Subscribe(ctx context.Context, topic string) (*pubsub.Mess
 	var reader Reader
 	// Lock the reader map to ensure only one subscriber access the reader at a time
 	k.mu.Lock()
+
+	if k.reader == nil {
+		k.reader = make(map[string]Reader)
+	}
 
 	if k.reader[topic] == nil {
 		k.reader[topic] = k.getNewReader(topic)
@@ -206,12 +193,20 @@ func (k *kafkaClient) Subscribe(ctx context.Context, topic string) (*pubsub.Mess
 
 	end := time.Since(start)
 
+	var hostName string
+
+	if len(k.config.Brokers) > 1 {
+		hostName = "multiple brokers"
+	} else {
+		hostName = k.config.Brokers[0]
+	}
+
 	k.logger.Debug(&pubsub.Log{
 		Mode:          "SUB",
 		CorrelationID: span.SpanContext().TraceID().String(),
 		MessageValue:  string(msg.Value),
 		Topic:         topic,
-		Host:          k.config.Broker,
+		Host:          hostName,
 		PubSubBackend: "KAFKA",
 		Time:          end.Microseconds(),
 	})
@@ -227,7 +222,7 @@ func (k *kafkaClient) Close() (err error) {
 	}
 
 	if k.writer != nil {
-		err = k.writer.Close()
+		err = errors.Join(err, k.writer.Close())
 	}
 
 	if k.conn != nil {
@@ -235,37 +230,4 @@ func (k *kafkaClient) Close() (err error) {
 	}
 
 	return err
-}
-
-func (k *kafkaClient) getNewReader(topic string) Reader {
-	reader := kafka.NewReader(kafka.ReaderConfig{
-		GroupID:     k.config.ConsumerGroupID,
-		Brokers:     []string{k.config.Broker},
-		Topic:       topic,
-		MinBytes:    10e3,
-		MaxBytes:    10e6,
-		Dialer:      k.dialer,
-		StartOffset: int64(k.config.OffSet),
-	})
-
-	return reader
-}
-
-func (k *kafkaClient) DeleteTopic(_ context.Context, name string) error {
-	return k.conn.DeleteTopics(name)
-}
-
-func (k *kafkaClient) Controller() (broker kafka.Broker, err error) {
-	return k.conn.Controller()
-}
-
-func (k *kafkaClient) CreateTopic(_ context.Context, name string) error {
-	topics := kafka.TopicConfig{Topic: name, NumPartitions: 1, ReplicationFactor: 1}
-
-	err := k.conn.CreateTopics(topics)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

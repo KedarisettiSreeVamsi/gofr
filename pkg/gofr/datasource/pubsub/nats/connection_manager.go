@@ -86,19 +86,21 @@ func (cm *ConnectionManager) Connect() error {
 
 	connInterface, err := cm.natsConnector.Connect(cm.config.Server, opts...)
 	if err != nil {
+		cm.logger.Debugf("Failed to connect to NATS server at %v: %v", cm.config.Server, err)
 		return err
 	}
 
 	js, err := cm.jetStreamCreator.New(connInterface)
 	if err != nil {
 		connInterface.Close()
-		cm.logger.Debugf("failed to create jStream context: %v", err)
+		cm.logger.Debugf("Failed to create jStream context: %v", err)
 
 		return err
 	}
 
 	cm.conn = connInterface
 	cm.jStream = js
+	cm.logger.Logf("Successfully connected to NATS server at %v", cm.config.Server)
 
 	return nil
 }
@@ -111,6 +113,10 @@ func (cm *ConnectionManager) Close(_ context.Context) {
 
 func (cm *ConnectionManager) Publish(ctx context.Context, subject string, message []byte, metrics Metrics) error {
 	metrics.IncrementCounter(ctx, "app_pubsub_publish_total_count", "subject", subject)
+
+	if !cm.isConnected() {
+		return errClientNotConnected
+	}
 
 	if err := cm.validateJetStream(subject); err != nil {
 		return err
@@ -161,4 +167,12 @@ func (cm *ConnectionManager) Health() datasource.Health {
 			"server": cm.config.Server,
 		},
 	}
+}
+
+func (cm *ConnectionManager) isConnected() bool {
+	if cm.conn == nil {
+		return false
+	}
+
+	return cm.conn.Status() == nats.CONNECTED
 }

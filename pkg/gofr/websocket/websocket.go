@@ -19,6 +19,9 @@ const WSConnectionKey WSKey = "ws-connection-key"
 // Connection is a wrapper for gorilla websocket connection.
 type Connection struct {
 	*websocket.Conn
+
+	// Mutex to prevent race conditions on write operations
+	writeMutex sync.Mutex
 }
 
 // ErrorConnection is the connection error that occurs when webscoket connection cannot be established.
@@ -76,6 +79,16 @@ func (w *Connection) Bind(v any) error {
 	return nil
 }
 
+// WriteMessage writes the data on the underlying ws connection.
+//
+// This method is thread-safe and be called concurrently with WriteJSON.
+func (w *Connection) WriteMessage(messageType int, data []byte) error {
+	w.writeMutex.Lock()
+	defer w.writeMutex.Unlock()
+
+	return w.Conn.WriteMessage(messageType, data)
+}
+
 func (*Connection) HostName() string {
 	return "" // Not applicable for WebSocket, can be implemented if needed
 }
@@ -106,7 +119,8 @@ func New() *Manager {
 }
 
 // Upgrade calls the upgrader to upgrade an http connection to a websocket connection.
-func (u *WSUpgrader) Upgrade(w http.ResponseWriter, r *http.Request, responseHeader http.Header) (*websocket.Conn, error) {
+func (u *WSUpgrader) Upgrade(w http.ResponseWriter, r *http.Request,
+	responseHeader http.Header) (*websocket.Conn, error) {
 	return u.Upgrader.Upgrade(w, r, responseHeader)
 }
 
@@ -116,6 +130,27 @@ func (ws *Manager) GetWebsocketConnection(connID string) *Connection {
 	defer ws.mu.Unlock()
 
 	return ws.WebSocketConnections[connID]
+}
+
+// ListConnections returns a list of all active WebSocket connection IDs.
+func (ws *Manager) ListConnections() []string {
+	ws.mu.RLock()
+	defer ws.mu.RUnlock()
+
+	connections := make([]string, 0, len(ws.WebSocketConnections))
+	for connID := range ws.WebSocketConnections {
+		connections = append(connections, connID)
+	}
+
+	return connections
+}
+
+// GetConnectionByServiceName retrieves a WebSocket connection by its service name.
+func (ws *Manager) GetConnectionByServiceName(serviceName string) *Connection {
+	ws.mu.RLock()
+	defer ws.mu.RUnlock()
+
+	return ws.WebSocketConnections[serviceName]
 }
 
 // AddWebsocketConnection add a new connection with the connection id key.
@@ -132,7 +167,9 @@ func (ws *Manager) CloseConnection(connID string) {
 	defer ws.mu.Unlock()
 
 	if conn, ok := ws.WebSocketConnections[connID]; ok {
-		conn.Close()
+		if conn.Conn != nil {
+			conn.Close()
+		}
 
 		delete(ws.WebSocketConnections, connID)
 	}

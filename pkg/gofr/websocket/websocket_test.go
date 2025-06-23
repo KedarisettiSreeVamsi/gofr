@@ -1,9 +1,10 @@
 package websocket
 
 import (
-	"context"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"sync"
 	"testing"
 	"time"
 
@@ -12,6 +13,11 @@ import (
 	"github.com/stretchr/testify/require"
 	gomock "go.uber.org/mock/gomock"
 )
+
+func TestMain(m *testing.M) {
+	os.Setenv("GOFR_TELEMETRY", "false")
+	m.Run()
+}
 
 func TestConnection_Bind_Success(t *testing.T) {
 	upgrader := websocket.Upgrader{}
@@ -113,7 +119,7 @@ func Test_Upgrade(t *testing.T) {
 
 	wsUpgrader := WSUpgrader{Upgrader: mockUpgrader}
 
-	req, err := http.NewRequestWithContext(context.TODO(), http.MethodGet, "/", http.NoBody)
+	req, err := http.NewRequestWithContext(t.Context(), http.MethodGet, "/", http.NoBody)
 	require.NoError(t, err)
 
 	w := httptest.NewRecorder()
@@ -143,4 +149,83 @@ func dereference(v any) any {
 	default:
 		return v
 	}
+}
+
+func TestConcurrentWriteMessageCalls(t *testing.T) {
+	upgrader := websocket.Upgrader{}
+
+	const message = "this is a test message"
+
+	loop := 10
+	workers := 10
+
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		conn, err := upgrader.Upgrade(w, r, nil)
+		assert.NoError(t, err)
+		defer conn.Close()
+
+		wc := &Connection{Conn: conn}
+
+		wg := sync.WaitGroup{}
+
+		for range loop {
+			for range workers {
+				wg.Add(1)
+
+				go func() {
+					defer wg.Done()
+
+					if err := wc.WriteMessage(websocket.TextMessage, []byte(message)); err != nil {
+						t.Errorf("concurrently wc.WriteMessage() returned %v", err)
+					}
+				}()
+			}
+		}
+
+		wg.Wait()
+	}))
+
+	server.Close()
+}
+
+func TestManager_ListConnections(t *testing.T) {
+	manager := New()
+
+	// Add mock connections
+	manager.AddWebsocketConnection("conn1", &Connection{Conn: &websocket.Conn{}})
+	manager.AddWebsocketConnection("conn2", &Connection{Conn: &websocket.Conn{}})
+	manager.AddWebsocketConnection("conn3", &Connection{Conn: &websocket.Conn{}})
+
+	// Get the list of connections
+	connections := manager.ListConnections()
+
+	assert.ElementsMatch(t, []string{"conn1", "conn2", "conn3"}, connections)
+}
+
+func TestManager_GetConnectionByServiceName(t *testing.T) {
+	manager := New()
+
+	mockConn := &Connection{Conn: &websocket.Conn{}}
+	manager.AddWebsocketConnection("testService", mockConn)
+
+	retrievedConn := manager.GetConnectionByServiceName("testService")
+
+	assert.Equal(t, mockConn, retrievedConn)
+}
+
+func TestManager_CloseConnection(t *testing.T) {
+	manager := New()
+
+	mockConn := &Connection{
+		Conn: &websocket.Conn{},
+	}
+	mockConn.Conn = nil
+
+	manager.AddWebsocketConnection("testConn", mockConn)
+
+	assert.NotNil(t, manager.GetWebsocketConnection("testConn"))
+
+	manager.CloseConnection("testConn")
+
+	assert.Nil(t, manager.GetWebsocketConnection("testConn"))
 }

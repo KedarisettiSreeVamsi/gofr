@@ -45,7 +45,7 @@ export const navigation = [
             {
                 title: 'Overriding Default',
                 href: '/docs/advanced-guide/overriding-default',
-                desc: "Understand how to override default configurations and behaviors in GoFR to tailor framework to your specific needs."
+                desc: "Understand how to override default configurations and behaviors in GoFr to tailor framework to your specific needs."
             },
             {
                 title: 'Remote Log Level Change',
@@ -70,12 +70,12 @@ export const navigation = [
             {
                 title: 'Adding Custom Middleware',
                 href: '/docs/advanced-guide/middlewares',
-                desc: "Learn how to add custom middleware to your GoFR application for enhanced functionality and request processing."
+                desc: "Learn how to add custom middleware to your GoFr application for enhanced functionality and request processing."
             },
             {
                 title: 'HTTP Communication',
                 href: '/docs/advanced-guide/http-communication',
-                desc: "Get familiar with making HTTP requests and handling responses within your GoFR application to facilitate seamless communication."
+                desc: "Get familiar with making HTTP requests and handling responses within your GoFr application to facilitate seamless communication."
             },
             {
                 title: 'HTTP Authentication',
@@ -95,58 +95,118 @@ export const navigation = [
             {
                 title: 'Handling Data Migrations',
                 href: '/docs/advanced-guide/handling-data-migrations',
-                desc: "Explore strategies for managing data migrations within your GoFR application to ensure smooth transitions and data integrity."
+                desc: "Explore strategies for managing data migrations within your GoFr application to ensure smooth transitions and data integrity."
             },
             {
                 title: 'Writing gRPC Server/Client',
                 href: '/docs/advanced-guide/grpc',
-                desc: "Step-by-step guide on writing a gRPC server in GoFR to facilitate efficient communication between services."
+                desc: "Step-by-step guide on writing a gRPC server in GoFr to facilitate efficient communication between services."
             },
             {
                 title: 'Using Pub/Sub',
                 href: '/docs/advanced-guide/using-publisher-subscriber',
-                desc: "Discover how to gofr seamlessly allows to integrate different Pub/Sub systems in your application for effective messaging and event-driven architectures."
-            },
-            {
-                title: 'Injecting Databases',
-                href: '/docs/advanced-guide/injecting-databases-drivers',
-                desc: "Learn how to inject database drivers into your GoFR application for seamless data management and operations."
+                desc: "Discover how to GoFr seamlessly allows to integrate different Pub/Sub systems in your application for effective messaging and event-driven architectures."
             },
             {
                 title: 'Key Value Store',
                 href: '/docs/advanced-guide/key-value-store',
-                desc: "Explore how to implement and manage a key-value store in your GoFR application for fast and efficient data retrieval."
+                desc: "Explore how to implement and manage a key-value store in your GoFr application for fast and efficient data retrieval."
             },
             {
                 title: 'Dealing with SQL',
                 href: '/docs/advanced-guide/dealing-with-sql',
-                desc: "Get insights into best practices for working with SQL databases in GoFR, including query optimization and error handling."
+                desc: "Get insights into best practices for working with SQL databases in GoFr, including query optimization and error handling."
             },
             {
                 title: 'Automatic SwaggerUI Rendering',
                 href: '/docs/advanced-guide/swagger-documentation',
-                desc: "Learn how to automatically render SwaggerUI documentation for your GoFR APIs, improving discoverability and usability."
+                desc: "Learn how to automatically render SwaggerUI documentation for your GoFr APIs, improving discoverability and usability."
             },
             {
                 title: 'Error Handling',
                 href: '/docs/advanced-guide/gofr-errors',
-                desc: "Understand error handling mechanisms in GoFR to ensure robust applications and improved user experience."
+                desc: "Understand error handling mechanisms in GoFr to ensure robust applications and improved user experience."
             },
             {
                 title: 'Handling File',
                 href: '/docs/advanced-guide/handling-file',
-                desc: "Explore how GoFR enables efficient file handling by abstracting remote and local filestore providers in your Go application. Learn to manage file uploads, downloads, and storage seamlessly, enhancing your application's capability to work with diverse data sources."
+                desc: "Explore how GoFr enables efficient file handling by abstracting remote and local filestore providers in your Go application. Learn to manage file uploads, downloads, and storage seamlessly, enhancing your application's capability to work with diverse data sources."
             },
             {
                 title: 'WebSockets',
                 href: '/docs/advanced-guide/websocket',
-                desc: "Explore how gofr eases the process of WebSocket communication in your Golang application for real-time data exchange."
+                desc: "Explore how GoFr eases the process of WebSocket communication in your Golang application for real-time data exchange."
             },
             {
                 title: 'Serving-Static Files',
                 href: '/docs/advanced-guide/serving-static-files',
                 desc: "Know how GoFr automatically serves static content from a static folder in the application directory."
+            },
+            {
+                title: 'Profiling in GoFr Applications',
+                href: '/docs/advanced-guide/debugging',
+                desc: "Discover GoFr auto-enables pprof profiling by leveraging its built-in configurations."
             }
+        ],
+    },
+    {
+        title: 'Datasources',
+        links: [
+            {
+                title: "Getting Started",
+                href: "/docs/datasources/getting-started",
+                desc: "Learn how to connect to and interact with multiple databases in GoFr."
+            },
+            {
+                title: "ArangoDB",
+                href: "/docs/datasources/arangodb",
+                desc: "Learn how to connect to and interact with arango database in GoFr."
+            },
+            {
+                title: "Cassandra",
+                href: "/docs/datasources/cassandra",
+                desc: "Learn how to connect to and interact with cassandra database in GoFr."
+            },
+            {
+                title: "ClickHouse",
+                href: "/docs/datasources/clickhouse",
+                desc: "Learn how to connect to and interact with clickhouse database in GoFr."
+            },
+            {
+                title: "CockroachDB",
+                href: "/docs/datasources/cockroachdb",
+                desc: "Learn how to connect to and interact with CockroachDB in GoFr."
+            },
+            {
+                title: "DGraph",
+                href: "/docs/datasources/dgraph",
+                desc: "Learn how to connect to and interact with dgraph database in GoFr."
+            },
+            {
+                title: "MongoDB",
+                href: "/docs/datasources/mongodb",
+                desc: "Learn how to connect to and interact with mongo database in GoFr."
+            },
+            {
+                title: "OpenTSDB",
+                href: "/docs/datasources/opentsdb",
+                desc: "Learn how to connect to and interact with opentsdb database in GoFr."
+            },
+            {
+                title: "ScyllaDB",
+                href: "/docs/datasources/scylladb",
+                desc: "Learn how to connect to and interact with scylla database in GoFr."
+            },
+            {
+                title: "Solr",
+                href: "/docs/datasources/solr",
+                desc: "Learn how to connect to and interact with solr database in GoFr."
+            },
+            {
+                title: "SurrealDB",
+                href: "/docs/datasources/surrealdb",
+                desc: "Learn how to connect to and interact with surreal database in GoFr."
+            },
         ],
     },
     {

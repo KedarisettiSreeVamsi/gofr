@@ -92,7 +92,7 @@ func (a *App) AddKVStore(db container.KVStoreProvider) {
 	db.UseLogger(a.Logger())
 	db.UseMetrics(a.Metrics())
 
-	tracer := otel.GetTracerProvider().Tracer("gofr-badger")
+	tracer := otel.GetTracerProvider().Tracer("gofr-kvstore")
 
 	db.UseTracer(tracer)
 
@@ -145,6 +145,7 @@ func (a *App) AddOpenTSDB(db container.OpenTSDBProvider) {
 	a.container.OpenTSDB = db
 }
 
+// AddScyllaDB sets the ScyllaDB datasource in the app's container.
 func (a *App) AddScyllaDB(db container.ScyllaDBProvider) {
 	// Create the ScyllaDB client with the provided configuration
 	db.UseLogger(a.Logger())
@@ -156,6 +157,23 @@ func (a *App) AddScyllaDB(db container.ScyllaDBProvider) {
 	a.container.ScyllaDB = db
 }
 
+// AddArangoDB sets the ArangoDB datasource in the app's container.
+func (a *App) AddArangoDB(db container.ArangoDBProvider) {
+	// Set up logger, metrics, and tracer
+	db.UseLogger(a.Logger())
+	db.UseMetrics(a.Metrics())
+
+	// Get tracer from OpenTelemetry
+	tracer := otel.GetTracerProvider().Tracer("gofr-arangodb")
+	db.UseTracer(tracer)
+
+	// Connect to ArangoDB
+	db.Connect()
+
+	// Add the ArangoDB provider to the container
+	a.container.ArangoDB = db
+}
+
 func (a *App) AddSurrealDB(db container.SurrealBDProvider) {
 	db.UseLogger(a.Logger())
 	db.UseMetrics(a.Metrics())
@@ -164,4 +182,15 @@ func (a *App) AddSurrealDB(db container.SurrealBDProvider) {
 	db.UseTracer(tracer)
 	db.Connect()
 	a.container.SurrealDB = db
+}
+
+func (a *App) AddElasticsearch(db container.ElasticsearchProvider) {
+	db.UseLogger(a.Logger())
+	db.UseMetrics(a.Metrics())
+
+	tracer := otel.GetTracerProvider().Tracer("gofr-elasticsearch")
+	db.UseTracer(tracer)
+	db.Connect()
+
+	a.container.Elasticsearch = db
 }

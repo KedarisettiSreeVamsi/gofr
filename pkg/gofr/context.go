@@ -2,6 +2,7 @@ package gofr
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/websocket"
@@ -11,6 +12,7 @@ import (
 	"gofr.dev/pkg/gofr/cmd/terminal"
 	"gofr.dev/pkg/gofr/container"
 	"gofr.dev/pkg/gofr/http/middleware"
+	"gofr.dev/pkg/gofr/logging"
 )
 
 type Context struct {
@@ -31,6 +33,8 @@ type Context struct {
 
 	// Terminal needs to be public as CMD applications need to access various terminal user interface(TUI) features.
 	Out terminal.Output
+
+	logging.ContextLogger
 }
 
 type AuthInfo interface {
@@ -77,6 +81,23 @@ func (c *Context) Bind(i any) error {
 func (c *Context) WriteMessageToSocket(data any) error {
 	// Retrieve connection from context based on connectionID
 	conn := c.Container.GetConnectionFromContext(c.Context)
+
+	message, err := serializeMessage(data)
+	if err != nil {
+		return err
+	}
+
+	return conn.WriteMessage(websocket.TextMessage, message)
+}
+
+// WriteMessageToService writes a message to the WebSocket connection associated with the given service name.
+// The data parameter can be of type string, []byte, or any struct that can be marshaled to JSON.
+func (c *Context) WriteMessageToService(serviceName string, data any) error {
+	// Retrieve connection using serviceName
+	conn := c.Container.GetWSConnectionByServiceName(serviceName)
+	if conn == nil {
+		return fmt.Errorf("%w: %s", ErrConnectionNotFound, serviceName)
+	}
 
 	message, err := serializeMessage(data)
 	if err != nil {
