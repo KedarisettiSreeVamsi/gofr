@@ -6,6 +6,14 @@ users can perform actions or access data within an application.
 
 GoFr offers various approaches to implement authorization.
 
+## Exempted Paths
+
+By default, the authentication middleware exempts the following paths from authentication:
+
+- i `/.well-known/alive`: Used for liveness probes, should be publicly accessible for health checks.
+
+The health check endpoint `/.well-known/health` is exempted by default, but as it may contain sensitive information about the service and its dependencies, it is recommended to require authentication for it.
+
 ## 1. HTTP Basic Auth
 *Basic Authentication* is a simple HTTP authentication scheme where the user's credentials (username and password) are 
 transmitted in the request header in a Base64-encoded format.
@@ -28,7 +36,7 @@ func main() {
 
 	app.EnableBasicAuth("admin", "secret_password") // Replace with your credentials
 
-	app.GET("/protected-resource", func(c *gofr.Context) (interface{}, error) {
+	app.GET("/protected-resource", func(c *gofr.Context) (any, error) {
 		// Handle protected resource access
 		return nil, nil
 	})
@@ -54,7 +62,7 @@ func main() {
 
 	app.EnableBasicAuthWithValidator(validateUser)
 
-	app.GET("/secure-data", func(c *gofr.Context) (interface{}, error) {
+	app.GET("/secure-data", func(c *gofr.Context) (any, error) {
 		// Handle access to secure data
 		return nil, nil
 	})
@@ -205,7 +213,7 @@ func main() {
         jwt.WithIssuer("https://auth.example.com")
 		)
 
-	app.GET("/protected-resource", func(c *gofr.Context) (interface{}, error) {
+	app.GET("/protected-resource", func(c *gofr.Context) (any, error) {
 		// Handle protected resource access
 		return nil, nil
 	})

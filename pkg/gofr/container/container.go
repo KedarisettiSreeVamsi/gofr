@@ -8,7 +8,7 @@ Supported data sources:
   - Key-value storages (Redis, BadgerDB)
   - Pub/Sub systems (Azure Event Hub, Google as backend, Kafka, MQTT)
   - Search engines (Solr)
-  - File systems (FTP, SFTP, S3)
+  - File systems (FTP, SFTP, S3, GCS, Azure File Storage)
 */
 package container
 
@@ -65,6 +65,9 @@ type Container struct {
 	SurrealDB     SurrealDB
 	ArangoDB      ArangoDB
 	Elasticsearch Elasticsearch
+	Oracle        OracleDB
+	Couchbase     Couchbase
+	InfluxDB      InfluxDB
 
 	KVStore KVStore
 
@@ -112,6 +115,8 @@ func (c *Container) Create(conf config.Config) {
 	c.Logger.Debug("Container is being created")
 
 	c.metricsManager = metrics.NewMetricsManager(exporters.Prometheus(c.GetAppName(), c.GetAppVersion()), c.Logger)
+
+	exporters.SendFrameworkStartupTelemetry(c.GetAppName(), c.GetAppVersion())
 
 	// Register framework metrics
 	c.registerFrameworkMetrics()
@@ -166,7 +171,7 @@ func (c *Container) Create(conf config.Config) {
 		c.PubSub = c.createMqttPubSub(conf)
 	}
 
-	c.File = file.New(c.Logger)
+	c.File = file.NewLocalFileSystem(c.Logger)
 
 	c.WSManager = websocket.New()
 }
@@ -199,6 +204,8 @@ func (c *Container) createMqttPubSub(conf config.Config) pubsub.Client {
 	port, _ := strconv.Atoi(conf.Get("MQTT_PORT"))
 	order, _ := strconv.ParseBool(conf.GetOrDefault("MQTT_MESSAGE_ORDER", "false"))
 
+	retrieveRetained, _ := strconv.ParseBool(conf.GetOrDefault("MQTT_RETRIEVE_RETAINED", "false"))
+
 	keepAlive, err := time.ParseDuration(conf.Get("MQTT_KEEP_ALIVE"))
 	if err != nil {
 		keepAlive = 30 * time.Second
@@ -216,16 +223,17 @@ func (c *Container) createMqttPubSub(conf config.Config) pubsub.Client {
 	}
 
 	configs := &mqtt.Config{
-		Protocol:     conf.GetOrDefault("MQTT_PROTOCOL", "tcp"), // using tcp as default method to connect to broker
-		Hostname:     conf.Get("MQTT_HOST"),
-		Port:         port,
-		Username:     conf.Get("MQTT_USER"),
-		Password:     conf.Get("MQTT_PASSWORD"),
-		ClientID:     conf.Get("MQTT_CLIENT_ID_SUFFIX"),
-		QoS:          qos,
-		Order:        order,
-		KeepAlive:    keepAlive,
-		CloseTimeout: 0 * time.Millisecond,
+		Protocol:         conf.GetOrDefault("MQTT_PROTOCOL", "tcp"), // using tcp as default method to connect to broker
+		Hostname:         conf.Get("MQTT_HOST"),
+		Port:             port,
+		Username:         conf.Get("MQTT_USER"),
+		Password:         conf.Get("MQTT_PASSWORD"),
+		ClientID:         conf.Get("MQTT_CLIENT_ID_SUFFIX"),
+		QoS:              qos,
+		Order:            order,
+		RetrieveRetained: retrieveRetained,
+		KeepAlive:        keepAlive,
+		CloseTimeout:     0 * time.Millisecond,
 	}
 
 	return mqtt.New(configs, c.Logger, c.metricsManager)
@@ -257,12 +265,12 @@ func (c *Container) registerFrameworkMetrics() {
 	}
 
 	{ // Redis metrics
-		redisBuckets := []float64{.05, .075, .1, .125, .15, .2, .3, .5, .75, 1, 1.25, 1.5, 2, 2.5, 3}
+		redisBuckets := getDefaultDatasourceBuckets()
 		c.Metrics().NewHistogram("app_redis_stats", "Response time of Redis commands in milliseconds.", redisBuckets...)
 	}
 
 	{ // SQL metrics
-		sqlBuckets := []float64{.05, .075, .1, .125, .15, .2, .3, .5, .75, 1, 2, 3, 4, 5, 7.5, 10}
+		sqlBuckets := getDefaultDatasourceBuckets()
 		c.Metrics().NewHistogram("app_sql_stats", "Response time of SQL queries in milliseconds.", sqlBuckets...)
 		c.Metrics().NewGauge("app_sql_open_connections", "Number of open SQL connections.")
 		c.Metrics().NewGauge("app_sql_inUse_connections", "Number of inUse SQL connections.")
@@ -293,12 +301,21 @@ func (c *Container) GetSubscriber() pubsub.Subscriber {
 
 // GetConnectionFromContext retrieves a WebSocket connection from the context using the Manager.
 func (c *Container) GetConnectionFromContext(ctx context.Context) *websocket.Connection {
-	connID, ok := ctx.Value(websocket.WSConnectionKey).(string)
-	if !ok {
+	if c.WSManager == nil {
 		return nil
 	}
 
-	return c.WSManager.GetWebsocketConnection(connID)
+	// First check if connection is directly stored in context
+	if conn, ok := ctx.Value(websocket.WSConnectionKey).(*websocket.Connection); ok {
+		return conn
+	}
+
+	// Fallback to connection ID lookup
+	if connID, ok := ctx.Value(websocket.WSConnectionKey).(string); ok {
+		return c.WSManager.GetWebsocketConnection(connID)
+	}
+
+	return nil
 }
 
 // GetWSConnectionByServiceName retrieves a WebSocket connection by its service name.
@@ -314,4 +331,14 @@ func (c *Container) AddConnection(connID string, conn *websocket.Connection) {
 // RemoveConnection removes a WebSocket connection from the Manager.
 func (c *Container) RemoveConnection(connID string) {
 	c.WSManager.CloseConnection(connID)
+}
+
+// getDefaultDatasourceBuckets returns the standard histogram buckets for all datasource operations in milliseconds.
+// Covers 0-30s range to align with typical request timeout boundaries and provide consistent observability
+// across SQL, Redis, MongoDB, Cassandra, and other datasources.
+func getDefaultDatasourceBuckets() []float64 {
+	return []float64{
+		.05, .075, .1, .125, .15, .2, .3, .5, .75, 1, 2, 3, 5, 7.5, 10, // 0-10ms: fast operations
+		25, 50, 100, 250, 500, 1000, 5000, 10000, 30000, // 10ms-30s: slower operations
+	}
 }

@@ -100,7 +100,10 @@ func All() map[int64]migration.Migrate {
     }
 }
 ```
-For detailed instructions on handling database migrations, see the [handling-data-migrations documentation](../../advanced-guide/handling-data-migrations/page.md)
+
+> **💡 Best Practice:** Learn about [organizing migrations by feature](../../docs/advanced-guide/handling-data-migrations#organizing-migrations-by-feature) to avoid creating one migration per table or operation.
+
+For detailed instructions on handling database migrations, see the [handling-data-migrations documentation](../../docs/advanced-guide/handling-data-migrations)
 For more examples, see the [using-migrations](https://github.com/gofr-dev/gofr/tree/main/examples/using-migrations)
 ---
 
@@ -172,7 +175,7 @@ func NewGreetHandler(helloClient client.HelloGoFrClient) *GreetHandler {
     }
 }
 
-func (g GreetHandler) Hello(ctx *gofr.Context) (interface{}, error) {
+func (g GreetHandler) Hello(ctx *gofr.Context) (any, error) {
     userName := ctx.Param("name")
     helloResponse, err := g.helloGRPCClient.SayHello(ctx, &client.HelloRequest{Name: userName})
     if err != nil {
